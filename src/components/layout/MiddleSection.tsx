@@ -4,9 +4,22 @@ import { NavTab } from "@/components/ui/NavItem";
 import { SendIcon } from "@/components/icons";
 import { ProposalForm } from "@/components/ui/ProposalForm";
 
+type Message = {
+  id: string;
+  text: string;
+  isUser: boolean;
+};
+
 export const MiddleSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "welcome",
+      text: "Welcome! Type a prompt to get started with your proposal.",
+      isUser: false,
+    },
+  ]);
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
@@ -18,7 +31,25 @@ export const MiddleSection: React.FC = () => {
 
   const handleSendClick = () => {
     if (inputValue.trim()) {
-      console.log("Sending:", inputValue);
+      // Add user message
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        text: inputValue,
+        isUser: true,
+      };
+      
+      setMessages((prev) => [...prev, userMessage]);
+      
+      // Simulate AI response
+      setTimeout(() => {
+        const aiResponse: Message = {
+          id: (Date.now() + 1).toString(),
+          text: `Processed your request: "${inputValue}"`,
+          isUser: false,
+        };
+        setMessages((prev) => [...prev, aiResponse]);
+      }, 1000);
+      
       setInputValue("");
     }
   };
@@ -33,14 +64,19 @@ export const MiddleSection: React.FC = () => {
     switch (activeTab) {
       case 0:
         return (
-          <div className="text-black text-[11px] font-semibold tracking-[1.715px] uppercase bg-[#E1E1DC] p-[17px] rounded-[9px]">
-            Lorem ipsum odor amet, consectetuer adipiscing elit. Mus elementum
-            diam aliquet justo montes vestibulum. Sagittis tortor ad mauris;
-            accumsan maximus felis. Inceptos posuere fusce fames hendrerit purus a
-            nullam. Duis gravida urna mattis taciti porta. Consectetur tellus
-            nunc, donec id ligula netus ridiculus. Enim lectus fames dolor donec
-            risus auctor. Diam primis diam himenaeos dis fermentum? Nec placerat
-            eget montes scelerisque porttitor egestas habitant libero Curae.
+          <div className="flex flex-col gap-3 overflow-y-auto max-h-full">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`${
+                  message.isUser
+                    ? "bg-[#E1E1DC] ml-auto"
+                    : "bg-[#F7F6F2] mr-auto"
+                } p-[17px] rounded-[9px] max-w-[90%] text-black text-[11px] font-semibold tracking-[1.715px]`}
+              >
+                {message.text}
+              </div>
+            ))}
           </div>
         );
       case 1:
