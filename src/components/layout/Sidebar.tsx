@@ -1,5 +1,7 @@
+
 import React from "react";
 import { NavItem } from "@/components/ui/NavItem";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   ArrowDownIcon,
   ViewIcon,
@@ -10,9 +12,14 @@ import {
 
 export const Sidebar: React.FC = () => {
   const [activeNavItem, setActiveNavItem] = React.useState(0);
+  const { user, signOut } = useAuth();
 
   const handleNavItemClick = (index: number) => {
     setActiveNavItem(index);
+  };
+
+  const handleLogout = () => {
+    signOut();
   };
 
   return (
@@ -57,9 +64,14 @@ export const Sidebar: React.FC = () => {
 
       <div className="h-[69px] p-[17px] border-t-black border-t border-solid">
         <div className="text-black text-[10px] font-semibold tracking-[1.544px] uppercase mb-3">
-          Josh@movercreative.com
+          {user ? user.email : 'Guest User'}
         </div>
-        <div className="flex items-center justify-between">
+        <div 
+          className="flex items-center justify-between cursor-pointer" 
+          onClick={handleLogout}
+          role="button"
+          tabIndex={0}
+        >
           <div className="text-black text-[10px] font-semibold tracking-[1.544px] uppercase">
             Logout
           </div>
