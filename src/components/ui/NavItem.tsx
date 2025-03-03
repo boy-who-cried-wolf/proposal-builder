@@ -91,7 +91,7 @@ export const NavTab: React.FC<Omit<NavItemProps, "icon">> = ({
   return (
     <div
       className={cn(
-        "rounded gap-[11px] text-[9px] font-semibold tracking-[1.389px] uppercase px-0 py-1.5",
+        "rounded-none gap-[11px] text-[9px] font-semibold tracking-[1.389px] uppercase px-0 py-1.5",
         active
           ? "text-black border-b-black border-b border-solid"
           : "text-[rgba(0,0,0,0.5)]",
