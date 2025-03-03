@@ -80,9 +80,15 @@ export const fetchUserProfileForProposal = async (): Promise<{
         
       if (profile.data) {
         // Prioritize organization data if available
-        if (profile.data.organizations) {
-          knowledgeBase = profile.data.organizations.knowledge_base || '';
-          userServices = profile.data.organizations.services || [];
+        if (profile.data.organizations && profile.data.organization_id) {
+          // Fix the TypeScript error by accessing as object
+          const orgData = profile.data.organizations as { 
+            knowledge_base: string; 
+            services: string[] 
+          };
+          
+          knowledgeBase = orgData.knowledge_base || '';
+          userServices = orgData.services || [];
           console.log('Loaded organization knowledge base and services for proposal generation');
         } else {
           // Fall back to profile data
