@@ -9,7 +9,7 @@ import { LucideIcon } from "lucide-react";
 
 interface Tab {
   title: string;
-  icon: LucideIcon;
+  icon: React.ComponentType<any>;
   type?: never;
 }
 
@@ -56,6 +56,7 @@ export function ExpandableTabs({
   onChange,
 }: ExpandableTabsProps) {
   const [selected, setSelected] = React.useState<number | null>(null);
+  const [hovered, setHovered] = React.useState<number | null>(null);
   const outsideClickRef = React.useRef(null);
 
   useOnClickOutside(outsideClickRef, () => {
@@ -76,7 +77,7 @@ export function ExpandableTabs({
     <div
       ref={outsideClickRef}
       className={cn(
-        "flex flex-wrap items-center gap-2 rounded-2xl border bg-background p-1 shadow-sm",
+        "flex flex-wrap items-center gap-2 rounded-lg border bg-background p-1 shadow-sm",
         className
       )}
     >
@@ -86,25 +87,29 @@ export function ExpandableTabs({
         }
 
         const Icon = tab.icon;
+        const isExpanded = selected === index || hovered === index;
+        
         return (
           <motion.button
             key={tab.title}
             variants={buttonVariants}
             initial={false}
             animate="animate"
-            custom={selected === index}
+            custom={isExpanded}
             onClick={() => handleSelect(index)}
+            onMouseEnter={() => setHovered(index)}
+            onMouseLeave={() => setHovered(null)}
             transition={transition}
             className={cn(
-              "relative flex items-center rounded-xl px-4 py-2 text-sm font-medium transition-colors duration-300",
-              selected === index
+              "relative flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors duration-300",
+              isExpanded
                 ? cn("bg-muted", activeColor)
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
             <Icon size={20} />
             <AnimatePresence initial={false}>
-              {selected === index && (
+              {isExpanded && (
                 <motion.span
                   variants={spanVariants}
                   initial="initial"

@@ -5,13 +5,12 @@ import { TableSection } from "@/components/ui/TableSection";
 import { MetricItem } from "@/components/ui/MetricItem";
 import { ExpandableTabs } from "@/components/ui/expandable-tabs";
 import {
-  DownloadIcon,
-  ViewIcon,
-  PlusIcon,
-  FileIcon,
-  ShareIcon,
-  CopyIcon,
-} from "@/components/icons";
+  Copy,
+  Eye,
+  Send,
+  Timer,
+  DiamondPlus,
+} from "lucide-react";
 
 // Sample data for tables
 const designItems = Array(7).fill({
@@ -36,13 +35,11 @@ export const MainContent: React.FC = () => {
   };
 
   const headerTabs = [
-    { title: "Download", icon: DownloadIcon },
-    { title: "View", icon: ViewIcon },
-    { type: "separator" },
-    { title: "Add", icon: PlusIcon },
-    { title: "File", icon: FileIcon },
-    { title: "Share", icon: ShareIcon },
-    { title: "Copy", icon: CopyIcon },
+    { title: "Add Section", icon: DiamondPlus },
+    { title: "Toggle Hours", icon: Timer },
+    { title: "Preview", icon: Eye },
+    { title: "Send", icon: Send },
+    { title: "Copy", icon: Copy },
   ];
 
   return (
