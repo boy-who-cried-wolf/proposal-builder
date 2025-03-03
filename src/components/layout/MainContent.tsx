@@ -4,6 +4,7 @@ import { NavTab } from "@/components/ui/NavItem";
 import { TableSection } from "@/components/ui/TableSection";
 import { MetricItem } from "@/components/ui/MetricItem";
 import { ExpandableTabs, Tab } from "@/components/ui/expandable-tabs";
+import { ProposalForm } from "@/components/ui/ProposalForm";
 import {
   Copy,
   Eye,
@@ -114,6 +115,7 @@ export const MainContent: React.FC = () => {
       case 0:
         return (
           <>
+            <ProposalForm />
             <TableSection title="design" items={designItems} subtotal="$25,000" />
             <TableSection title="development" items={developmentItems} subtotal="$25,000" />
           </>
