@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +47,22 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     }
   };
 
+  // Get service tag color
+  const getServiceTagColor = (service: string) => {
+    switch (service.trim().toLowerCase()) {
+      case 'web design':
+        return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
+      case 'services':
+        return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+      case 'development':
+        return 'bg-green-100 text-green-800 hover:bg-green-200';
+      case 'marketing':
+        return 'bg-pink-100 text-pink-800 hover:bg-pink-200';
+      default:
+        return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+    }
+  };
+
   if (viewMode === "list") {
     return (
       <div className="border-b border-gray-200 py-4">
@@ -73,7 +88,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             <p className="uppercase text-xs text-gray-500">DAYS REMAINING</p>
           </div>
           <div>
-            <p className="text-sm font-poppins">WEB DESIGN, SERVICES</p>
+            <div className="flex flex-wrap gap-1">
+              {["WEB DESIGN", "SERVICES"].map((service, index) => (
+                <Badge 
+                  key={index} 
+                  className={cn("font-poppins text-xs", getServiceTagColor(service))}
+                >
+                  {service}
+                </Badge>
+              ))}
+            </div>
             <p className="uppercase text-xs text-gray-500">SERVICES</p>
           </div>
         </div>
@@ -115,6 +139,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             </p>
             <p className="text-muted-foreground">Rate</p>
           </div>
+        </div>
+        
+        <div className="mt-4 flex flex-wrap gap-1">
+          {["WEB DESIGN", "SERVICES"].map((service, index) => (
+            <Badge 
+              key={index} 
+              className={cn("font-poppins text-xs", getServiceTagColor(service))}
+            >
+              {service}
+            </Badge>
+          ))}
         </div>
         
         <div className="mt-4 flex justify-between gap-2">
