@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
 import { SendIcon } from "@/components/icons";
@@ -18,13 +17,7 @@ interface MiddleSectionProps {
 export const MiddleSection: React.FC<MiddleSectionProps> = ({ onProposalGenerated }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [inputValue, setInputValue] = useState("");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      text: "Welcome! Type a prompt to get started with your proposal.",
-      isUser: false,
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);

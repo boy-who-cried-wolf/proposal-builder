@@ -3,6 +3,18 @@ import React, { useState } from "react";
 import { generateProposal, ProposalSection, ProposalInput } from "@/utils/openaiProposal";
 import { Send } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { DateRange } from "react-day-picker";
+import { addDays } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
 
 const projectTypes = [
   "Website",
@@ -27,9 +39,14 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
   const { toast } = useToast();
   const [projectDescription, setProjectDescription] = useState("");
   const [hourlyRate, setHourlyRate] = useState(100);
+  const [projectBudget, setProjectBudget] = useState(5000);
   const [projectType, setProjectType] = useState(projectTypes[0]);
   const [proposalSections, setProposalSections] = useState<ProposalSection[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: addDays(new Date(), 14),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +67,8 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
         projectDescription,
         hourlyRate,
         projectType,
+        projectBudget,
+        dateRange
       };
       
       const sections = await generateProposal(input);
@@ -78,13 +97,9 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
 
   return (
     <div className="mb-4">
-      <div className="text-black text-lg font-bold bg-[#E1E1DC] px-[17px] py-[11px] rounded-[4px_4px_0_0]">
-        Generate AI Proposal
-      </div>
-      
       <div className="p-4 bg-white">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
                 Project Type
@@ -113,6 +128,62 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
                 onChange={(e) => setHourlyRate(Number(e.target.value))}
                 className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
               />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
+                Project Budget ($)
+              </label>
+              <input
+                type="number"
+                min="100"
+                value={projectBudget}
+                onChange={(e) => setProjectBudget(Number(e.target.value))}
+                className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
+              />
+            </div>
+            
+            <div>
+              <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
+                Project Timeline
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full h-[39px] justify-start text-left font-normal border border-[#E1E1DC] bg-[#F7F6F2] text-[9px] font-semibold tracking-[1.389px] uppercase p-[11px]",
+                      !dateRange && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "LLL dd, y")} -{" "}
+                          {format(dateRange.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Select date range</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           

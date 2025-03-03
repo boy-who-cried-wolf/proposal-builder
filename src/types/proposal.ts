@@ -16,6 +16,11 @@ export interface ProposalInput {
   projectDescription: string;
   hourlyRate: number;
   projectType: string;
+  projectBudget?: number;
+  dateRange?: {
+    from: Date;
+    to?: Date;
+  };
 }
 
 export interface SaveProposalInput {
