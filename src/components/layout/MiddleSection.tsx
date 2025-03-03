@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
-import { SendIcon } from "@/components/icons";
+import { SendIcon, UnfoldHorizontalIcon } from "@/components/icons";
 import { ProposalForm } from "@/components/ui/ProposalForm";
 import { ProposalSection } from "@/utils/openaiProposal";
 
@@ -25,6 +24,7 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
   const [activeTab, setActiveTab] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
@@ -44,8 +44,6 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
     }
 
     try {
-      // Here we'd call the edge function to process the request
-      // For now, we'll simulate a response
       const response = await fetch('/api/process-proposal-request', {
         method: 'POST',
         headers: {
@@ -56,7 +54,6 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
           sections: proposalSections
         }),
       }).catch(() => {
-        // If the API doesn't exist yet, simulate a response
         const updatedSections = processProposalSimulated(userMessage, proposalSections);
         
         if (onUpdateProposal) {
@@ -91,14 +88,10 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
     }
   };
 
-  // Temporary function to simulate AI changes to the proposal
   const processProposalSimulated = (message: string, sections: ProposalSection[]): ProposalSection[] => {
     const lowerMessage = message.toLowerCase();
     const updatedSections = JSON.parse(JSON.stringify(sections)) as ProposalSection[];
     
-    // Process common operations based on keywords
-    
-    // Example: Add hours to a specific task
     if (lowerMessage.includes("add") && lowerMessage.includes("hours")) {
       const hourMatch = lowerMessage.match(/add\s+(\d+)\s+(?:more\s+)?hours\s+to\s+(.+?)(?:\s|$)/i);
       if (hourMatch) {
@@ -112,7 +105,6 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
               const newHours = currentHours + hoursToAdd;
               item.hours = newHours.toString();
               
-              // Update price based on hours
               const price = parseFloat(item.price.toString().replace(/[^0-9.-]+/g, ''));
               const hourlyRate = price / currentHours;
               item.price = `$${Math.round(newHours * hourlyRate)}`;
@@ -120,12 +112,10 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
           });
         });
         
-        // Recalculate subtotals
         recalculateSubtotals(updatedSections);
       }
     }
     
-    // Example: Remove an item
     if (lowerMessage.includes("remove")) {
       const removePattern = /remove\s+(.+?)(?:\s|$)/i;
       const removeMatch = lowerMessage.match(removePattern);
@@ -139,12 +129,10 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
           );
         });
         
-        // Recalculate subtotals
         recalculateSubtotals(updatedSections);
       }
     }
     
-    // Example: Add a new item with price
     if (lowerMessage.includes("add") && (lowerMessage.includes("$") || lowerMessage.includes("dollars"))) {
       const addPattern = /add\s+(.+?)\s+at\s+(\$|\$?(\d+[\d,.]*)\s*dollars)/i;
       const addMatch = lowerMessage.match(addPattern);
@@ -154,7 +142,6 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
         const priceText = addMatch[2];
         let price = 0;
         
-        // Extract the price
         if (priceText.includes("$")) {
           price = parseFloat(priceText.replace(/[^0-9.-]+/g, ''));
         } else {
@@ -165,11 +152,9 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
         }
         
         if (price > 0 && updatedSections.length > 0) {
-          // Add to the first section by default
           const section = updatedSections[0];
           
-          // Calculate hours based on average hourly rate in section
-          let avgHourlyRate = 100; // Default fallback
+          let avgHourlyRate = 100;
           if (section.items.length > 0) {
             let totalPrice = 0;
             let totalHours = 0;
@@ -191,7 +176,6 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
             price: `$${price}`
           });
           
-          // Recalculate subtotals
           recalculateSubtotals(updatedSections);
         }
       }
@@ -215,7 +199,6 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
 
   const handleSendClick = async () => {
     if (inputValue.trim()) {
-      // Add user message
       const userMessage: Message = {
         id: Date.now().toString(),
         text: inputValue,
@@ -225,7 +208,6 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
       setMessages((prev) => [...prev, userMessage]);
       setInputValue("");
       
-      // Process the request and get AI response
       const aiResponse = await processProposalRequest(userMessage.text);
       setMessages((prev) => [...prev, aiResponse]);
     }
@@ -238,7 +220,6 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
   };
 
   const handleProposalGenerated = (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number) => {
-    // Add message about proposal being generated
     const proposalMessage: Message = {
       id: Date.now().toString(),
       text: `Generated proposal for ${type} project: ${description}`,
@@ -247,7 +228,8 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
     
     setMessages((prev) => [...prev, proposalMessage]);
     
-    // Pass data to parent component
+    setActiveTab(1);
+    
     if (onProposalGenerated) {
       onProposalGenerated(sections, description, type, rate, freelancerRate);
     }
@@ -291,8 +273,12 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
     }
   };
 
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
-    <section className="w-[345px] flex flex-col border-r-black border-r border-solid max-md:w-full max-md:h-auto">
+    <section className={`flex flex-col border-r-black border-r border-solid max-md:w-full max-md:h-auto ${isExpanded ? 'w-[345px]' : 'w-[200px]'} min-w-[200px] transition-all duration-300`}>
       <div className="text-[rgba(0,0,0,0.5)] text-[11px] font-semibold tracking-[1.715px] uppercase h-[69px] px-[19px] py-[25px] border-b-black border-b border-solid">
         Client Project Title &gt; Poposal...
       </div>
@@ -329,6 +315,14 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
         >
           <SendIcon />
         </button>
+      </div>
+      
+      <div 
+        className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full cursor-pointer hover:bg-gray-300 z-10"
+        onClick={toggleExpand}
+        aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+      >
+        <UnfoldHorizontalIcon className="w-4 h-4" />
       </div>
     </section>
   );

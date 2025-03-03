@@ -1,4 +1,9 @@
 import React from "react";
+import { UnfoldHorizontal } from "lucide-react";
+
+export const UnfoldHorizontalIcon: React.FC<{ className?: string }> = ({ className }) => {
+  return <UnfoldHorizontal className={className} />;
+};
 
 export const DownloadIcon = () => (
   <svg

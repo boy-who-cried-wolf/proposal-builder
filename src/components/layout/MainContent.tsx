@@ -19,6 +19,8 @@ export const MainContent: React.FC<MainContentProps> = ({
   freelancerRate = 0,
   projectBudget = 0,
   dateRange,
+  proposalHistory,
+  onRevertProposal,
 }) => {
   const {
     activeTab,
@@ -94,6 +96,8 @@ export const MainContent: React.FC<MainContentProps> = ({
             handleHeaderTabChange={handleHeaderTabChange}
             handleSaveProposal={handleSaveProposal}
             handleCopyToFigma={handleCopyToFigma}
+            proposalHistory={proposalHistory}
+            onRevertProposal={onRevertProposal}
             isSaving={isSaving}
             isCopying={isCopying}
           />
@@ -102,7 +106,7 @@ export const MainContent: React.FC<MainContentProps> = ({
 
       <nav className="flex gap-[34px] px-[23px] py-[15px]">
         <NavTab active={activeTab === 0} onClick={() => handleTabClick(0)}>
-          download
+          Proposal
         </NavTab>
 
         <NavTab active={activeTab === 1} onClick={() => handleTabClick(1)}>

@@ -7,9 +7,9 @@ interface MetricsTabProps {
 
 export const MetricsTab: React.FC<MetricsTabProps> = () => {
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Metrics</h2>
-      <p>View detailed metrics about your proposal performance.</p>
+    <div className="flex flex-col items-center justify-center h-full p-4">
+      <h2 className="text-2xl font-bold mb-4">Metrics</h2>
+      <p className="text-gray-500 text-lg">Coming Soon</p>
     </div>
   );
 };
