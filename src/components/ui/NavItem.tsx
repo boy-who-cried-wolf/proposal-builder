@@ -1,7 +1,7 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface NavItemProps {
   active?: boolean;
@@ -12,15 +12,6 @@ interface NavItemProps {
   isExpanded?: boolean;
 }
 
-const buttonVariants = {
-  initial: {
-    gap: 0,
-  },
-  animate: (isExpanded: boolean) => ({
-    gap: isExpanded ? ".5rem" : 0,
-  }),
-};
-
 export const NavItem: React.FC<NavItemProps> = ({
   active = false,
   children,
@@ -29,56 +20,67 @@ export const NavItem: React.FC<NavItemProps> = ({
   onClick,
   isExpanded = true,
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const baseClasses = "flex rounded items-center cursor-pointer transition-all duration-300";
-  const textClasses = "text-black text-[9px] font-semibold tracking-[1.389px] uppercase";
-  const shouldShowText = isExpanded || isHovered;
+  const iconClasses = cn(
+    "flex items-center justify-center rounded transition-all duration-300",
+    !active && isExpanded ? "w-[39px] h-[39px] bg-[#F7F6F2]" : "w-[39px] h-[39px]",
+    !isExpanded ? "w-[39px] h-[39px]" : ""
+  );
 
-  return (
-    <motion.div
-      variants={buttonVariants}
-      initial="initial"
-      animate="animate"
-      custom={isExpanded}
-      transition={{ duration: 0.3 }}
-      className={cn(
-        baseClasses, 
-        className,
-        isExpanded ? "p-[11px]" : "p-[11px] justify-center",
-        active && isExpanded ? "bg-muted" : ""
-      )}
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      role="button"
-      tabIndex={0}
-    >
-      {icon && (
-        <div
-          className={cn(
-            "flex items-center justify-center rounded transition-all duration-300",
-            !active && isExpanded ? "w-[39px] h-[39px] bg-[#F7F6F2]" : "w-[39px] h-[39px]",
-            !isExpanded ? "w-[39px] h-[39px]" : ""
-          )}
-        >
-          <div className="text-black">{icon}</div>
+  // If expanded, show the icon and text side by side
+  if (isExpanded) {
+    return (
+      <div
+        className={cn(
+          baseClasses, 
+          className,
+          "p-[11px]",
+          active ? "bg-muted" : ""
+        )}
+        onClick={onClick}
+        role="button"
+        tabIndex={0}
+      >
+        {icon && (
+          <div className={iconClasses}>
+            <div className="text-black">{icon}</div>
+          </div>
+        )}
+        <div className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase ml-2">
+          {children}
         </div>
-      )}
-      
-      {shouldShowText && (
-        <AnimatePresence>
-          <motion.div 
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: "auto", opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className={cn(textClasses, active ? "text-black" : "text-black")}
+      </div>
+    );
+  }
+  
+  // If collapsed, show only the icon with a tooltip
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className={cn(
+              baseClasses, 
+              className,
+              "p-[11px] justify-center",
+              active ? "bg-muted" : ""
+            )}
+            onClick={onClick}
+            role="button"
+            tabIndex={0}
           >
-            {children}
-          </motion.div>
-        </AnimatePresence>
-      )}
-    </motion.div>
+            {icon && (
+              <div className={iconClasses}>
+                <div className="text-black">{icon}</div>
+              </div>
+            )}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent className="text-[9px] font-semibold tracking-[1.389px] uppercase bg-white border border-gray-200">
+          {children}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

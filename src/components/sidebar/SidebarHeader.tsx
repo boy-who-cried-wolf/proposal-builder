@@ -1,10 +1,14 @@
+
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 interface SidebarHeaderProps {
   isExpanded: boolean;
   toggleExpand: () => void;
 }
+
 export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   isExpanded,
   toggleExpand
@@ -17,9 +21,19 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
           <div className="cursor-pointer" onClick={toggleExpand} role="button" tabIndex={0}>
             <ChevronLeft size={20} />
           </div>
-        </> : <div className="cursor-pointer" onClick={toggleExpand} role="button" tabIndex={0}>
-          <img src="/lovable-uploads/8e073d5c-cebc-4046-a3c6-7861dda72ee8.png" alt="PM" className="h-8 mb-1" />
-          
-        </div>}
+        </> : 
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="cursor-pointer" onClick={toggleExpand} role="button" tabIndex={0}>
+                <img src="/lovable-uploads/8e073d5c-cebc-4046-a3c6-7861dda72ee8.png" alt="PM" className="h-8 mb-1" />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="text-[9px] font-semibold tracking-[1.389px] uppercase bg-white border border-gray-200">
+              Expand Sidebar
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      }
     </div>;
 };
