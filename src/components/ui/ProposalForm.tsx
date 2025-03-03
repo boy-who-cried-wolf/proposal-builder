@@ -1,7 +1,6 @@
 
 import React, { useState } from "react";
 import { generateProposal, ProposalSection, ProposalInput } from "@/utils/openaiProposal";
-import { TableSection } from "./TableSection";
 import { Send } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -78,14 +77,14 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
   };
 
   return (
-    <div className="section_wrapper mb-8">
+    <div className="mb-4">
       <div className="text-black text-lg font-bold bg-[#E1E1DC] px-[17px] py-[11px] rounded-[4px_4px_0_0]">
         Generate AI Proposal
       </div>
       
       <div className="p-4 bg-white">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 mb-4 max-sm:grid-cols-1">
+          <div className="grid grid-cols-1 gap-4 mb-4">
             <div>
               <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
                 Project Type
@@ -147,19 +146,6 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
           </div>
         </form>
       </div>
-      
-      {proposalSections.length > 0 && (
-        <div className="mt-8">
-          {proposalSections.map((section, index) => (
-            <TableSection
-              key={index}
-              title={section.title}
-              items={section.items}
-              subtotal={section.subtotal}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 };

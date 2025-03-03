@@ -1,10 +1,8 @@
 
 import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
-import { TableSection } from "@/components/ui/TableSection";
 import { MetricItem } from "@/components/ui/MetricItem";
 import { ExpandableTabs, Tab } from "@/components/ui/expandable-tabs";
-import { ProposalForm } from "@/components/ui/ProposalForm";
 import {
   Copy,
   Eye,
@@ -12,31 +10,10 @@ import {
   Timer,
   DiamondPlus,
   Save,
-  Settings,
-  FileText,
-  Clock,
-  Users,
-  PieChart,
-  Mail,
 } from "lucide-react";
 import { saveProposal, ProposalSection } from "@/utils/openaiProposal";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
-// Sample data for tables
-const designItems = Array(7).fill({
-  item: "Item Name",
-  description: "Here is a summary of this item",
-  hours: "15",
-  price: "$2500",
-});
-
-const developmentItems = Array(5).fill({
-  item: "Item Name",
-  description: "Here is a summary of this item",
-  hours: "15",
-  price: "$2500",
-});
 
 export const MainContent: React.FC = () => {
   const { toast } = useToast();
@@ -196,21 +173,68 @@ export const MainContent: React.FC = () => {
       case 0:
         return (
           <>
-            <ProposalForm onProposalGenerated={handleProposalData} />
-            {generatedProposalSections.length > 0 ? (
-              generatedProposalSections.map((section, index) => (
-                <TableSection 
-                  key={index}
-                  title={section.title} 
-                  items={section.items} 
-                  subtotal={section.subtotal} 
-                />
-              ))
-            ) : (
-              <>
-                <TableSection title="design" items={designItems} subtotal="$25,000" />
-                <TableSection title="development" items={developmentItems} subtotal="$25,000" />
-              </>
+            {generatedProposalSections.length > 0 && (
+              <div className="space-y-6">
+                {generatedProposalSections.map((section, index) => (
+                  <div key={index} className="section_wrapper mb-[34px]">
+                    <div className="text-black text-lg font-bold bg-[#E1E1DC] px-[17px] py-[11px] rounded-[4px_4px_0_0]">
+                      {section.title}
+                    </div>
+                    
+                    {/* Table Header */}
+                    <div className="section_table_header grid grid-cols-[2fr_4fr_1fr_1fr] text-black text-[9px] font-semibold tracking-[1.389px] uppercase px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
+                      <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                        Item
+                      </div>
+                      <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                        Description
+                      </div>
+                      <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                        Hours
+                      </div>
+                      <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                        Price
+                      </div>
+                    </div>
+
+                    {/* Table Rows */}
+                    {section.items.map((item, itemIndex) => (
+                      <div
+                        key={itemIndex}
+                        className="section_table_row grid grid-cols-[2fr_4fr_1fr_1fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]"
+                      >
+                        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                          {item.item}
+                        </div>
+                        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                          {item.description}
+                        </div>
+                        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                          {item.hours}
+                        </div>
+                        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                          {item.price}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Table Footer */}
+                    <div className="section_table_footer grid grid-cols-[2fr_4fr_1fr_1fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
+                      <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                        Subtotal
+                      </div>
+                      <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                        {section.subtotal}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {generatedProposalSections.length === 0 && (
+              <div className="p-6 bg-[#F7F6F2] rounded-md text-center">
+                <p className="text-gray-600">No proposal generated yet. Use the Project Settings tab to generate a proposal.</p>
+              </div>
             )}
           </>
         );

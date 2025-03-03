@@ -1,6 +1,8 @@
+
 import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
 import { SendIcon } from "@/components/icons";
+import { ProposalForm } from "@/components/ui/ProposalForm";
 
 export const MiddleSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -27,6 +29,27 @@ export const MiddleSection: React.FC = () => {
     }
   };
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 0:
+        return (
+          <div className="text-black text-[11px] font-semibold tracking-[1.715px] uppercase bg-[#E1E1DC] p-[17px] rounded-[9px]">
+            Lorem ipsum odor amet, consectetuer adipiscing elit. Mus elementum
+            diam aliquet justo montes vestibulum. Sagittis tortor ad mauris;
+            accumsan maximus felis. Inceptos posuere fusce fames hendrerit purus a
+            nullam. Duis gravida urna mattis taciti porta. Consectetur tellus
+            nunc, donec id ligula netus ridiculus. Enim lectus fames dolor donec
+            risus auctor. Diam primis diam himenaeos dis fermentum? Nec placerat
+            eget montes scelerisque porttitor egestas habitant libero Curae.
+          </div>
+        );
+      case 1:
+        return <ProposalForm />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <section className="w-[345px] flex flex-col border-r-black border-r border-solid max-md:w-full max-md:h-auto">
       <div className="text-[rgba(0,0,0,0.5)] text-[11px] font-semibold tracking-[1.715px] uppercase h-[69px] px-[19px] py-[25px] border-b-black border-b border-solid">
@@ -43,16 +66,8 @@ export const MiddleSection: React.FC = () => {
         </NavTab>
       </div>
 
-      <div className="grow p-[11px]">
-        <div className="text-black text-[11px] font-semibold tracking-[1.715px] uppercase bg-[#E1E1DC] p-[17px] rounded-[9px]">
-          Lorem ipsum odor amet, consectetuer adipiscing elit. Mus elementum
-          diam aliquet justo montes vestibulum. Sagittis tortor ad mauris;
-          accumsan maximus felis. Inceptos posuere fusce fames hendrerit purus a
-          nullam. Duis gravida urna mattis taciti porta. Consectetur tellus
-          nunc, donec id ligula netus ridiculus. Enim lectus fames dolor donec
-          risus auctor. Diam primis diam himenaeos dis fermentum? Nec placerat
-          eget montes scelerisque porttitor egestas habitant libero Curae.
-        </div>
+      <div className="grow p-[11px] overflow-y-auto">
+        {renderTabContent()}
       </div>
 
       <div className="flex gap-3.5 p-[17px]">

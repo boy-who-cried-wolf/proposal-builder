@@ -1,9 +1,23 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MiddleSection } from "@/components/layout/MiddleSection";
 import { MainContent } from "@/components/layout/MainContent";
+import { ProposalSection } from "@/utils/openaiProposal";
 
 const Index = () => {
+  const [generatedProposalSections, setGeneratedProposalSections] = useState<ProposalSection[]>([]);
+  const [projectDescription, setProjectDescription] = useState("");
+  const [projectType, setProjectType] = useState("");
+  const [hourlyRate, setHourlyRate] = useState(0);
+
+  const handleProposalGenerated = (sections: ProposalSection[], description: string, type: string, rate: number) => {
+    setGeneratedProposalSections(sections);
+    setProjectDescription(description);
+    setProjectType(type);
+    setHourlyRate(rate);
+  };
+
   return (
     <>
       <link
