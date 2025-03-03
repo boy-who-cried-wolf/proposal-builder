@@ -39,13 +39,13 @@ export const ProjectCardGrid: React.FC<ProjectCardGridProps> = ({
 
   return (
     <Card 
-      className="overflow-hidden hover:shadow-md transition-shadow"
+      className="overflow-hidden hover:bg-gray-50 transition-colors"
       draggable={true}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDrop={onDrop}
     >
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 bg-white">
         <div className="flex justify-between items-start">
           <div className="flex items-center">
             <GripVertical size={16} className="mr-2 cursor-grab text-gray-400" />
@@ -55,27 +55,27 @@ export const ProjectCardGrid: React.FC<ProjectCardGridProps> = ({
             {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
           </Badge>
         </div>
-        <p className="text-sm text-muted-foreground">{project.client}</p>
+        <p className="text-sm text-muted-foreground ml-6">{project.client}</p>
       </CardHeader>
-      <CardContent>
-        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-          <div>
-            <p className="font-semibold font-poppins">{formattedValue}</p>
-            <p className="text-muted-foreground">Value</p>
+      <CardContent className="pt-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col">
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{formattedValue}</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">PROPOSAL AMOUNT</p>
           </div>
-          <div>
-            <p className={cn("font-semibold font-poppins", dueDateColorClass)}>{dueDate}</p>
-            <p className="text-muted-foreground">Due Date</p>
+          <div className="flex flex-col">
+            <p className={cn("text-black text-[9px] font-semibold tracking-[1.389px] uppercase", dueDateColorClass)}>{dueDate}</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">DUE DATE</p>
           </div>
-          <div>
-            <p className="font-semibold font-poppins">{project.hours}</p>
-            <p className="text-muted-foreground">Hours</p>
+          <div className="flex flex-col">
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{project.hours}</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">HOURS</p>
           </div>
-          <div>
-            <p className={cn("font-semibold font-poppins", daysRemainingColorClass)}>
+          <div className="flex flex-col">
+            <p className={cn("text-black text-[9px] font-semibold tracking-[1.389px] uppercase", daysRemainingColorClass)}>
               {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days` : `${daysRemaining} days`}
             </p>
-            <p className="text-muted-foreground">Remaining</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">DAYS REMAINING</p>
           </div>
         </div>
         
@@ -90,14 +90,12 @@ export const ProjectCardGrid: React.FC<ProjectCardGridProps> = ({
           ))}
         </div>
         
-        <div className="mt-4 flex justify-between gap-2">
-          <Button variant="outline" size="sm" className="flex-1" onClick={onView}>
-            <Eye size={16} className="mr-2" />
-            View
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="ghost" size="sm" className="h-7 px-2" onClick={onView}>
+            <Eye size={14} />
           </Button>
-          <Button variant="outline" size="sm" className="flex-1">
-            <Edit size={16} className="mr-2" />
-            Edit
+          <Button variant="ghost" size="sm" className="h-7 px-2">
+            <Edit size={14} />
           </Button>
         </div>
       </CardContent>
