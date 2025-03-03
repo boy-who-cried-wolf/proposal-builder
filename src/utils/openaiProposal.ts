@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface ProposalSection {
@@ -26,6 +25,15 @@ export interface SaveProposalInput {
   projectType: string;
   hourlyRate: number;
   sections: ProposalSection[];
+}
+
+export interface SectionTemplate {
+  id: string;
+  title: string;
+  description: string;
+  items: ProposalItem[];
+  user_id: string;
+  created_at: string;
 }
 
 const systemPrompt = `
@@ -170,5 +178,31 @@ export async function saveProposal(input: SaveProposalInput): Promise<{ success:
       success: false, 
       error: error instanceof Error ? error.message : 'Unknown error saving proposal' 
     };
+  }
+}
+
+export async function getSectionTemplates(): Promise<SectionTemplate[]> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return [];
+    }
+    
+    const { data, error } = await supabase
+      .from('section_templates')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching section templates:', error);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Error in getSectionTemplates:', error);
+    return [];
   }
 }

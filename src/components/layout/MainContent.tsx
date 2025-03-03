@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
 import { MetricItem } from "@/components/ui/MetricItem";
@@ -7,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { saveProposal, ProposalSection } from "@/utils/openaiProposal";
 import { ProposalTable } from "@/components/proposal/ProposalTable";
 import { TaskEditor } from "@/components/proposal/TaskEditor";
+import { SectionEditor } from "@/components/proposal/SectionEditor";
 import { RevisionsTab, Revision } from "@/components/proposal/RevisionsTab";
 import { MetricsTab } from "@/components/proposal/MetricsTab";
 import { ProposalHeaderTabs } from "@/components/proposal/ProposalHeaderTabs";
@@ -44,6 +44,8 @@ export const MainContent: React.FC<MainContentProps> = ({
   } | null>(null);
   const [isHoursPriceLocked, setIsHoursPriceLocked] = useState(true);
   const [revisions, setRevisions] = useState<Revision[]>([]);
+  const [isSectionEditorOpen, setIsSectionEditorOpen] = useState(false);
+  const [editingSectionIndex, setEditingSectionIndex] = useState<number | null>(null);
 
   React.useEffect(() => {
     setSections(generatedProposalSections);
@@ -156,7 +158,6 @@ export const MainContent: React.FC<MainContentProps> = ({
 
   const openEditDialog = (sectionIndex: number, itemIndex: number) => {
     const item = { ...sections[sectionIndex].items[itemIndex] };
-    // Convert numbers to strings for the form
     const formattedItem = {
       ...item,
       hours: item.hours.toString(),
@@ -170,6 +171,11 @@ export const MainContent: React.FC<MainContentProps> = ({
     });
     
     setIsEditDialogOpen(true);
+  };
+
+  const openSectionSettings = (sectionIndex: number) => {
+    setEditingSectionIndex(sectionIndex);
+    setIsSectionEditorOpen(true);
   };
 
   const handleItemChange = (field: keyof TaskItem, value: string) => {
@@ -202,7 +208,7 @@ export const MainContent: React.FC<MainContentProps> = ({
       ...newSections[sectionIndex],
       items: [
         ...newSections[sectionIndex].items.slice(0, itemIndex),
-        item as any, // Cast to fix type issue
+        item as any,
         ...newSections[sectionIndex].items.slice(itemIndex + 1),
       ],
     };
@@ -232,13 +238,100 @@ export const MainContent: React.FC<MainContentProps> = ({
     });
   };
 
+  const deleteItem = () => {
+    if (!editingItem) return;
+
+    const { sectionIndex, itemIndex, item } = editingItem;
+    
+    const newSections = [...sections];
+    const oldItems = [...newSections[sectionIndex].items];
+    
+    newSections[sectionIndex] = {
+      ...newSections[sectionIndex],
+      items: [
+        ...oldItems.slice(0, itemIndex),
+        ...oldItems.slice(itemIndex + 1),
+      ],
+    };
+
+    const newRevision: Revision = {
+      id: Date.now().toString(),
+      date: new Date(),
+      sectionTitle: sections[sectionIndex].title,
+      itemName: item.item,
+      field: 'item',
+      oldValue: item.item,
+      newValue: 'Deleted',
+    };
+    setRevisions(prev => [newRevision, ...prev]);
+
+    setSections(newSections);
+    setIsEditDialogOpen(false);
+    
+    toast({
+      title: "Item deleted",
+      description: `Removed ${item.item} from ${sections[sectionIndex].title}`,
+    });
+  };
+
+  const updateSection = (sectionIndex: number, updatedSection: Partial<ProposalSection>) => {
+    const newSections = [...sections];
+    const oldSection = newSections[sectionIndex];
+    
+    newSections[sectionIndex] = {
+      ...oldSection,
+      ...updatedSection,
+    };
+
+    if (updatedSection.title && updatedSection.title !== oldSection.title) {
+      const newRevision: Revision = {
+        id: Date.now().toString(),
+        date: new Date(),
+        sectionTitle: oldSection.title,
+        itemName: 'Section',
+        field: 'title',
+        oldValue: oldSection.title,
+        newValue: updatedSection.title,
+      };
+      setRevisions(prev => [newRevision, ...prev]);
+    }
+
+    setSections(newSections);
+  };
+
+  const deleteSection = (sectionIndex: number) => {
+    const sectionToDelete = sections[sectionIndex];
+    
+    const newSections = [
+      ...sections.slice(0, sectionIndex),
+      ...sections.slice(sectionIndex + 1),
+    ];
+
+    const newRevision: Revision = {
+      id: Date.now().toString(),
+      date: new Date(),
+      sectionTitle: sectionToDelete.title,
+      itemName: 'Section',
+      field: 'title',
+      oldValue: sectionToDelete.title,
+      newValue: 'Deleted',
+    };
+    setRevisions(prev => [newRevision, ...prev]);
+
+    setSections(newSections);
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 0:
         return (
           <>
             {sections.length > 0 ? (
-              <ProposalTable sections={sections} onEditItem={openEditDialog} />
+              <ProposalTable 
+                sections={sections} 
+                onEditItem={openEditDialog} 
+                onOpenSectionSettings={openSectionSettings}
+              />
             ) : (
               <div className="p-6 bg-[#F7F6F2] rounded-md text-center">
                 <p className="text-gray-600">No proposal generated yet. Use the Project Settings tab to generate a proposal.</p>
@@ -307,6 +400,16 @@ export const MainContent: React.FC<MainContentProps> = ({
         handleItemChange={handleItemChange}
         saveItemChanges={saveItemChanges}
         hourlyRate={hourlyRate}
+        deleteItem={deleteItem}
+      />
+
+      <SectionEditor
+        isOpen={isSectionEditorOpen}
+        onOpenChange={setIsSectionEditorOpen}
+        section={editingSectionIndex !== null ? sections[editingSectionIndex] : null}
+        sectionIndex={editingSectionIndex}
+        onSave={updateSection}
+        onDelete={deleteSection}
       />
     </main>
   );

@@ -1,20 +1,32 @@
 
 import React from "react";
 import { ProposalSection } from "@/utils/openaiProposal";
-import { Pencil } from "lucide-react";
+import { Pencil, Settings } from "lucide-react";
 
 interface ProposalTableProps {
   sections: ProposalSection[];
   onEditItem: (sectionIndex: number, itemIndex: number) => void;
+  onOpenSectionSettings: (sectionIndex: number) => void;
 }
 
-export const ProposalTable: React.FC<ProposalTableProps> = ({ sections, onEditItem }) => {
+export const ProposalTable: React.FC<ProposalTableProps> = ({ 
+  sections, 
+  onEditItem,
+  onOpenSectionSettings 
+}) => {
   return (
     <div className="space-y-6">
       {sections.map((section, index) => (
         <div key={index} className="section_wrapper mb-[34px]">
-          <div className="text-black text-lg font-bold bg-[#E1E1DC] px-[17px] py-[11px] rounded-[4px_4px_0_0]">
-            {section.title}
+          <div className="text-black text-lg font-bold bg-[#E1E1DC] px-[17px] py-[11px] rounded-[4px_4px_0_0] flex justify-between items-center">
+            <span>{section.title}</span>
+            <button
+              onClick={() => onOpenSectionSettings(index)}
+              className="p-1 rounded bg-gray-200 hover:bg-gray-300"
+              aria-label="Section settings"
+            >
+              <Settings size={16} />
+            </button>
           </div>
           
           <div className="section_table_header grid grid-cols-[2fr_4fr_1fr_1fr_0.5fr] text-black text-[9px] font-semibold tracking-[1.389px] uppercase px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">

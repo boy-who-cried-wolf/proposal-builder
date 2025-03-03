@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Check, Lock, Unlock } from "lucide-react";
+import { Check, Lock, Unlock, Trash } from "lucide-react";
 
 interface TaskItem {
   item: string;
@@ -26,6 +26,7 @@ interface TaskEditorProps {
   handleItemChange: (field: keyof TaskItem, value: string) => void;
   saveItemChanges: () => void;
   hourlyRate: number;
+  deleteItem?: () => void;
 }
 
 export const TaskEditor: React.FC<TaskEditorProps> = ({
@@ -37,6 +38,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
   handleItemChange,
   saveItemChanges,
   hourlyRate,
+  deleteItem,
 }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -121,13 +123,22 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
           )}
         </div>
         
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button type="button" onClick={saveItemChanges} className="flex items-center gap-2">
-            Save Changes <Check size={14} />
-          </Button>
+        <DialogFooter className="flex justify-between">
+          <div className="flex gap-2">
+            {deleteItem && (
+              <Button type="button" variant="destructive" onClick={deleteItem} className="flex items-center gap-2">
+                Delete <Trash size={14} />
+              </Button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={saveItemChanges} className="flex items-center gap-2">
+              Save Changes <Check size={14} />
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

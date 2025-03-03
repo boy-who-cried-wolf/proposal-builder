@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ExpandableTabs, Tab } from "@/components/ui/expandable-tabs";
 import { DiamondPlus, Timer, Eye, Send, Copy, Save } from "lucide-react";
@@ -17,71 +16,56 @@ export const ProposalHeaderTabs: React.FC<ProposalHeaderTabsProps> = ({
   handleSaveProposal,
   isSaving,
 }) => {
-  const headerTabs: Tab[] = [
+  const tabs: Tab[] = [
     { 
-      title: "Add Section", 
+      title: "Add Premium", 
       icon: DiamondPlus,
-      content: (
-        <div>
-          <h2 className="text-xl font-bold mb-4">Add New Section</h2>
-          <p>Here you can add a new section to your proposal.</p>
-        </div>
-      )
+      content: <div className="p-4">Add premium features here</div> 
     },
     { 
-      title: "Toggle Hours", 
+      title: "Time Tracking", 
       icon: Timer,
-      content: (
-        <div>
-          <h2 className="text-xl font-bold mb-4">Hours Display Settings</h2>
-          <p>Configure how hours are displayed in your proposal.</p>
-        </div>
-      )
+      content: <div className="p-4">Enable time tracking</div> 
     },
     { 
       title: "Preview", 
       icon: Eye,
-      content: (
-        <div>
-          <h2 className="text-xl font-bold mb-4">Proposal Preview</h2>
-          <p>Preview how your proposal will appear to clients.</p>
-        </div>
-      )
+      content: <div className="p-4">Preview the proposal</div> 
     },
     { 
       title: "Send", 
       icon: Send,
-      content: (
-        <div>
-          <h2 className="text-xl font-bold mb-4">Send Proposal</h2>
-          <p>Send this proposal to your client via email or generate a shareable link.</p>
-        </div>
-      )
+      content: <div className="p-4">Send proposal to client</div> 
     },
     { 
       title: "Copy", 
       icon: Copy,
-      content: (
-        <div>
-          <h2 className="text-xl font-bold mb-4">Copy Proposal</h2>
-          <p>Create a duplicate of this proposal as a starting point for a new one.</p>
-        </div>
-      )
+      content: <div className="p-4">Copy proposal content</div> 
     },
     { 
       title: "Save Proposal", 
       icon: Save,
-      onClick: handleSaveProposal,
-      content: null
+      content: (
+        <div className="p-4">
+          <h2 className="text-xl font-bold mb-4">Save Proposal</h2>
+          <p className="mb-4">Save your current proposal to your account.</p>
+          <Button 
+            onClick={handleSaveProposal} 
+            disabled={isSaving}
+            className="bg-black text-white px-4 py-2 rounded flex items-center gap-2"
+          >
+            {isSaving ? 'Saving...' : 'Save Proposal'} <Save size={16} />
+          </Button>
+        </div>
+      )
     },
   ];
 
   return (
-    <ExpandableTabs 
-      tabs={headerTabs}
-      className="border-gray-200"
-      onChange={handleHeaderTabChange}
-      showTabContent={activeHeaderTab !== null}
+    <ExpandableTabs
+      tabs={tabs}
+      activeTab={activeHeaderTab}
+      onTabChange={handleHeaderTabChange}
     />
   );
 };
