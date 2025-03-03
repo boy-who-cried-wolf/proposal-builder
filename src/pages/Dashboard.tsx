@@ -80,7 +80,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Welcome back, {user?.email || 'User'}
               </p>
             </div>
