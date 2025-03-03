@@ -43,7 +43,7 @@ export const ProjectCardList: React.FC<ProjectCardListProps> = ({
     >
       <div className="section_table_row grid grid-cols-7 gap-4 items-center text-sm px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px] hover:bg-gray-50 transition-colors">
         <div className="flex items-center">
-          <GripVertical size={16} className="mr-2 cursor-grab text-gray-400" />
+          <GripVertical size={16} className="cursor-grab text-gray-400" />
         </div>
         <div className="section_table_cell">
           <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{formattedValue}</p>

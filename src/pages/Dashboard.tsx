@@ -145,31 +145,6 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="flex gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    {sortField === "value" ? <DollarSign size={16} className="mr-1" /> : 
-                     sortField === "date" ? <Clock size={16} className="mr-1" /> : 
-                     <Clock size={16} className="mr-1" />}
-                    Sort by {sortField}
-                    {sortDirection === "asc" ? <ArrowUp size={16} className="ml-1" /> : <ArrowDown size={16} className="ml-1" />}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => handleSortToggle("value")}>
-                    <DollarSign size={16} className="mr-2" />
-                    Sort by amount
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSortToggle("date")}>
-                    <Clock size={16} className="mr-2" />
-                    Sort by due date
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSortToggle("hours")}>
-                    <Clock size={16} className="mr-2" />
-                    Sort by hours
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -199,8 +174,33 @@ const Dashboard = () => {
               <TabsTrigger value="pending" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1.389px]">PENDING</TabsTrigger>
             </TabsList>
             
-            <div className="bg-[#F1F1F1] px-4 py-3 mt-4 mb-2">
+            <div className="bg-[#F1F1F1] px-4 py-3 mt-4 mb-2 flex justify-between items-center">
               <h2 className="text-[#403E43] text-lg font-medium">proposals & contracts</h2>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    {sortField === "value" ? <DollarSign size={16} className="mr-1" /> : 
+                     sortField === "date" ? <Clock size={16} className="mr-1" /> : 
+                     <Clock size={16} className="mr-1" />}
+                    Sort by {sortField}
+                    {sortDirection === "asc" ? <ArrowUp size={16} className="ml-1" /> : <ArrowDown size={16} className="ml-1" />}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => handleSortToggle("value")}>
+                    <DollarSign size={16} className="mr-2" />
+                    Sort by amount
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSortToggle("date")}>
+                    <Clock size={16} className="mr-2" />
+                    Sort by due date
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSortToggle("hours")}>
+                    <Clock size={16} className="mr-2" />
+                    Sort by hours
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             
             <TabsContent value="all" className="mt-0">
