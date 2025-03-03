@@ -2,13 +2,16 @@
 import { supabase } from './client';
 
 // Helper function to create a new organization
-export const createOrganization = async (name: string) => {
+export const createOrganization = async (name: string, userId: string) => {
   try {
     console.log('Creating organization with name:', name);
     
     const { data, error } = await supabase
       .from('organizations')
-      .insert([{ name }])
+      .insert([{ 
+        name, 
+        owner_id: userId  // Add the owner_id for RLS policy
+      }])
       .select()
       .single();
 

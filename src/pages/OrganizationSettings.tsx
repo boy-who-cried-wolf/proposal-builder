@@ -33,8 +33,8 @@ const OrganizationSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [companyName, setCompanyName] = useState("");
-  const [hourlyRate, setHourlyRate] = useState<number>(0);
-  const [clientRate, setClientRate] = useState<number>(0);
+  const [hourlyRate, setHourlyRate] = useState<number | null>(null);
+  const [clientRate, setClientRate] = useState<number | null>(null);
   const [knowledgeBase, setKnowledgeBase] = useState("");
   const [services, setServices] = useState<string[]>([]);
   const [newService, setNewService] = useState("");
@@ -59,15 +59,15 @@ const OrganizationSettings = () => {
           const org = profile.organizations;
           setOrganizationId(org.id);
           setCompanyName(org.name || "");
-          setHourlyRate(org.hourly_rate || 100);
-          setClientRate(org.client_rate || 75);
+          setHourlyRate(org.hourly_rate || null);
+          setClientRate(org.client_rate || null);
           setKnowledgeBase(org.knowledge_base || "");
           setServices(org.services || []);
         } else {
           // Use profile data as fallback
           setCompanyName(profile.company_name || "");
-          setHourlyRate(profile.hourly_rate || 100);
-          setClientRate(profile.client_rate || 75);
+          setHourlyRate(profile.hourly_rate || null);
+          setClientRate(profile.client_rate || null);
           setKnowledgeBase(profile.knowledge_base || "");
           setServices(profile.services || []);
         }
@@ -89,7 +89,7 @@ const OrganizationSettings = () => {
       // If user doesn't have an organization yet, create one
       if (!organizationId) {
         toast.info("Creating new organization...");
-        const newOrg = await createOrganization(companyName);
+        const newOrg = await createOrganization(companyName, user.id);
         setOrganizationId(newOrg.id);
         
         // Link user to the new organization
@@ -160,6 +160,26 @@ const OrganizationSettings = () => {
       console.error("Error removing service:", error);
       toast.error("Failed to remove service");
     }
+  };
+
+  // Handle input change for number fields to prevent starting with 0
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<number | null>>) => {
+    const value = e.target.value;
+    
+    // If the input is empty, set to null
+    if (!value) {
+      setter(null);
+      return;
+    }
+    
+    // Remove leading zeros
+    if (value.startsWith('0') && value.length > 1) {
+      const newValue = parseInt(value, 10);
+      setter(newValue);
+      return;
+    }
+    
+    setter(parseInt(value, 10));
   };
 
   return (
@@ -236,7 +256,7 @@ const OrganizationSettings = () => {
                       onChange={(e) => setNewService(e.target.value)}
                       placeholder="Add a service" 
                     />
-                    <Button onClick={handleAddService} size="sm" type="button">
+                    <Button onClick={handleAddService} size="default" type="button" className="h-10">
                       <Plus size={16} className="mr-1" /> Add
                     </Button>
                   </div>
@@ -247,18 +267,20 @@ const OrganizationSettings = () => {
                     <label className="block text-sm font-medium mb-1">Your Hourly Rate ($)</label>
                     <Input 
                       type="number" 
-                      value={hourlyRate} 
-                      onChange={(e) => setHourlyRate(Number(e.target.value))}
-                      min={0} 
+                      value={hourlyRate === null ? "" : hourlyRate} 
+                      onChange={(e) => handleNumberChange(e, setHourlyRate)}
+                      min={1} 
+                      placeholder="Enter hourly rate"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Client Hourly Rate ($)</label>
                     <Input 
                       type="number" 
-                      value={clientRate} 
-                      onChange={(e) => setClientRate(Number(e.target.value))}
-                      min={0} 
+                      value={clientRate === null ? "" : clientRate} 
+                      onChange={(e) => handleNumberChange(e, setClientRate)}
+                      min={1} 
+                      placeholder="Enter client rate"
                     />
                   </div>
                 </div>

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserProfile } from "@/integrations/supabase/profileService";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface SidebarNavigationProps {
   activeNavItem: number | null;
@@ -25,6 +26,8 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
 }) => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -41,28 +44,33 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     checkAdmin();
   }, [user]);
 
+  const handleNavigation = (index: number, path: string) => {
+    onNavItemClick(index);
+    navigate(path);
+  };
+
   return (
     <div className="flex-grow overflow-y-auto">
       <SidebarNavItem
         isExpanded={isExpanded}
-        isActive={activeNavItem === 0}
-        onClick={() => onNavItemClick(0)}
+        isActive={activeNavItem === 0 || location.pathname === "/"}
+        onClick={() => handleNavigation(0, "/")}
         icon={Home}
         label="Home"
         path="/"
       />
       <SidebarNavItem
         isExpanded={isExpanded}
-        isActive={activeNavItem === 1}
-        onClick={() => onNavItemClick(1)}
+        isActive={activeNavItem === 1 || location.pathname.includes("proposals")}
+        onClick={() => handleNavigation(1, "/")}
         icon={FileText}
         label="Proposals"
         path="/"
       />
       <SidebarNavItem
         isExpanded={isExpanded}
-        isActive={activeNavItem === 2}
-        onClick={() => onNavItemClick(2)}
+        isActive={activeNavItem === 2 || location.pathname === "/dashboard"}
+        onClick={() => handleNavigation(2, "/dashboard")}
         icon={BarChart3}
         label="Dashboard"
         path="/dashboard"
@@ -70,8 +78,8 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       {isAdmin && (
         <SidebarNavItem
           isExpanded={isExpanded}
-          isActive={activeNavItem === 3}
-          onClick={() => onNavItemClick(3)}
+          isActive={activeNavItem === 3 || location.pathname === "/admin"}
+          onClick={() => handleNavigation(3, "/admin")}
           icon={ShieldCheck}
           label="Admin"
           path="/admin"
@@ -79,8 +87,8 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       )}
       <SidebarNavItem
         isExpanded={isExpanded}
-        isActive={activeNavItem === 4}
-        onClick={() => onNavItemClick(4)}
+        isActive={activeNavItem === 4 || location.pathname.includes("account-settings")}
+        onClick={() => handleNavigation(4, "/account-settings")}
         icon={Settings}
         label="Settings"
         path="/account-settings"
