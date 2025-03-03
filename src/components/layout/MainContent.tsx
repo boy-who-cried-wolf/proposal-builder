@@ -21,6 +21,7 @@ export const MainContent: React.FC<MainContentProps> = ({
     activeTab,
     activeHeaderTab,
     isSaving,
+    isCopying,
     sections,
     isEditDialogOpen,
     editingItem,
@@ -34,6 +35,7 @@ export const MainContent: React.FC<MainContentProps> = ({
     getHoursPerDayDisplay,
     calculateTotalValue,
     handleSaveProposal,
+    handleCopyToFigma,
     openEditDialog,
     openSectionSettings,
     setIsEditDialogOpen,
@@ -82,7 +84,9 @@ export const MainContent: React.FC<MainContentProps> = ({
             activeHeaderTab={activeHeaderTab}
             handleHeaderTabChange={handleHeaderTabChange}
             handleSaveProposal={handleSaveProposal}
+            handleCopyToFigma={handleCopyToFigma}
             isSaving={isSaving}
+            isCopying={isCopying}
           />
         </div>
       </header>
@@ -133,4 +137,4 @@ export const MainContent: React.FC<MainContentProps> = ({
       />
     </main>
   );
-};
+}

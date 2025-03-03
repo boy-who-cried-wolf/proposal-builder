@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ProposalSection } from "@/utils/openaiProposal";
 import { EditingItem } from "@/types/mainContent";
@@ -6,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { saveProposal } from "@/utils/openaiProposal";
 import { Revision } from "@/components/proposal/RevisionsTab";
+import { formatProposalForFigma } from "@/utils/proposal/formatProposalForFigma";
 
 export function useProposalContent(
   generatedProposalSections: ProposalSection[],
@@ -17,6 +17,7 @@ export function useProposalContent(
   const [activeTab, setActiveTab] = useState(0);
   const [activeHeaderTab, setActiveHeaderTab] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
   const [sections, setSections] = useState<ProposalSection[]>(generatedProposalSections);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<EditingItem | null>(null);
@@ -130,6 +131,56 @@ export function useProposalContent(
       });
     } finally {
       setIsSaving(false);
+      setActiveHeaderTab(null);
+    }
+  };
+
+  const handleCopyToFigma = async () => {
+    try {
+      if (sections.length === 0) {
+        toast({
+          title: "No proposal to copy",
+          description: "Please generate a proposal first",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsCopying(true);
+
+      const formattedText = formatProposalForFigma(
+        sections,
+        `Proposal for ${projectType} project`,
+        projectType,
+        hourlyRate
+      );
+
+      await navigator.clipboard.writeText(formattedText);
+
+      const newRevision: Revision = {
+        id: Date.now().toString(),
+        date: new Date(),
+        sectionTitle: "Proposal",
+        itemName: "All",
+        field: "copy",
+        oldValue: "",
+        newValue: "Copied to Figma",
+      };
+      setRevisions(prev => [newRevision, ...prev]);
+
+      toast({
+        title: "Copied to clipboard",
+        description: "Proposal is ready to paste into Figma",
+      });
+    } catch (error) {
+      console.error("Error copying to Figma:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to copy proposal to clipboard",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCopying(false);
       setActiveHeaderTab(null);
     }
   };
@@ -303,6 +354,7 @@ export function useProposalContent(
     activeTab,
     activeHeaderTab,
     isSaving,
+    isCopying,
     sections,
     isEditDialogOpen,
     editingItem,
@@ -316,6 +368,7 @@ export function useProposalContent(
     getHoursPerDayDisplay,
     calculateTotalValue,
     handleSaveProposal,
+    handleCopyToFigma,
     openEditDialog,
     openSectionSettings,
     setIsEditDialogOpen,
