@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 
 export const createCheckoutSession = async (userId: string, planId: string) => {
   try {
+    console.log(`Creating checkout session for user ${userId} and plan ${planId}`);
+    
     const { data, error } = await supabase.functions.invoke('stripe-integration', {
       body: { action: 'createCheckoutSession', userId, planId }
     });
@@ -14,10 +16,14 @@ export const createCheckoutSession = async (userId: string, planId: string) => {
       throw error;
     }
 
+    console.log('Checkout session response:', data);
+
     // Redirect to Stripe Checkout
     if (data?.url) {
+      console.log('Redirecting to Stripe checkout:', data.url);
       window.location.href = data.url;
     } else {
+      console.error('No URL in response:', data);
       toast.error('Invalid response from server');
     }
 

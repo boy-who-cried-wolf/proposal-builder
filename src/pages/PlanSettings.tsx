@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -20,7 +19,6 @@ const PlanSettings = () => {
   const [cancelLoading, setCancelLoading] = React.useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = React.useState<any>(null);
   
-  // Check for query parameters
   const searchParams = new URLSearchParams(location.search);
   const success = searchParams.get('success');
   const canceled = searchParams.get('canceled');
@@ -28,11 +26,9 @@ const PlanSettings = () => {
   useEffect(() => {
     if (success) {
       toast.success("Subscription updated successfully!");
-      // Remove query parameters
       navigate('/account-settings/plan', { replace: true });
     } else if (canceled) {
       toast.info("Subscription update was canceled.");
-      // Remove query parameters
       navigate('/account-settings/plan', { replace: true });
     }
   }, [success, canceled, navigate]);
@@ -60,6 +56,7 @@ const PlanSettings = () => {
 
   const handlePlanSelect = async (planId: string) => {
     if (planId === currentPlan) {
+      toast.info("You are already on this plan");
       return;
     }
     
@@ -68,11 +65,15 @@ const PlanSettings = () => {
       return;
     }
     
+    console.log(`Selecting plan: ${planId} for user: ${user.id}`);
+    
     try {
       setCheckoutLoading(planId);
+      toast.info(`Preparing checkout for ${planId} plan...`);
       await createCheckoutSession(user.id, planId);
     } catch (error) {
       console.error("Error selecting plan:", error);
+      toast.error("Failed to create checkout session");
     } finally {
       setCheckoutLoading("");
     }
@@ -92,7 +93,6 @@ const PlanSettings = () => {
     try {
       setCancelLoading(true);
       await cancelSubscription(user.id);
-      // Refresh subscription data
       const subscription = await getCurrentSubscription(user.id);
       setCurrentPlan(subscription.plan_id);
       setSubscriptionInfo(subscription);
