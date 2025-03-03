@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, Clock, CheckCircle2, AlertCircle, Grid, List } from "lucide-react";
+import { DollarSign, Clock, Grid, List } from "lucide-react";
 import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { DashboardFooter } from "@/components/dashboard/DashboardFooter";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -60,7 +60,7 @@ const sampleProjects = [
 const Dashboard = () => {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   
   // Filter projects based on selected status
   const filteredProjects = statusFilter === "all" 
@@ -107,18 +107,21 @@ const Dashboard = () => {
           </div>
           
           <Tabs defaultValue="all" className="mb-6" onValueChange={setStatusFilter}>
-            <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
-              <TabsTrigger value="draft">Drafts</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
+            <TabsList className="bg-[#F6F6F7] text-[#8E9196]">
+              <TabsTrigger value="all" className="data-[state=active]:bg-white">ALL PROPOSALS</TabsTrigger>
+              <TabsTrigger value="draft" className="data-[state=active]:bg-white">DRAFTS</TabsTrigger>
+              <TabsTrigger value="completed" className="data-[state=active]:bg-white">COMPLETED</TabsTrigger>
+              <TabsTrigger value="pending" className="data-[state=active]:bg-white">PENDING</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="all" className="mt-4">
+            <div className="bg-[#F1F1F1] px-4 py-3 mt-4 mb-2">
+              <h2 className="text-[#403E43] text-lg font-medium">proposals & contracts</h2>
+            </div>
+            
+            <TabsContent value="all" className="mt-0">
               <div className={viewMode === "grid" 
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "flex flex-col gap-4"
+                : "flex flex-col"
               }>
                 {filteredProjects.map(project => (
                   <ProjectCard key={project.id} project={project} viewMode={viewMode} />
@@ -126,10 +129,10 @@ const Dashboard = () => {
               </div>
             </TabsContent>
             
-            <TabsContent value="active" className="mt-4">
+            <TabsContent value="active" className="mt-0">
               <div className={viewMode === "grid" 
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "flex flex-col gap-4"
+                : "flex flex-col"
               }>
                 {filteredProjects.map(project => (
                   <ProjectCard key={project.id} project={project} viewMode={viewMode} />
@@ -137,10 +140,10 @@ const Dashboard = () => {
               </div>
             </TabsContent>
             
-            <TabsContent value="completed" className="mt-4">
+            <TabsContent value="completed" className="mt-0">
               <div className={viewMode === "grid" 
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "flex flex-col gap-4"
+                : "flex flex-col"
               }>
                 {filteredProjects.map(project => (
                   <ProjectCard key={project.id} project={project} viewMode={viewMode} />
@@ -148,10 +151,10 @@ const Dashboard = () => {
               </div>
             </TabsContent>
             
-            <TabsContent value="draft" className="mt-4">
+            <TabsContent value="draft" className="mt-0">
               <div className={viewMode === "grid" 
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "flex flex-col gap-4"
+                : "flex flex-col"
               }>
                 {filteredProjects.map(project => (
                   <ProjectCard key={project.id} project={project} viewMode={viewMode} />
@@ -159,10 +162,10 @@ const Dashboard = () => {
               </div>
             </TabsContent>
             
-            <TabsContent value="pending" className="mt-4">
+            <TabsContent value="pending" className="mt-0">
               <div className={viewMode === "grid" 
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "flex flex-col gap-4"
+                : "flex flex-col"
               }>
                 {filteredProjects.map(project => (
                   <ProjectCard key={project.id} project={project} viewMode={viewMode} />

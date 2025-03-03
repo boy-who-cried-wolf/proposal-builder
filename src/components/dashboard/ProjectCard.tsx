@@ -50,45 +50,34 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
   if (viewMode === "list") {
     return (
-      <Card className="overflow-hidden hover:shadow-md transition-shadow">
-        <div className="flex flex-col md:flex-row md:items-center p-4">
-          <div className="flex-grow md:flex md:items-center">
-            <div className="md:w-1/3">
-              <h3 className="text-lg font-bold">{project.title}</h3>
-              <p className="text-sm text-muted-foreground">{project.client}</p>
-            </div>
-            <div className="grid grid-cols-3 gap-4 mt-2 md:mt-0 md:w-2/3">
-              <div>
-                <p className="text-sm text-muted-foreground">Value</p>
-                <p className="font-semibold">{formattedValue}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Hours</p>
-                <p className="font-semibold">{project.hours}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Date</p>
-                <p className="font-semibold">{project.date}</p>
-              </div>
-            </div>
+      <div className="border-b border-gray-200 py-4">
+        <div className="grid grid-cols-6 gap-4 items-center text-sm">
+          <div>
+            <p className="uppercase text-xs text-gray-500">PROPOSAL AMOUNT</p>
+            <p className="font-bold text-lg uppercase">{formattedValue}</p>
           </div>
-          <div className="flex items-center gap-4 mt-4 md:mt-0">
-            <Badge className={getBadgeVariant(project.status)}>
-              {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-            </Badge>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Eye size={16} className="mr-2" />
-                View
-              </Button>
-              <Button variant="outline" size="sm">
-                <Edit size={16} className="mr-2" />
-                Edit
-              </Button>
-            </div>
+          <div>
+            <p className="uppercase text-xs text-gray-500">CLIENT NAME</p>
+            <p className="font-bold text-lg uppercase">{project.client}</p>
+          </div>
+          <div>
+            <p className="uppercase text-xs text-gray-500">HOURS</p>
+            <p className="font-bold text-lg uppercase">{project.hours}</p>
+          </div>
+          <div>
+            <p className="uppercase text-xs text-gray-500">DUE DATE</p>
+            <p className="font-bold text-lg uppercase">{project.date}</p>
+          </div>
+          <div>
+            <p className="uppercase text-xs text-gray-500">DAYS REMAINING</p>
+            <p className="font-bold text-lg uppercase">--</p>
+          </div>
+          <div>
+            <p className="uppercase text-xs text-gray-500">SERVICES</p>
+            <p className="text-sm">WEB DESIGN, SERVICES</p>
           </div>
         </div>
-      </Card>
+      </div>
     );
   }
 

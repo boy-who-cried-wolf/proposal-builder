@@ -25,15 +25,48 @@ export const DashboardFooter: React.FC<DashboardFooterProps> = ({
   const formattedHourlyRate = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    maximumFractionDigits: 0
+    maximumFractionDigits: 1
   }).format(avgHourlyRate);
 
+  // Calculate hours per day (pseudo calculation for demo)
+  const hoursPerDay = (totalHours / 30).toFixed(1);
+  
+  // Calculate monthly revenue (pseudo calculation for demo)
+  const monthlyRevenue = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0
+  }).format(totalValue / 3);
+  
+  // Calculate profit margin (pseudo calculation for demo)
+  const profitMargin = "45%";
+
   return (
-    <footer className="flex justify-between bg-white px-[17px] py-[15px] border-t-[#C8C8C9] border-t border-solid max-sm:flex-col max-sm:gap-5">
-      <MetricItem value={projectCount.toString()} label="Projects" className="text-[#403E43]" />
-      <MetricItem value={totalHours.toString()} label="Total Hours" className="text-[#403E43]" />
-      <MetricItem value={formattedHourlyRate} label="Avg. Hourly Rate" className="text-[#403E43]" />
-      <MetricItem value={formattedValue} label="Total Value" className="text-[#403E43]" />
+    <footer className="flex justify-between bg-white px-[17px] py-[15px] border-t border-[#C8C8C9]">
+      <div className="text-left">
+        <p className="text-3xl font-bold">{totalHours}</p>
+        <p className="text-xs text-[#8E9196] uppercase font-medium">TOTAL HOURS</p>
+      </div>
+      
+      <div className="text-left text-[#FF6A00]">
+        <p className="text-3xl font-bold">{hoursPerDay}</p>
+        <p className="text-xs text-[#8E9196] uppercase font-medium">HOURS/DAY</p>
+      </div>
+      
+      <div className="text-left text-[#00C875]">
+        <p className="text-3xl font-bold">{monthlyRevenue}</p>
+        <p className="text-xs text-[#8E9196] uppercase font-medium">MONTHLY REVENUE</p>
+      </div>
+      
+      <div className="text-left">
+        <p className="text-3xl font-bold">{profitMargin}</p>
+        <p className="text-xs text-[#8E9196] uppercase font-medium">PROFIT MARGIN</p>
+      </div>
+      
+      <div className="text-left">
+        <p className="text-3xl font-bold">{formattedValue}</p>
+        <p className="text-xs text-[#8E9196] uppercase font-medium">TOTAL VALUE</p>
+      </div>
     </footer>
   );
 };
