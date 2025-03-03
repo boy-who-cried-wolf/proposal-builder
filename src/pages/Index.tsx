@@ -7,6 +7,7 @@ import { ProposalSection } from "@/utils/openaiProposal";
 import { Toaster } from "@/components/ui/toaster";
 import { DateRange } from "react-day-picker";
 import { useAuth } from "@/contexts/AuthContext";
+import { getSavedProposalFormData, clearSavedProposalFormData } from "@/utils/localStorage";
 
 const Index = () => {
   const { user } = useAuth();
@@ -18,6 +19,30 @@ const Index = () => {
   const [freelancerRate, setFreelancerRate] = useState(0);
   const [projectBudget, setProjectBudget] = useState(0);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  // Check if there's saved form data after login
+  useEffect(() => {
+    if (user) {
+      const savedData = getSavedProposalFormData();
+      if (savedData) {
+        setProjectDescription(savedData.projectDescription);
+        setProjectType(savedData.projectType);
+        setHourlyRate(savedData.hourlyRate);
+        setFreelancerRate(savedData.freelancerRate);
+        setProjectBudget(savedData.projectBudget);
+        
+        if (savedData.dateRange) {
+          setDateRange({
+            from: new Date(savedData.dateRange.from),
+            to: new Date(savedData.dateRange.to),
+          });
+        }
+        
+        // Clear saved data since we've restored it
+        clearSavedProposalFormData();
+      }
+    }
+  }, [user]);
 
   const handleProposalGenerated = (
     sections: ProposalSection[], 

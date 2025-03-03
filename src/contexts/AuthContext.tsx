@@ -1,9 +1,10 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
+import { getSavedProposalFormData } from '@/utils/localStorage';
 
 interface AuthContextType {
   session: Session | null;
@@ -21,6 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Set up initial session
@@ -65,8 +67,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) throw error;
-      navigate('/');
-      toast.success('Logged in successfully!');
+      
+      // Check if we have saved form data that would indicate we should redirect to index
+      const savedData = getSavedProposalFormData();
+      if (savedData && location.pathname === '/auth') {
+        navigate('/');
+        toast.success('Logged in successfully! Your proposal data has been restored.');
+      } else {
+        navigate('/');
+        toast.success('Logged in successfully!');
+      }
     } catch (error: any) {
       toast.error(error.message || 'Invalid login credentials');
       throw error;

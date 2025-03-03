@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { generateProposal, ProposalSection, ProposalInput } from "@/utils/openaiProposal";
 import { Send } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -12,6 +12,7 @@ import { ProjectDescriptionTextarea } from "./ProjectDescriptionTextarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
+import { saveProposalFormData, getSavedProposalFormData, clearSavedProposalFormData } from "@/utils/localStorage";
 
 interface ProposalFormProps {
   onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number) => void;
@@ -33,6 +34,30 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
     from: new Date(),
     to: addDays(new Date(), 14),
   });
+
+  // Check for saved form data on component mount
+  useEffect(() => {
+    const savedData = getSavedProposalFormData();
+    if (savedData) {
+      setProjectDescription(savedData.projectDescription);
+      setProjectType(savedData.projectType);
+      setHourlyRate(savedData.hourlyRate);
+      setFreelancerRate(savedData.freelancerRate);
+      setProjectBudget(savedData.projectBudget);
+      
+      if (savedData.dateRange) {
+        setDateRange({
+          from: new Date(savedData.dateRange.from),
+          to: new Date(savedData.dateRange.to),
+        });
+      }
+      
+      // Clear saved data since we've restored it
+      if (user) {
+        clearSavedProposalFormData();
+      }
+    }
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +82,19 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
 
     // Check if user is authenticated
     if (!user) {
+      // Save the current form data to localStorage before redirecting
+      saveProposalFormData({
+        projectDescription,
+        projectType,
+        hourlyRate,
+        freelancerRate,
+        projectBudget,
+        dateRange: dateRange ? {
+          from: dateRange.from.toISOString(),
+          to: dateRange.to.toISOString()
+        } : undefined
+      });
+      
       setShowAuthDialog(true);
       return;
     }
@@ -103,6 +141,19 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
   };
 
   const handleGoToAuth = () => {
+    // Save form data before navigating
+    saveProposalFormData({
+      projectDescription,
+      projectType,
+      hourlyRate,
+      freelancerRate,
+      projectBudget,
+      dateRange: dateRange ? {
+        from: dateRange.from.toISOString(),
+        to: dateRange.to.toISOString()
+      } : undefined
+    });
+    
     navigate('/auth');
   };
 
