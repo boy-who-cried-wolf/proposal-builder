@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
 import { MetricItem } from "@/components/ui/MetricItem";
@@ -15,14 +14,22 @@ import { saveProposal, ProposalSection } from "@/utils/openaiProposal";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-export const MainContent: React.FC = () => {
+interface MainContentProps {
+  generatedProposalSections: ProposalSection[];
+  projectDescription: string;
+  projectType: string;
+  hourlyRate: number;
+}
+
+export const MainContent: React.FC<MainContentProps> = ({
+  generatedProposalSections,
+  projectDescription,
+  projectType,
+  hourlyRate,
+}) => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState(0);
   const [activeHeaderTab, setActiveHeaderTab] = useState<number | null>(null);
-  const [generatedProposalSections, setGeneratedProposalSections] = useState<ProposalSection[]>([]);
-  const [projectDescription, setProjectDescription] = useState("");
-  const [projectType, setProjectType] = useState("");
-  const [hourlyRate, setHourlyRate] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleTabClick = (index: number) => {
@@ -31,13 +38,6 @@ export const MainContent: React.FC = () => {
 
   const handleHeaderTabChange = (index: number | null) => {
     setActiveHeaderTab(index);
-  };
-
-  const handleProposalData = (sections: ProposalSection[], description: string, type: string, rate: number) => {
-    setGeneratedProposalSections(sections);
-    setProjectDescription(description);
-    setProjectType(type);
-    setHourlyRate(rate);
   };
 
   const handleSaveProposal = async () => {

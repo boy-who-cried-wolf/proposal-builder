@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
 import { SendIcon } from "@/components/icons";
 import { ProposalForm } from "@/components/ui/ProposalForm";
+import { ProposalSection } from "@/utils/openaiProposal";
 
 type Message = {
   id: string;
@@ -10,7 +11,11 @@ type Message = {
   isUser: boolean;
 };
 
-export const MiddleSection: React.FC = () => {
+interface MiddleSectionProps {
+  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number) => void;
+}
+
+export const MiddleSection: React.FC<MiddleSectionProps> = ({ onProposalGenerated }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>([
@@ -80,7 +85,7 @@ export const MiddleSection: React.FC = () => {
           </div>
         );
       case 1:
-        return <ProposalForm />;
+        return <ProposalForm onProposalGenerated={onProposalGenerated} />;
       default:
         return null;
     }

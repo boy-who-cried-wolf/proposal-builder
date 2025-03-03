@@ -26,8 +26,13 @@ const Index = () => {
       />
       <div className="flex w-full h-screen bg-white max-md:flex-col">
         <Sidebar />
-        <MiddleSection />
-        <MainContent />
+        <MiddleSection onProposalGenerated={handleProposalGenerated} />
+        <MainContent 
+          generatedProposalSections={generatedProposalSections}
+          projectDescription={projectDescription}
+          projectType={projectType}
+          hourlyRate={hourlyRate}
+        />
       </div>
     </>
   );
