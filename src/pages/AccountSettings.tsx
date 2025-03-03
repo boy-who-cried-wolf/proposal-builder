@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import MainContent from "@/components/layout/MainContent";
+import { MainContent } from "@/components/layout/MainContent";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserProfile, updateUserProfile } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";

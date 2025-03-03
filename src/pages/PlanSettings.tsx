@@ -1,6 +1,5 @@
-
 import React from "react";
-import MainContent from "@/components/layout/MainContent";
+import { MainContent } from "@/components/layout/MainContent";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
