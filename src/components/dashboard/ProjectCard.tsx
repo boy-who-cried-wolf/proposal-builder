@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -98,7 +99,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 </Badge>
               ))}
             </div>
-            <p className="uppercase text-xs text-gray-500">SERVICES</p>
           </div>
         </div>
       </div>
