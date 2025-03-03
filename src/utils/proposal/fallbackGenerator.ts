@@ -21,37 +21,13 @@ export const fallbackGenerateProposal = async (
     });
   };
 
-  // Introduction section
-  await addSection({
-    title: 'Introduction',
-    items: [{
-      item: 'Introduction',
-      description: `Thank you for considering our services for your ${input.projectType} project. This proposal outlines our approach to deliver a high-quality solution that meets your requirements.`,
-      hours: '0',
-      price: '$0'
-    }],
-    subtotal: '$0',
-  }, 500);
-
-  // Project Overview
-  await addSection({
-    title: 'Project Overview',
-    items: [{
-      item: 'Project Description',
-      description: input.projectDescription || 'This project aims to create a custom solution tailored to your specific needs and requirements.',
-      hours: '0',
-      price: '$0'
-    }],
-    subtotal: '$0',
-  }, 1000);
-
   // Calculate appropriate hours based on budget
-  const totalHours = Math.floor(input.projectBudget / input.hourlyRate);
-  const distributableHours = totalHours - Math.floor(totalHours * 0.2); // Reserve 20% for management
+  const totalHours = Math.floor((input.projectBudget || 5000) / input.hourlyRate);
+  const distributableHours = Math.max(totalHours - Math.floor(totalHours * 0.1), 1); // Reserve 10% for management
   
-  // Scope of Work with tasks
+  // Scope of Work with billable tasks only
   const scopeSection: ProposalSection = {
-    title: 'Scope of Work',
+    title: 'Project Scope',
     items: [],
     subtotal: '$0',
   };
@@ -83,38 +59,69 @@ export const fallbackGenerateProposal = async (
         price: `$${testingHours * input.hourlyRate}`
       },
       {
-        item: 'Project management and coordination',
+        item: 'Project management',
         description: 'Overseeing project progress and communication',
-        hours: Math.floor(totalHours * 0.2).toString(),
-        price: `$${Math.floor(totalHours * 0.2) * input.hourlyRate}`
+        hours: Math.floor(totalHours * 0.1).toString(),
+        price: `$${Math.floor(totalHours * 0.1) * input.hourlyRate}`
+      },
+    ];
+  } else if (input.projectType === 'Mobile App') {
+    const designHours = Math.floor(distributableHours * 0.25);
+    const developmentHours = Math.floor(distributableHours * 0.6);
+    const testingHours = distributableHours - designHours - developmentHours;
+    
+    scopeSection.items = [
+      {
+        item: 'UI/UX Design',
+        description: 'Creating app wireframes and UI components',
+        hours: designHours.toString(),
+        price: `$${designHours * input.hourlyRate}`
+      },
+      {
+        item: 'App Development',
+        description: 'Building the mobile application functionality',
+        hours: developmentHours.toString(),
+        price: `$${developmentHours * input.hourlyRate}`
+      },
+      {
+        item: 'Testing & App Store Submission',
+        description: 'QA testing and preparing for app stores',
+        hours: testingHours.toString(),
+        price: `$${testingHours * input.hourlyRate}`
+      },
+      {
+        item: 'Project management',
+        description: 'Coordination and client communication',
+        hours: Math.floor(totalHours * 0.1).toString(),
+        price: `$${Math.floor(totalHours * 0.1) * input.hourlyRate}`
       },
     ];
   } else {
     // Generic tasks for other project types
     scopeSection.items = [
       {
-        item: 'Planning and requirements gathering',
+        item: 'Discovery & Planning',
         description: 'Defining project scope and requirements',
         hours: Math.floor(distributableHours * 0.2).toString(),
         price: `$${Math.floor(distributableHours * 0.2) * input.hourlyRate}`
       },
       {
-        item: 'Implementation and development',
+        item: 'Implementation',
         description: 'Building the core functionality of the project',
         hours: Math.floor(distributableHours * 0.6).toString(),
         price: `$${Math.floor(distributableHours * 0.6) * input.hourlyRate}`
       },
       {
-        item: 'Testing and quality assurance',
+        item: 'Testing & Quality Assurance',
         description: 'Ensuring all components work correctly',
         hours: (distributableHours - Math.floor(distributableHours * 0.2) - Math.floor(distributableHours * 0.6)).toString(),
         price: `$${(distributableHours - Math.floor(distributableHours * 0.2) - Math.floor(distributableHours * 0.6)) * input.hourlyRate}`
       },
       {
-        item: 'Project management and coordination',
-        description: 'Overseeing project progress and communication',
-        hours: Math.floor(totalHours * 0.2).toString(),
-        price: `$${Math.floor(totalHours * 0.2) * input.hourlyRate}`
+        item: 'Project Management',
+        description: 'Coordination and client communication',
+        hours: Math.floor(totalHours * 0.1).toString(),
+        price: `$${Math.floor(totalHours * 0.1) * input.hourlyRate}`
       },
     ];
   }
@@ -129,43 +136,32 @@ export const fallbackGenerateProposal = async (
   });
   scopeSection.subtotal = `$${scopeSubtotal}`;
   
-  await addSection(scopeSection, 1500);
-
-  // Timeline section
-  await addSection({
-    title: 'Timeline',
-    items: [{
-      item: 'Project Timeline',
-      description: `This project is estimated to be completed within ${Math.ceil(totalHours / 40)} weeks from the start date. We will begin work immediately upon approval of this proposal.`,
-      hours: '0',
-      price: '$0'
-    }],
-    subtotal: '$0',
-  }, 800);
-
-  // Budget section
-  await addSection({
-    title: 'Budget',
-    items: [{
-      item: 'Total Budget',
-      description: `The total budget for this project is $${input.projectBudget.toLocaleString()}, based on our hourly rate of $${input.hourlyRate}/hour. This includes all tasks outlined in the Scope of Work.`,
-      hours: totalHours.toString(),
-      price: `$${input.projectBudget}`
-    }],
-    subtotal: `$${input.projectBudget}`,
-  }, 700);
-
-  // Terms section
-  await addSection({
-    title: 'Terms and Conditions',
-    items: [{
-      item: 'Payment Terms',
-      description: 'Payment terms: 50% deposit upon signing, with the remaining 50% due upon project completion. The project includes two rounds of revisions. Additional revisions will be billed at our standard hourly rate.',
-      hours: '0',
-      price: '$0'
-    }],
-    subtotal: '$0',
-  }, 600);
+  // Start with just the primary billable sections
+  await addSection(scopeSection, 1000);
+  
+  // For larger projects, add more sections
+  if (input.projectType === 'Website' || input.projectType === 'Mobile App') {
+    const additionalSection: ProposalSection = {
+      title: input.projectType === 'Website' ? 'Content & SEO' : 'Marketing & Launch',
+      items: [
+        {
+          item: input.projectType === 'Website' ? 'Content Creation' : 'Launch Strategy',
+          description: input.projectType === 'Website' ? 'Creating website content' : 'Planning app launch and marketing',
+          hours: Math.floor(totalHours * 0.1).toString(),
+          price: `$${Math.floor(totalHours * 0.1) * input.hourlyRate}`
+        },
+        {
+          item: input.projectType === 'Website' ? 'SEO Optimization' : 'App Store Optimization',
+          description: input.projectType === 'Website' ? 'Search engine optimization' : 'Optimizing app store listing',
+          hours: Math.floor(totalHours * 0.05).toString(), 
+          price: `$${Math.floor(totalHours * 0.05) * input.hourlyRate}`
+        }
+      ],
+      subtotal: `$${(Math.floor(totalHours * 0.1) + Math.floor(totalHours * 0.05)) * input.hourlyRate}`
+    };
+    
+    await addSection(additionalSection, 800);
+  }
   
   return sections;
 };
