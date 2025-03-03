@@ -4,32 +4,11 @@ import { generateProposal, ProposalSection, ProposalInput } from "@/utils/openai
 import { Send } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
-import { addDays, differenceInBusinessDays } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-
-const projectTypes = [
-  "Website",
-  "Branding",
-  "Mobile App",
-  "E-commerce",
-  "Marketing",
-  "Content Writing",
-  "UI/UX Design",
-  "Graphic Design",
-  "SEO",
-  "Social Media",
-  "Video Production",
-  "Other"
-];
+import { addDays } from "date-fns";
+import { ProjectTypeSelect } from "./ProjectTypeSelect";
+import { NumericInput } from "./NumericInput";
+import { DateRangePicker } from "./DateRangePicker";
+import { ProjectDescriptionTextarea } from "./ProjectDescriptionTextarea";
 
 interface ProposalFormProps {
   onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number) => void;
@@ -41,7 +20,7 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
   const [hourlyRate, setHourlyRate] = useState(100);
   const [freelancerRate, setFreelancerRate] = useState(60);
   const [projectBudget, setProjectBudget] = useState(5000);
-  const [projectType, setProjectType] = useState(projectTypes[0]);
+  const [projectType, setProjectType] = useState("Website");
   const [proposalSections, setProposalSections] = useState<ProposalSection[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -111,116 +90,40 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
       <div className="p-4 bg-white">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-4">
-            <div>
-              <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
-                Project Type
-              </label>
-              <select
-                value={projectType}
-                onChange={(e) => setProjectType(e.target.value)}
-                className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
-              >
-                {projectTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <ProjectTypeSelect 
+              projectType={projectType}
+              setProjectType={setProjectType}
+            />
             
-            <div>
-              <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
-                Hourly Rate ($)
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={hourlyRate}
-                onChange={(e) => setHourlyRate(Number(e.target.value))}
-                className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
-              />
-            </div>
+            <NumericInput
+              label="Hourly Rate ($)"
+              value={hourlyRate}
+              onChange={setHourlyRate}
+            />
 
-            <div>
-              <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
-                Freelancer Rate ($)
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={freelancerRate}
-                onChange={(e) => setFreelancerRate(Number(e.target.value))}
-                className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
-              />
-            </div>
+            <NumericInput
+              label="Freelancer Rate ($)"
+              value={freelancerRate}
+              onChange={setFreelancerRate}
+            />
 
-            <div>
-              <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
-                Project Budget ($)
-              </label>
-              <input
-                type="number"
-                min="100"
-                value={projectBudget}
-                onChange={(e) => setProjectBudget(Number(e.target.value))}
-                className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
-              />
-            </div>
+            <NumericInput
+              label="Project Budget ($)"
+              value={projectBudget}
+              onChange={setProjectBudget}
+              min={100}
+            />
             
-            <div>
-              <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
-                Project Timeline
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full h-[39px] justify-start text-left font-normal border border-[#E1E1DC] bg-[#F7F6F2] text-[9px] font-semibold tracking-[1.389px] uppercase p-[11px]",
-                      !dateRange && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateRange?.from ? (
-                      dateRange.to ? (
-                        <>
-                          {format(dateRange.from, "LLL dd, y")} -{" "}
-                          {format(dateRange.to, "LLL dd, y")}
-                        </>
-                      ) : (
-                        format(dateRange.from, "LLL dd, y")
-                      )
-                    ) : (
-                      <span>Select date range</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={dateRange?.from}
-                    selected={dateRange}
-                    onSelect={setDateRange}
-                    numberOfMonths={2}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-          
-          <div>
-            <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
-              Project Description
-            </label>
-            <textarea
-              value={projectDescription}
-              onChange={(e) => setProjectDescription(e.target.value)}
-              rows={5}
-              placeholder="Describe your project in detail..."
-              className="w-full rounded border text-black text-[9px] font-semibold tracking-[1.389px] bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
+            <DateRangePicker
+              dateRange={dateRange}
+              setDateRange={setDateRange}
             />
           </div>
+          
+          <ProjectDescriptionTextarea
+            projectDescription={projectDescription}
+            setProjectDescription={setProjectDescription}
+          />
           
           <div className="flex justify-end">
             <button
