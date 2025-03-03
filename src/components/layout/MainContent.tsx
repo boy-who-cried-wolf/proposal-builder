@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useProposalContent } from "@/hooks/useProposalContent";
 import { ProposalHeader } from "@/components/proposal/ProposalHeader";
@@ -18,7 +17,12 @@ export const MainContent: React.FC<MainContentProps> = ({
   dateRange,
   proposalHistory,
   onRevertProposal,
+  children
 }) => {
+  if (children) {
+    return <main className="grow flex flex-col max-md:h-screen">{children}</main>;
+  }
+
   const {
     activeTab,
     activeHeaderTab,
@@ -52,10 +56,10 @@ export const MainContent: React.FC<MainContentProps> = ({
     deleteSection,
     setIsSectionEditorOpen
   } = useProposalContent(
-    generatedProposalSections,
-    projectDescription,
-    projectType,
-    hourlyRate,
+    generatedProposalSections || [],
+    projectDescription || "",
+    projectType || "",
+    hourlyRate || 0,
     freelancerRate,
     projectBudget,
     dateRange
@@ -107,7 +111,7 @@ export const MainContent: React.FC<MainContentProps> = ({
         setIsHoursPriceLocked={setIsHoursPriceLocked}
         handleItemChange={handleItemChange}
         saveItemChanges={saveItemChanges}
-        hourlyRate={hourlyRate}
+        hourlyRate={hourlyRate || 0}
         deleteItem={deleteItem}
         isSectionEditorOpen={isSectionEditorOpen}
         setIsSectionEditorOpen={setIsSectionEditorOpen}

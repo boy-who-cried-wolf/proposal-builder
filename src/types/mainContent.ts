@@ -2,15 +2,16 @@
 import { ProposalSection } from "@/types/proposal";
 
 export interface MainContentProps {
-  generatedProposalSections: ProposalSection[];
-  projectDescription: string;
-  projectType: string;
-  hourlyRate: number;
+  generatedProposalSections?: ProposalSection[];
+  projectDescription?: string;
+  projectType?: string;
+  hourlyRate?: number;
   freelancerRate?: number;
   projectBudget?: number;
   dateRange?: { from: Date; to?: Date };
   proposalHistory?: ProposalSection[][];
   onRevertProposal?: (index: number) => void;
+  children?: React.ReactNode;
 }
 
 export interface EditingItem {
