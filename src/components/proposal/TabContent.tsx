@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ProposalContent } from "@/components/proposal/ProposalContent";
 import { RevisionsTab } from "@/components/proposal/RevisionsTab";
@@ -27,7 +26,6 @@ export const TabContent: React.FC<TabContentProps> = ({
   const { user } = useAuth();
   const { currentPlan } = usePlanSubscription(user?.id);
   
-  // Proposal limit check for freelancer plan
   const hasReachedProposalLimit = () => {
     if (currentPlan === 'freelancer' && sections.length >= 3) {
       return true;
@@ -36,7 +34,7 @@ export const TabContent: React.FC<TabContentProps> = ({
   };
 
   const renderAuthOverlay = () => (
-    <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+    <div className="absolute inset-0 flex flex-col items-center justify-center z-10 w-full h-full">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/70 to-white pointer-events-none"></div>
       <div className="z-20 bg-white border-2 border-black py-3 px-6 text-center">
         <h3 className="text-xl font-bold">SIGN IN OR LOGIN TO CONTINUE</h3>
@@ -52,7 +50,7 @@ export const TabContent: React.FC<TabContentProps> = ({
   );
   
   const renderPlanUpgradeOverlay = (feature: string) => (
-    <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+    <div className="absolute inset-0 flex flex-col items-center justify-center z-10 w-full h-full">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/70 to-white pointer-events-none"></div>
       <div className="z-20 bg-white border-2 border-amber-500 py-3 px-6 text-center max-w-md">
         <h3 className="text-xl font-bold text-amber-800 mb-2">Upgrade Required</h3>
@@ -82,10 +80,8 @@ export const TabContent: React.FC<TabContentProps> = ({
             onOpenSectionSettings={openSectionSettings}
           />
           
-          {/* Authentication overlay for non-authenticated users */}
           {!user && sections.length > 0 && renderAuthOverlay()}
           
-          {/* Plan limit overlay for freelancer plan */}
           {user && hasReachedProposalLimit() && renderPlanUpgradeOverlay('proposal-limit')}
         </div>
       );
@@ -94,10 +90,8 @@ export const TabContent: React.FC<TabContentProps> = ({
         <div className="relative">
           <RevisionsTab revisions={revisions} />
           
-          {/* Authentication overlay for non-authenticated users */}
           {!user && revisions.length > 0 && renderAuthOverlay()}
           
-          {/* Assistant access restriction - only Pro plan */}
           {user && currentPlan !== 'pro' && renderPlanUpgradeOverlay('assistant')}
         </div>
       );
