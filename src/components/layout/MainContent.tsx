@@ -81,16 +81,18 @@ export const MainContent: React.FC<MainContentProps> = ({
             
             {/* Authentication overlay for non-authenticated users */}
             {!user && sections.length > 0 && (
-              <div className="absolute inset-0 backdrop-blur-md flex flex-col items-center justify-center bg-black/30 z-10">
-                <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
-                  <h3 className="text-xl font-bold mb-3">Sign Up to View Full Results</h3>
-                  <p className="mb-6">Create an account or sign in to see your complete proposal.</p>
-                  <div className="flex flex-col space-y-3">
-                    <Link to="/auth" className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded">
-                      Sign Up / Login
-                    </Link>
-                  </div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/70 to-white pointer-events-none"></div>
+                <div className="z-20 bg-white border-2 border-black py-3 px-6 text-center">
+                  <h3 className="text-xl font-bold">SIGN IN OR LOGIN TO CONTINUE</h3>
                 </div>
+                
+                <Link 
+                  to="/auth" 
+                  className="mt-6 z-20 bg-black text-white py-2 px-4 font-semibold rounded hover:bg-black/80 transition-colors"
+                >
+                  Sign In / Create Account
+                </Link>
               </div>
             )}
           </div>
@@ -102,16 +104,18 @@ export const MainContent: React.FC<MainContentProps> = ({
             
             {/* Authentication overlay for non-authenticated users */}
             {!user && revisions.length > 0 && (
-              <div className="absolute inset-0 backdrop-blur-md flex flex-col items-center justify-center bg-black/30 z-10">
-                <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
-                  <h3 className="text-xl font-bold mb-3">Sign Up to View Revisions</h3>
-                  <p className="mb-6">Create an account or sign in to see your proposal revision history.</p>
-                  <div className="flex flex-col space-y-3">
-                    <Link to="/auth" className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded">
-                      Sign Up / Login
-                    </Link>
-                  </div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/70 to-white pointer-events-none"></div>
+                <div className="z-20 bg-white border-2 border-black py-3 px-6 text-center">
+                  <h3 className="text-xl font-bold">SIGN IN OR LOGIN TO CONTINUE</h3>
                 </div>
+                
+                <Link 
+                  to="/auth" 
+                  className="mt-6 z-20 bg-black text-white py-2 px-4 font-semibold rounded hover:bg-black/80 transition-colors"
+                >
+                  Sign In / Create Account
+                </Link>
               </div>
             )}
           </div>
@@ -162,6 +166,7 @@ export const MainContent: React.FC<MainContentProps> = ({
         {renderTabContent()}
       </div>
 
+      {/* Footer is always visible, even for non-authenticated users */}
       <ProposalFooter 
         totalHours={getTotalHoursDisplay()}
         hoursPerDay={getHoursPerDayDisplay()}

@@ -95,7 +95,10 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
         } : undefined
       });
       
-      setShowAuthDialog(true);
+      // Generate the proposal for the non-logged in user to preview
+      await generateProposalContent();
+      
+      // Don't show the dialog - let them see the preview with the gradient overlay
       return;
     }
 
