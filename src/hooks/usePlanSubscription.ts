@@ -1,13 +1,19 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { getCurrentSubscription, createCheckoutSession, cancelSubscription } from "@/services/stripeService";
+import { 
+  getCurrentSubscription, 
+  createCheckoutSession, 
+  cancelSubscription,
+  createCustomerPortalSession
+} from "@/services/stripeService";
 
 export function usePlanSubscription(userId: string | undefined) {
   const [currentPlan, setCurrentPlan] = useState("free");
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState("");
   const [cancelLoading, setCancelLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string>("");
@@ -103,11 +109,37 @@ export function usePlanSubscription(userId: string | undefined) {
     }
   };
 
+  const handleManageSubscription = async () => {
+    if (!userId) {
+      toast.error("You must be logged in to manage your subscription");
+      return;
+    }
+    
+    if (currentPlan === "free") {
+      toast.info("You are on the free plan with no active subscription to manage");
+      return;
+    }
+    
+    try {
+      setPortalLoading(true);
+      setError(null);
+      await createCustomerPortalSession(userId);
+      // No need to fetch subscription here as we're redirecting to Stripe portal
+    } catch (error) {
+      console.error("Error accessing customer portal:", error);
+      setError("Unable to access the subscription management portal. Please try again later.");
+      setErrorDetails(JSON.stringify(error, null, 2));
+      setShowErrorDialog(true);
+      setPortalLoading(false);
+    }
+  };
+
   return {
     currentPlan,
     loading,
     checkoutLoading,
     cancelLoading,
+    portalLoading,
     subscriptionInfo,
     error,
     errorDetails,
@@ -117,6 +149,7 @@ export function usePlanSubscription(userId: string | undefined) {
     fetchSubscription,
     handleRefresh,
     handlePlanSelect,
-    handleCancelSubscription
+    handleCancelSubscription,
+    handleManageSubscription
   };
 }

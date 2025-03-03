@@ -24,6 +24,7 @@ const PlanSettings = () => {
     loading,
     checkoutLoading,
     cancelLoading,
+    portalLoading,
     subscriptionInfo,
     error,
     errorDetails,
@@ -33,7 +34,8 @@ const PlanSettings = () => {
     fetchSubscription,
     handleRefresh,
     handlePlanSelect,
-    handleCancelSubscription
+    handleCancelSubscription,
+    handleManageSubscription
   } = usePlanSubscription(user?.id);
   
   const searchParams = new URLSearchParams(location.search);
@@ -117,7 +119,9 @@ const PlanSettings = () => {
               subscriptionInfo={subscriptionInfo}
               currentPlan={currentPlan}
               cancelLoading={cancelLoading}
+              portalLoading={portalLoading}
               onCancel={handleCancelSubscription}
+              onManageSubscription={handleManageSubscription}
             />
             
             <PlansGrid 

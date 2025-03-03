@@ -80,6 +80,60 @@ serve(async (req) => {
     const { action, userId, planId } = body;
     console.log(`Processing ${action || 'unknown'} request for user ${userId || 'unknown'}${planId ? ` and plan ${planId}` : ''}`)
 
+    // Create a customer portal session
+    if (action === 'createCustomerPortalSession') {
+      if (!userId) {
+        return new Response(
+          JSON.stringify({ error: 'User ID is required' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // Get the customer ID from the database
+      const { data: subscription, error: subscriptionError } = await supabase
+        .from('subscriptions')
+        .select('stripe_customer_id')
+        .eq('user_id', userId)
+        .single()
+
+      if (subscriptionError) {
+        console.error('Error fetching subscription:', subscriptionError)
+        return new Response(
+          JSON.stringify({ error: `Error fetching subscription: ${subscriptionError.message}` }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      if (!subscription?.stripe_customer_id) {
+        console.error('No customer ID found for user:', userId)
+        return new Response(
+          JSON.stringify({ error: 'No active subscription found' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      try {
+        // Create a customer portal session
+        console.log(`Creating customer portal session for customer ${subscription.stripe_customer_id}`)
+        const session = await stripe.billingPortal.sessions.create({
+          customer: subscription.stripe_customer_id,
+          return_url: `${req.headers.get('origin')}/account-settings/plan`,
+        })
+
+        console.log(`Created customer portal session: ${session.id}, URL: ${session.url}`)
+        return new Response(
+          JSON.stringify({ url: session.url }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      } catch (error) {
+        console.error('Error creating customer portal session:', error)
+        return new Response(
+          JSON.stringify({ error: `Error creating customer portal session: ${error.message}` }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
     // Create a customer if needed
     if (action === 'createCheckoutSession') {
       if (!userId) {
