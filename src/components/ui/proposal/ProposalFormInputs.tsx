@@ -5,6 +5,7 @@ import { NumericInput } from "../NumericInput";
 import { DateRangePicker } from "../DateRangePicker";
 import { ProjectDescriptionTextarea } from "../ProjectDescriptionTextarea";
 import { DateRange } from "react-day-picker";
+import { Textarea } from "../textarea";
 
 interface ProposalFormInputsProps {
   projectType: string;
@@ -36,8 +37,8 @@ export const ProposalFormInputs: React.FC<ProposalFormInputsProps> = ({
   setProjectDescription
 }) => {
   return (
-    <>
-      <div className="space-y-4">
+    <div className="flex flex-col h-full">
+      <div className="space-y-4 mb-4">
         <ProjectTypeSelect 
           projectType={projectType}
           setProjectType={setProjectType}
@@ -68,10 +69,12 @@ export const ProposalFormInputs: React.FC<ProposalFormInputsProps> = ({
         />
       </div>
       
-      <ProjectDescriptionTextarea
-        projectDescription={projectDescription}
-        setProjectDescription={setProjectDescription}
-      />
-    </>
+      <div className="flex-grow mb-4">
+        <ProjectDescriptionTextarea
+          projectDescription={projectDescription}
+          setProjectDescription={setProjectDescription}
+        />
+      </div>
+    </div>
   );
 };

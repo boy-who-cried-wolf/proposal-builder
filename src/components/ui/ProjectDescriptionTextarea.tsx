@@ -1,5 +1,6 @@
 
 import React from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ProjectDescriptionTextareaProps {
   projectDescription: string;
@@ -11,16 +12,16 @@ export const ProjectDescriptionTextarea: React.FC<ProjectDescriptionTextareaProp
   setProjectDescription,
 }) => {
   return (
-    <div>
-      <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
+    <div className="flex flex-col h-full">
+      <label htmlFor="project-description" className="block text-gray-700 mb-2">
         Project Description
       </label>
-      <textarea
+      <Textarea
+        id="project-description"
         value={projectDescription}
         onChange={(e) => setProjectDescription(e.target.value)}
-        rows={5}
         placeholder="Describe your project in detail..."
-        className="w-full rounded border text-black text-[9px] font-semibold tracking-[1.389px] bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
+        className="h-full min-h-[200px] resize-none flex-grow"
       />
     </div>
   );

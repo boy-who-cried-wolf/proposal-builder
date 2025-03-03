@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { ProposalSection, ProposalInput } from "@/types/proposal"; 
 import { useProposalGeneration } from "@/hooks/proposal/useProposalGeneration";
@@ -44,7 +43,6 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
     onProposalGenerated
   );
 
-  // Check for saved form data on component mount
   useEffect(() => {
     const savedData = getSavedProposalFormData();
     if (savedData) {
@@ -61,7 +59,6 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
         });
       }
       
-      // Clear saved data since we've restored it
       if (user) {
         clearSavedProposalFormData();
       }
@@ -79,9 +76,7 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
       return;
     }
 
-    // Check if user is authenticated
     if (!user) {
-      // Save the current form data to localStorage before redirecting
       saveProposalFormData({
         projectDescription,
         projectType,
@@ -94,19 +89,15 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
         } : undefined
       });
       
-      // Generate the proposal for the non-logged in user to preview
       await generateProposalContent();
       
-      // Don't show the dialog - let them see the preview with the gradient overlay
       return;
     }
 
-    // If we get here, user is authenticated, so proceed with proposal generation
     await generateProposalContent();
   };
 
   const handleGoToAuth = () => {
-    // Save form data before navigating
     saveProposalFormData({
       projectDescription,
       projectType,
@@ -123,9 +114,9 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
   };
 
   return (
-    <div className="mb-4">
-      <div className="p-4 bg-white">
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="h-full mb-4 flex flex-col">
+      <div className="p-4 bg-white flex-grow flex flex-col h-full">
+        <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <ProposalFormInputs 
             projectType={projectType}
             setProjectType={setProjectType}

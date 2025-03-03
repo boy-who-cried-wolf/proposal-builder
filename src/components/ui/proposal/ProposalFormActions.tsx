@@ -12,11 +12,11 @@ export const ProposalFormActions: React.FC<ProposalFormActionsProps> = ({
   streamProgress
 }) => {
   return (
-    <div className="flex justify-end">
+    <div className="w-full mt-auto">
       <button
         type="submit"
         disabled={isGenerating}
-        className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded"
+        className="w-full flex items-center justify-center gap-2 bg-black text-white px-4 py-3 rounded"
       >
         {isGenerating ? (
           <div className="flex items-center">
