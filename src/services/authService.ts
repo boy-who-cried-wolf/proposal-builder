@@ -83,8 +83,16 @@ export const requestPasswordReset = async (email: string) => {
     
     if (error) throw error;
     
-    // Then, send a transactional email via Loops.so with the reset link
-    await notifyLoopsPasswordReset(email, resetUrl);
+    // Then, try to send a transactional email via Loops.so with the reset link
+    // But don't let it block the flow if it fails
+    try {
+      await notifyLoopsPasswordReset(email, resetUrl);
+      console.log('Password reset notification sent via Loops.so');
+    } catch (loopsError) {
+      console.error('Failed to send Loops.so password reset notification:', loopsError);
+      // Continue with the flow even if Loops notification fails
+      // Supabase will still send its default password reset email
+    }
     
     toast.success('Password reset instructions sent to your email.');
     return { success: true };

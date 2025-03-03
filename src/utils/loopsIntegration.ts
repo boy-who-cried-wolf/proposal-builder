@@ -119,11 +119,13 @@ export const notifyLoopsPasswordReset = async (email: string, passwordResetLink:
 
     if (error) {
       console.error('Error sending password reset email via Loops:', error);
+      throw error;
     } else {
       console.log('Password reset email sent via Loops successfully:', data);
     }
   } catch (error) {
     console.error('Error invoking Loops integration:', error);
+    throw error; // Re-throw the error to be caught in the calling function
   }
 };
 
