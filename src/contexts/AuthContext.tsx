@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { getSavedProposalFormData } from '@/utils/localStorage';
+import { signUp, signIn, signOut, requestPasswordReset } from '@/services/authService';
 
 interface AuthContextType {
   session: Session | null;
@@ -45,104 +46,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  // Function to add user to Loops.so
-  const addUserToLoops = async (email: string, userGroup: string = 'free') => {
+  const handleSignIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.functions.invoke('loops-integration', {
-        body: {
-          action: 'createContact',
-          userData: {
-            email,
-            userGroup,
-            source: 'website_signup'
-          }
-        }
-      });
-
-      if (error) {
-        console.error('Error adding user to Loops:', error);
-      } else {
-        console.log('User added to Loops successfully:', data);
-      }
-    } catch (error) {
-      console.error('Error invoking Loops integration:', error);
-    }
-  };
-
-  // Function to update user in Loops.so
-  const updateUserInLoops = async (email: string, userGroup: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('loops-integration', {
-        body: {
-          action: 'updateContact',
-          userData: {
-            email,
-            userGroup
-          }
-        }
-      });
-
-      if (error) {
-        console.error('Error updating user in Loops:', error);
-      } else {
-        console.log('User updated in Loops successfully:', data);
-      }
-    } catch (error) {
-      console.error('Error invoking Loops integration:', error);
-    }
-  };
-
-  // Function to trigger an event in Loops.so
-  const triggerLoopsEvent = async (email: string, eventName: string, customFields?: Record<string, any>) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('loops-integration', {
-        body: {
-          action: 'triggerEvent',
-          userData: {
-            email,
-            customFields
-          },
-          eventName
-        }
-      });
-
-      if (error) {
-        console.error(`Error triggering ${eventName} event in Loops:`, error);
-      } else {
-        console.log(`${eventName} event triggered in Loops successfully:`, data);
-      }
-    } catch (error) {
-      console.error('Error invoking Loops integration:', error);
-    }
-  };
-
-  const signUp = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-      
-      // Add user to Loops.so
-      await addUserToLoops(email);
-      
-      toast.success('Account created successfully! Check your email to confirm.');
-    } catch (error: any) {
-      toast.error(error.message || 'An error occurred during sign up');
-      throw error;
-    }
-  };
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+      await signIn(email, password);
       
       // Check if we have saved form data that would indicate we should redirect to index
       const savedData = getSavedProposalFormData();
@@ -151,47 +57,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toast.success('Logged in successfully! Your proposal data has been restored.');
       } else {
         navigate('/');
-        toast.success('Logged in successfully!');
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Invalid login credentials');
-      throw error;
+    } catch (error) {
+      // Error is already handled in the service
+      console.error(error);
     }
   };
 
-  const signOut = async () => {
+  const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await signOut();
       navigate('/auth');
-      toast.success('Logged out successfully!');
-    } catch (error: any) {
-      toast.error(error.message || 'Error signing out');
-      throw error;
-    }
-  };
-
-  const requestPasswordReset = async (email: string) => {
-    try {
-      // First, request password reset from Supabase
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
-      });
-      
-      if (error) throw error;
-      
-      // Then, notify Loops.so about the password reset request
-      await supabase.functions.invoke('loops-integration', {
-        body: {
-          action: 'passwordReset',
-          userData: { email }
-        }
-      });
-      
-      toast.success('Password reset instructions sent to your email.');
-    } catch (error: any) {
-      toast.error(error.message || 'Error requesting password reset');
-      throw error;
+    } catch (error) {
+      // Error is already handled in the service
+      console.error(error);
     }
   };
 
@@ -200,8 +79,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     loading,
     signUp,
-    signIn,
-    signOut,
+    signIn: handleSignIn,
+    signOut: handleSignOut,
     requestPasswordReset,
   };
 
