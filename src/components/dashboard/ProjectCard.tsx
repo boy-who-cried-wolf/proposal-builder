@@ -132,13 +132,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           </div>
           <div>
             <p className={cn("font-bold text-lg uppercase font-poppins", daysRemainingColorClass)}>
-              {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days overdue` : `${daysRemaining} days`}
+              {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days` : `${daysRemaining} days`}
             </p>
             <p className="uppercase text-xs text-gray-500">DAYS REMAINING</p>
           </div>
           <div>
             <div className="flex flex-wrap gap-1">
-              {["WEB DESIGN", "SERVICES"].map((service, index) => (
+              {["WEB DESIGN"].map((service, index) => (
                 <Badge 
                   key={index} 
                   className={cn("font-poppins text-xs", getServiceTagColor(service))}
@@ -180,14 +180,14 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           </div>
           <div>
             <p className={cn("font-semibold font-poppins", daysRemainingColorClass)}>
-              {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days overdue` : `${daysRemaining} days`}
+              {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days` : `${daysRemaining} days`}
             </p>
             <p className="text-muted-foreground">Remaining</p>
           </div>
         </div>
         
         <div className="mt-4 flex flex-wrap gap-1">
-          {["WEB DESIGN", "SERVICES"].map((service, index) => (
+          {["WEB DESIGN"].map((service, index) => (
             <Badge 
               key={index} 
               className={cn("font-poppins text-xs", getServiceTagColor(service))}
