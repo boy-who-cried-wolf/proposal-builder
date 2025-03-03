@@ -100,6 +100,8 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
               value={editingItem.item.hours}
               onChange={(e) => handleItemChange('hours', e.target.value)}
               className="col-span-3"
+              min="1"
+              step="1"
             />
           </div>
           
@@ -118,7 +120,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
           
           {isHoursPriceLocked && (
             <div className="text-xs text-gray-500 italic">
-              Price is calculated automatically based on hours at ${hourlyRate}/hour. Unlock to set custom price.
+              Price is calculated automatically based on whole hours at ${hourlyRate}/hour. Unlock to set custom price.
             </div>
           )}
         </div>

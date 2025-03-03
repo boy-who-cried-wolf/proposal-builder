@@ -37,8 +37,9 @@ export const adjustSectionsToMatchBudget = (
         sectionTotal += newPrice;
         
         if (isHoursPriceLocked && hourlyRate > 0) {
-          const newHours = Math.round((newPrice / hourlyRate) * 10) / 10;
-          item.hours = newHours.toFixed(1);
+          // Calculate hours as whole numbers
+          const newHours = Math.round(newPrice / hourlyRate);
+          item.hours = newHours.toString();
         }
       }
     });

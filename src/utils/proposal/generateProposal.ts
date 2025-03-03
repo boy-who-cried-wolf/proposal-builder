@@ -41,10 +41,23 @@ Project Description: ${projectDescription}`,
     }
 
     let sections = data.sections;
+    
+    // Ensure all hours are whole numbers and prices correctly match hourly rate
+    sections.forEach(section => {
+      section.items.forEach(item => {
+        // Convert hours to whole numbers and ensure price matches
+        const hours = parseInt(item.hours.toString(), 10);
+        if (!isNaN(hours)) {
+          item.hours = hours.toString();
+          const price = hours * hourlyRate;
+          item.price = `$${price}`;
+        }
+      });
+    });
 
     // If a project budget is specified, adjust all line items to match this budget
     if (projectBudget) {
-      sections = adjustSectionsToMatchBudget(sections, projectBudget);
+      sections = adjustSectionsToMatchBudget(sections, projectBudget, hourlyRate);
     }
 
     return sections;
@@ -55,7 +68,7 @@ Project Description: ${projectDescription}`,
 }
 
 // Helper function to adjust section prices to match the budget
-function adjustSectionsToMatchBudget(sections: ProposalSection[], budget: number): ProposalSection[] {
+function adjustSectionsToMatchBudget(sections: ProposalSection[], budget: number, hourlyRate: number): ProposalSection[] {
   // Calculate current total
   let currentTotal = 0;
   sections.forEach(section => {
@@ -85,6 +98,12 @@ function adjustSectionsToMatchBudget(sections: ProposalSection[], budget: number
         const newPrice = Math.round(originalPrice * ratio);
         item.price = `$${newPrice}`;
         sectionTotal += newPrice;
+        
+        // Recalculate hours based on new price to maintain hourly rate
+        if (hourlyRate > 0) {
+          const newHours = Math.round(newPrice / hourlyRate);
+          item.hours = newHours.toString();
+        }
       }
     });
     

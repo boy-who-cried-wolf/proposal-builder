@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ProposalSection } from "@/types/proposal";
 import { EditingItem } from "@/types/mainContent";
@@ -48,10 +47,11 @@ export function useProposalEditing(
     const updatedItem = { ...editingItem.item, [field]: value };
 
     if (field === 'hours' && isHoursPriceLocked) {
-      const hours = parseFloat(value);
+      const hours = parseInt(value, 10);
       if (!isNaN(hours)) {
+        updatedItem.hours = hours.toString();
         const priceValue = hours * hourlyRate;
-        updatedItem.price = `$${Math.round(priceValue)}`;
+        updatedItem.price = `$${priceValue}`;
       }
     }
 
@@ -67,12 +67,14 @@ export function useProposalEditing(
     const { sectionIndex, itemIndex, item } = editingItem;
     const oldItem = sections[sectionIndex].items[itemIndex];
     
-    // Process hours to ensure it's formatted correctly
     if (item.hours) {
-      const hours = parseFloat(item.hours.toString());
+      const hours = parseInt(item.hours.toString(), 10);
       if (!isNaN(hours)) {
-        // Round to 1 decimal place
-        item.hours = Math.round(hours * 10) / 10 + '';
+        item.hours = hours.toString();
+        if (isHoursPriceLocked) {
+          const priceValue = hours * hourlyRate;
+          item.price = `$${priceValue}`;
+        }
       }
     }
     
@@ -86,10 +88,8 @@ export function useProposalEditing(
       ],
     };
 
-    // Recalculate subtotals for all sections
     recalculateSubtotals(newSections);
 
-    // Match budget if needed
     if (projectBudget > 0) {
       const currentTotal = calculateTotalFromSections(newSections);
       if (currentTotal !== projectBudget) {
@@ -97,7 +97,6 @@ export function useProposalEditing(
       }
     }
 
-    // Create revisions for changed fields
     Object.keys(item).forEach((key) => {
       const field = key as keyof typeof item;
       if (item[field] !== oldItem[field]) {
@@ -217,7 +216,6 @@ export function useProposalEditing(
   };
 }
 
-// Helper function to avoid circular dependency
 function calculateTotalFromSections(sections: ProposalSection[]): number {
   let total = 0;
   sections.forEach(section => {

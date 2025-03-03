@@ -6,13 +6,13 @@ export const calculateTotalHours = (sections: ProposalSection[]): number => {
   let total = 0;
   sections.forEach(section => {
     section.items.forEach(item => {
-      const hours = parseFloat(item.hours.toString());
+      const hours = parseInt(item.hours.toString(), 10);
       if (!isNaN(hours)) {
         total += hours;
       }
     });
   });
-  return Math.round(total * 10) / 10;
+  return total;
 };
 
 export const calculateTotalWorkingDays = (
