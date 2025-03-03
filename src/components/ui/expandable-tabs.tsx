@@ -7,9 +7,10 @@ import { useOnClickOutside } from "usehooks-ts";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
-interface Tab {
+export interface Tab {
   title: string;
   icon: React.ComponentType<any>;
+  content?: React.ReactNode;
   type?: never;
 }
 
@@ -17,6 +18,7 @@ interface Separator {
   type: "separator";
   title?: never;
   icon?: never;
+  content?: never;
 }
 
 type TabItem = Tab | Separator;
@@ -26,6 +28,7 @@ interface ExpandableTabsProps {
   className?: string;
   activeColor?: string;
   onChange?: (index: number | null) => void;
+  showTabContent?: boolean;
 }
 
 const buttonVariants = {
@@ -54,6 +57,7 @@ export function ExpandableTabs({
   className,
   activeColor = "text-primary",
   onChange,
+  showTabContent = false,
 }: ExpandableTabsProps) {
   const [selected, setSelected] = React.useState<number | null>(null);
   const [hovered, setHovered] = React.useState<number | null>(null);
@@ -74,57 +78,65 @@ export function ExpandableTabs({
   );
 
   return (
-    <div
-      ref={outsideClickRef}
-      className={cn(
-        "flex flex-wrap items-center gap-2 rounded-lg bg-background p-1",
-        className
-      )}
-    >
-      {tabs.map((tab, index) => {
-        if (tab.type === "separator") {
-          return <Separator key={`separator-${index}`} />;
-        }
+    <div className="flex flex-col">
+      <div
+        ref={outsideClickRef}
+        className={cn(
+          "flex flex-wrap items-center gap-2 bg-background p-1",
+          className
+        )}
+      >
+        {tabs.map((tab, index) => {
+          if (tab.type === "separator") {
+            return <Separator key={`separator-${index}`} />;
+          }
 
-        const TabIcon = tab.icon as LucideIcon;
-        const isExpanded = selected === index || hovered === index;
-        
-        return (
-          <motion.button
-            key={tab.title}
-            variants={buttonVariants}
-            initial={false}
-            animate="animate"
-            custom={isExpanded}
-            onClick={() => handleSelect(index)}
-            onMouseEnter={() => setHovered(index)}
-            onMouseLeave={() => setHovered(null)}
-            transition={transition}
-            className={cn(
-              "relative flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors duration-300 whitespace-nowrap",
-              isExpanded
-                ? cn("bg-muted", activeColor)
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            )}
-          >
-            <TabIcon size={20} />
-            <AnimatePresence initial={false}>
-              {isExpanded && (
-                <motion.span
-                  variants={spanVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={transition}
-                  className="overflow-hidden whitespace-nowrap"
-                >
-                  {tab.title}
-                </motion.span>
+          const TabIcon = tab.icon as LucideIcon;
+          const isExpanded = selected === index || hovered === index;
+          
+          return (
+            <motion.button
+              key={tab.title}
+              variants={buttonVariants}
+              initial={false}
+              animate="animate"
+              custom={isExpanded}
+              onClick={() => handleSelect(index)}
+              onMouseEnter={() => setHovered(index)}
+              onMouseLeave={() => setHovered(null)}
+              transition={transition}
+              className={cn(
+                "relative flex items-center px-4 py-2 text-sm font-medium transition-colors duration-300 whitespace-nowrap",
+                isExpanded
+                  ? cn("bg-muted", activeColor)
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
-            </AnimatePresence>
-          </motion.button>
-        );
-      })}
+            >
+              <TabIcon size={20} />
+              <AnimatePresence initial={false}>
+                {isExpanded && (
+                  <motion.span
+                    variants={spanVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    transition={transition}
+                    className="overflow-hidden whitespace-nowrap"
+                  >
+                    {tab.title}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          );
+        })}
+      </div>
+      
+      {showTabContent && selected !== null && (
+        <div className="mt-4 p-4 bg-muted/20 rounded-lg">
+          {tabs[selected] && !('type' in tabs[selected]) && tabs[selected].content}
+        </div>
+      )}
     </div>
   );
 }
