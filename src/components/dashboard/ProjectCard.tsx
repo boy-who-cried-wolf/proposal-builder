@@ -53,28 +53,28 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       <div className="border-b border-gray-200 py-4">
         <div className="grid grid-cols-6 gap-4 items-center text-sm">
           <div>
+            <p className="font-bold text-lg uppercase font-poppins">{formattedValue}</p>
             <p className="uppercase text-xs text-gray-500">PROPOSAL AMOUNT</p>
-            <p className="font-bold text-lg uppercase">{formattedValue}</p>
           </div>
           <div>
+            <p className="font-bold text-lg uppercase font-poppins">{project.client}</p>
             <p className="uppercase text-xs text-gray-500">CLIENT NAME</p>
-            <p className="font-bold text-lg uppercase">{project.client}</p>
           </div>
           <div>
+            <p className="font-bold text-lg uppercase font-poppins">{project.hours}</p>
             <p className="uppercase text-xs text-gray-500">HOURS</p>
-            <p className="font-bold text-lg uppercase">{project.hours}</p>
           </div>
           <div>
+            <p className="font-bold text-lg uppercase font-poppins">{project.date}</p>
             <p className="uppercase text-xs text-gray-500">DUE DATE</p>
-            <p className="font-bold text-lg uppercase">{project.date}</p>
           </div>
           <div>
+            <p className="font-bold text-lg uppercase font-poppins">--</p>
             <p className="uppercase text-xs text-gray-500">DAYS REMAINING</p>
-            <p className="font-bold text-lg uppercase">--</p>
           </div>
           <div>
+            <p className="text-sm font-poppins">WEB DESIGN, SERVICES</p>
             <p className="uppercase text-xs text-gray-500">SERVICES</p>
-            <p className="text-sm">WEB DESIGN, SERVICES</p>
           </div>
         </div>
       </div>
@@ -85,7 +85,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     <Card className="overflow-hidden hover:shadow-md transition-shadow">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-bold">{project.title}</CardTitle>
+          <CardTitle className="text-lg font-bold font-poppins">{project.title}</CardTitle>
           <Badge className={getBadgeVariant(project.status)}>
             {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
           </Badge>
@@ -95,25 +95,25 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       <CardContent>
         <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <div>
+            <p className="font-semibold font-poppins">{formattedValue}</p>
             <p className="text-muted-foreground">Value</p>
-            <p className="font-semibold">{formattedValue}</p>
           </div>
           <div>
+            <p className="font-semibold font-poppins">{project.date}</p>
             <p className="text-muted-foreground">Date</p>
-            <p className="font-semibold">{project.date}</p>
           </div>
           <div>
+            <p className="font-semibold font-poppins">{project.hours}</p>
             <p className="text-muted-foreground">Hours</p>
-            <p className="font-semibold">{project.hours}</p>
           </div>
           <div>
-            <p className="text-muted-foreground">Rate</p>
-            <p className="font-semibold">
+            <p className="font-semibold font-poppins">
               {new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: 'USD',
               }).format(project.value / project.hours)}/hr
             </p>
+            <p className="text-muted-foreground">Rate</p>
           </div>
         </div>
         
