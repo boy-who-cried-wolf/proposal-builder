@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,65 +7,54 @@ import { DashboardFooter } from "@/components/dashboard/DashboardFooter";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Edit } from "lucide-react";
-
-const sampleProjects = [
-  {
-    id: "1",
-    title: "Website Redesign",
-    client: "Acme Corp",
-    date: "June 15, 2023",
-    value: 12500,
-    hours: 125,
-    status: "active"
-  },
-  {
-    id: "2",
-    title: "Mobile App Development",
-    client: "TechStart Inc",
-    date: "July 3, 2023",
-    value: 24000,
-    hours: 240,
-    status: "active"
-  },
-  {
-    id: "3",
-    title: "E-commerce Platform",
-    client: "RetailGiant",
-    date: "May 22, 2023",
-    value: 18000,
-    hours: 180,
-    status: "completed"
-  },
-  {
-    id: "4",
-    title: "Brand Identity",
-    client: "NewVenture LLC",
-    date: "August 10, 2023",
-    value: 8500,
-    hours: 85,
-    status: "draft"
-  },
-  {
-    id: "5",
-    title: "Marketing Campaign",
-    client: "GrowFast Co",
-    date: "September 5, 2023",
-    value: 15000,
-    hours: 150,
-    status: "pending"
-  }
-];
-
+const sampleProjects = [{
+  id: "1",
+  title: "Website Redesign",
+  client: "Acme Corp",
+  date: "June 15, 2023",
+  value: 12500,
+  hours: 125,
+  status: "active"
+}, {
+  id: "2",
+  title: "Mobile App Development",
+  client: "TechStart Inc",
+  date: "July 3, 2023",
+  value: 24000,
+  hours: 240,
+  status: "active"
+}, {
+  id: "3",
+  title: "E-commerce Platform",
+  client: "RetailGiant",
+  date: "May 22, 2023",
+  value: 18000,
+  hours: 180,
+  status: "completed"
+}, {
+  id: "4",
+  title: "Brand Identity",
+  client: "NewVenture LLC",
+  date: "August 10, 2023",
+  value: 8500,
+  hours: 85,
+  status: "draft"
+}, {
+  id: "5",
+  title: "Marketing Campaign",
+  client: "GrowFast Co",
+  date: "September 5, 2023",
+  value: 15000,
+  hours: 150,
+  status: "pending"
+}];
 const Dashboard = () => {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [sortField, setSortField] = useState<"value" | "date" | "hours">("value");
@@ -74,27 +62,19 @@ const Dashboard = () => {
   const [projects, setProjects] = useState(sampleProjects);
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  
-  const filteredProjects = statusFilter === "all" 
-    ? projects 
-    : projects.filter(project => project.status === statusFilter);
-  
+  const filteredProjects = statusFilter === "all" ? projects : projects.filter(project => project.status === statusFilter);
   const sortedProjects = [...filteredProjects].sort((a, b) => {
     if (sortField === "date") {
       const dateA = new Date(a.date).getTime();
       const dateB = new Date(b.date).getTime();
       return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
     } else {
-      return sortDirection === "asc" 
-        ? a[sortField] - b[sortField] 
-        : b[sortField] - a[sortField];
+      return sortDirection === "asc" ? a[sortField] - b[sortField] : b[sortField] - a[sortField];
     }
   });
-  
   const totalValue = filteredProjects.reduce((sum, project) => sum + project.value, 0);
   const totalHours = filteredProjects.reduce((sum, project) => sum + project.hours, 0);
   const avgHourlyRate = totalHours > 0 ? totalValue / totalHours : 0;
-  
   const handleSortToggle = (field: "value" | "date" | "hours") => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -103,41 +83,31 @@ const Dashboard = () => {
       setSortDirection("desc");
     }
   };
-  
   const handleDragStart = (e: React.DragEvent, id: string) => {
     e.dataTransfer.setData("text/plain", id);
   };
-  
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
-  
   const handleDrop = (e: React.DragEvent, targetId: string) => {
     e.preventDefault();
     const draggedId = e.dataTransfer.getData("text/plain");
-    
     if (draggedId === targetId) return;
-    
     const draggedIndex = projects.findIndex(p => p.id === draggedId);
     const targetIndex = projects.findIndex(p => p.id === targetId);
-    
     const newProjects = [...projects];
     const [draggedProject] = newProjects.splice(draggedIndex, 1);
     newProjects.splice(targetIndex, 0, draggedProject);
-    
     setProjects(newProjects);
   };
-  
   const handleViewProject = (project: any) => {
     setSelectedProject(project);
     setIsViewDialogOpen(true);
   };
-  
-  return (
-    <div className="flex h-screen">
+  return <div className="flex h-screen">
       <Sidebar />
       <div className="flex flex-col flex-grow">
-        <header className="border-b border-black py-4 px-6">
+        <header className="border-b border-black px-6 py-[13px]">
           <div className="flex justify-between items-center h-[42px]">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
@@ -146,22 +116,10 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="icon" 
-                className={viewMode === "grid" ? "bg-muted" : ""}
-                onClick={() => setViewMode("grid")}
-                title="Grid View"
-              >
+              <Button variant="outline" size="icon" className={viewMode === "grid" ? "bg-muted" : ""} onClick={() => setViewMode("grid")} title="Grid View">
                 <Grid size={16} />
               </Button>
-              <Button 
-                variant="outline" 
-                size="icon" 
-                className={viewMode === "list" ? "bg-muted" : ""}
-                onClick={() => setViewMode("list")}
-                title="List View"
-              >
+              <Button variant="outline" size="icon" className={viewMode === "list" ? "bg-muted" : ""} onClick={() => setViewMode("list")} title="List View">
                 <List size={16} />
               </Button>
             </div>
@@ -182,9 +140,7 @@ const Dashboard = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
-                    {sortField === "value" ? <DollarSign size={16} className="mr-1" /> : 
-                     sortField === "date" ? <Clock size={16} className="mr-1" /> : 
-                     <Clock size={16} className="mr-1" />}
+                    {sortField === "value" ? <DollarSign size={16} className="mr-1" /> : sortField === "date" ? <Clock size={16} className="mr-1" /> : <Clock size={16} className="mr-1" />}
                     Sort by {sortField}
                     {sortDirection === "asc" ? <ArrowUp size={16} className="ml-1" /> : <ArrowDown size={16} className="ml-1" />}
                   </Button>
@@ -207,108 +163,38 @@ const Dashboard = () => {
             </div>
             
             <TabsContent value="all" className="mt-0">
-              <div className={viewMode === "grid" 
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "flex flex-col"
-              }>
-                {sortedProjects.map(project => (
-                  <ProjectCard 
-                    key={project.id} 
-                    project={project} 
-                    viewMode={viewMode} 
-                    onDragStart={(e) => handleDragStart(e, project.id)}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, project.id)}
-                    onView={() => handleViewProject(project)}
-                  />
-                ))}
+              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
+                {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
               </div>
             </TabsContent>
             
             <TabsContent value="active" className="mt-0">
-              <div className={viewMode === "grid" 
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "flex flex-col"
-              }>
-                {sortedProjects.map(project => (
-                  <ProjectCard 
-                    key={project.id} 
-                    project={project} 
-                    viewMode={viewMode} 
-                    onDragStart={(e) => handleDragStart(e, project.id)}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, project.id)}
-                    onView={() => handleViewProject(project)}
-                  />
-                ))}
+              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
+                {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
               </div>
             </TabsContent>
             
             <TabsContent value="completed" className="mt-0">
-              <div className={viewMode === "grid" 
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "flex flex-col"
-              }>
-                {sortedProjects.map(project => (
-                  <ProjectCard 
-                    key={project.id} 
-                    project={project} 
-                    viewMode={viewMode} 
-                    onDragStart={(e) => handleDragStart(e, project.id)}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, project.id)}
-                    onView={() => handleViewProject(project)}
-                  />
-                ))}
+              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
+                {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
               </div>
             </TabsContent>
             
             <TabsContent value="draft" className="mt-0">
-              <div className={viewMode === "grid" 
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "flex flex-col"
-              }>
-                {sortedProjects.map(project => (
-                  <ProjectCard 
-                    key={project.id} 
-                    project={project} 
-                    viewMode={viewMode} 
-                    onDragStart={(e) => handleDragStart(e, project.id)}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, project.id)}
-                    onView={() => handleViewProject(project)}
-                  />
-                ))}
+              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
+                {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
               </div>
             </TabsContent>
             
             <TabsContent value="pending" className="mt-0">
-              <div className={viewMode === "grid" 
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "flex flex-col"
-              }>
-                {sortedProjects.map(project => (
-                  <ProjectCard 
-                    key={project.id} 
-                    project={project} 
-                    viewMode={viewMode} 
-                    onDragStart={(e) => handleDragStart(e, project.id)}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, project.id)}
-                    onView={() => handleViewProject(project)}
-                  />
-                ))}
+              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
+                {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
               </div>
             </TabsContent>
           </Tabs>
         </div>
 
-        <DashboardFooter 
-          totalValue={totalValue} 
-          totalHours={totalHours} 
-          avgHourlyRate={avgHourlyRate}
-          projectCount={filteredProjects.length}
-        />
+        <DashboardFooter totalValue={totalValue} totalHours={totalHours} avgHourlyRate={avgHourlyRate} projectCount={filteredProjects.length} />
       </div>
       
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
@@ -335,7 +221,7 @@ const Dashboard = () => {
                   <p className="text-muted-foreground">Value:</p>
                   <p>{selectedProject && new Intl.NumberFormat('en-US', {
                     style: 'currency',
-                    currency: 'USD',
+                    currency: 'USD'
                   }).format(selectedProject.value)}</p>
                 </div>
                 <div>
@@ -365,8 +251,6 @@ const Dashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
