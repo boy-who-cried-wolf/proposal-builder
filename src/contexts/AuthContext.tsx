@@ -13,6 +13,7 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,6 +45,77 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
+  // Function to add user to Loops.so
+  const addUserToLoops = async (email: string, userGroup: string = 'free') => {
+    try {
+      const { data, error } = await supabase.functions.invoke('loops-integration', {
+        body: {
+          action: 'createContact',
+          userData: {
+            email,
+            userGroup,
+            source: 'website_signup'
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Error adding user to Loops:', error);
+      } else {
+        console.log('User added to Loops successfully:', data);
+      }
+    } catch (error) {
+      console.error('Error invoking Loops integration:', error);
+    }
+  };
+
+  // Function to update user in Loops.so
+  const updateUserInLoops = async (email: string, userGroup: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('loops-integration', {
+        body: {
+          action: 'updateContact',
+          userData: {
+            email,
+            userGroup
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Error updating user in Loops:', error);
+      } else {
+        console.log('User updated in Loops successfully:', data);
+      }
+    } catch (error) {
+      console.error('Error invoking Loops integration:', error);
+    }
+  };
+
+  // Function to trigger an event in Loops.so
+  const triggerLoopsEvent = async (email: string, eventName: string, customFields?: Record<string, any>) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('loops-integration', {
+        body: {
+          action: 'triggerEvent',
+          userData: {
+            email,
+            customFields
+          },
+          eventName
+        }
+      });
+
+      if (error) {
+        console.error(`Error triggering ${eventName} event in Loops:`, error);
+      } else {
+        console.log(`${eventName} event triggered in Loops successfully:`, data);
+      }
+    } catch (error) {
+      console.error('Error invoking Loops integration:', error);
+    }
+  };
+
   const signUp = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signUp({
@@ -52,6 +124,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) throw error;
+      
+      // Add user to Loops.so
+      await addUserToLoops(email);
+      
       toast.success('Account created successfully! Check your email to confirm.');
     } catch (error: any) {
       toast.error(error.message || 'An error occurred during sign up');
@@ -95,6 +171,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const requestPasswordReset = async (email: string) => {
+    try {
+      // First, request password reset from Supabase
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+      
+      if (error) throw error;
+      
+      // Then, notify Loops.so about the password reset request
+      await supabase.functions.invoke('loops-integration', {
+        body: {
+          action: 'passwordReset',
+          userData: { email }
+        }
+      });
+      
+      toast.success('Password reset instructions sent to your email.');
+    } catch (error: any) {
+      toast.error(error.message || 'Error requesting password reset');
+      throw error;
+    }
+  };
+
   const value = {
     session,
     user,
@@ -102,6 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signUp,
     signIn,
     signOut,
+    requestPasswordReset,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

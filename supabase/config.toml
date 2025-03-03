@@ -1,1 +1,20 @@
+
 project_id = "pjpqgiahidqohjaaynqt"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+
+[realtime]
+enabled = true
+
+[functions]
+[functions.generate-proposal]
+verify_jwt = false
+[functions.loops-integration]
+verify_jwt = false
+

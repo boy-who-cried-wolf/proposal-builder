@@ -7,8 +7,9 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, requestPasswordReset } = useAuth();
 
   // Redirect if already logged in
   if (user) {
@@ -20,7 +21,12 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      if (isLogin) {
+      if (isForgotPassword) {
+        await requestPasswordReset(email);
+        // Reset form to login after password reset request
+        setIsForgotPassword(false);
+        setIsLogin(true);
+      } else if (isLogin) {
         await signIn(email, password);
       } else {
         await signUp(email, password);
@@ -38,7 +44,11 @@ const Auth = () => {
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="w-full max-w-md p-8 border border-black">
         <h2 className="text-2xl font-bold mb-8 text-center">
-          {isLogin ? 'Sign In' : 'Create Account'}
+          {isForgotPassword 
+            ? 'Reset Password' 
+            : isLogin 
+              ? 'Sign In' 
+              : 'Create Account'}
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -56,39 +66,67 @@ const Auth = () => {
             />
           </div>
           
-          <div>
-            <label htmlFor="password" className="block text-sm font-semibold mb-2">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border border-black rounded"
-              required
-              minLength={6}
-            />
-          </div>
+          {!isForgotPassword && (
+            <div>
+              <label htmlFor="password" className="block text-sm font-semibold mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-3 border border-black rounded"
+                required
+                minLength={6}
+              />
+            </div>
+          )}
           
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-black text-white p-3 rounded font-semibold"
           >
-            {loading ? 'Loading...' : isLogin ? 'Sign In' : 'Create Account'}
+            {loading 
+              ? 'Loading...' 
+              : isForgotPassword 
+                ? 'Send Reset Instructions' 
+                : isLogin 
+                  ? 'Sign In' 
+                  : 'Create Account'}
           </button>
         </form>
         
-        <div className="mt-6 text-center">
-          <button 
-            onClick={() => setIsLogin(!isLogin)} 
-            className="text-sm font-semibold hover:underline"
-          >
-            {isLogin 
-              ? "Don't have an account? Sign up" 
-              : "Already have an account? Sign in"}
-          </button>
+        <div className="mt-6 text-center space-y-2">
+          {isLogin && !isForgotPassword && (
+            <button 
+              onClick={() => setIsForgotPassword(true)} 
+              className="text-sm font-semibold hover:underline"
+            >
+              Forgot password?
+            </button>
+          )}
+          
+          {isForgotPassword && (
+            <button 
+              onClick={() => setIsForgotPassword(false)} 
+              className="text-sm font-semibold hover:underline"
+            >
+              Back to Sign In
+            </button>
+          )}
+          
+          {!isForgotPassword && (
+            <button 
+              onClick={() => setIsLogin(!isLogin)} 
+              className="text-sm font-semibold hover:underline block w-full"
+            >
+              {isLogin 
+                ? "Don't have an account? Sign up" 
+                : "Already have an account? Sign in"}
+            </button>
+          )}
         </div>
       </div>
     </div>
