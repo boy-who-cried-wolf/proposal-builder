@@ -8,7 +8,9 @@ export const createCheckoutSession = async (userId: string, planId: string) => {
     
     // Check connectivity to Supabase Functions
     try {
-      const connectivityCheck = await fetch(`${supabase.functions.url}/stripe-integration/health`, {
+      // Using proper way to access the Edge Function URL
+      const functionUrl = `${process.env.SUPABASE_URL || ''}/functions/v1/stripe-integration/health`;
+      const connectivityCheck = await fetch(functionUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
