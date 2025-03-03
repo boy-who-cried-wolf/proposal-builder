@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from "react";
 import { MainContent } from "@/components/layout/MainContent";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserProfile, updateUserProfile, addServiceToProfile, removeServiceFromProfile } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -9,11 +11,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const OrganizationSettings = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [companyName, setCompanyName] = useState("");
@@ -101,113 +104,133 @@ const OrganizationSettings = () => {
   };
 
   return (
-    <MainContent>
-      <div className="border-b border-border pb-2 mb-6">
-        <div className="container px-4 py-2 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Account Settings</h1>
+    <div className="flex h-screen">
+      <Sidebar />
+      <MainContent>
+        <div className="border-b border-border pb-2 mb-6">
+          <div className="container px-4 py-2 flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Account Settings</h1>
+          </div>
         </div>
-      </div>
-      
-      <div className="container px-4">
-        <Tabs defaultValue="organization" className="w-full">
-          <TabsList className="mb-4">
-            <TabsTrigger value="account" onClick={() => navigate("/account-settings")}>Account</TabsTrigger>
-            <TabsTrigger value="organization">Organization</TabsTrigger>
-            <TabsTrigger value="plan" onClick={() => navigate("/account-settings/plan")}>Plan</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="organization" className="space-y-6">
-            {loading ? (
-              <div className="text-center py-8">Loading organization settings...</div>
-            ) : (
-              <>
-                <div className="grid gap-4 max-w-2xl">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Company Name</label>
-                    <Input 
-                      value={companyName} 
-                      onChange={(e) => setCompanyName(e.target.value)}
-                      placeholder="Your company name" 
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Services</label>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {services.length === 0 ? (
-                        <div className="text-muted-foreground text-sm">No services added yet</div>
-                      ) : (
-                        services.map((service, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                            {service}
-                            <button 
-                              onClick={() => handleRemoveService(service)}
-                              className="text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                              <X size={14} />
-                            </button>
-                          </Badge>
-                        ))
-                      )}
-                    </div>
-                    <div className="flex gap-2">
+        
+        <div className="container px-4">
+          <Tabs defaultValue="organization" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger 
+                value="account" 
+                onClick={() => navigate("/account-settings")}
+                className={`${location.pathname === "/account-settings" ? "bg-primary text-primary-foreground" : ""}`}
+              >
+                Account
+              </TabsTrigger>
+              <TabsTrigger 
+                value="organization"
+                className={`${location.pathname === "/account-settings/organization" ? "bg-primary text-primary-foreground" : ""}`}
+              >
+                Organization
+              </TabsTrigger>
+              <TabsTrigger 
+                value="plan" 
+                onClick={() => navigate("/account-settings/plan")}
+                className={`${location.pathname === "/account-settings/plan" ? "bg-primary text-primary-foreground" : ""}`}
+              >
+                Plan
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="organization" className="space-y-6">
+              {loading ? (
+                <div className="text-center py-8">Loading organization settings...</div>
+              ) : (
+                <>
+                  <div className="grid gap-4 max-w-2xl">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Company Name</label>
                       <Input 
-                        value={newService} 
-                        onChange={(e) => setNewService(e.target.value)}
-                        placeholder="Add a service" 
+                        value={companyName} 
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        placeholder="Your company name" 
                       />
-                      <Button onClick={handleAddService} size="sm" type="button">
-                        <Plus size={16} className="mr-1" /> Add
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Services</label>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {services.length === 0 ? (
+                          <div className="text-muted-foreground text-sm">No services added yet</div>
+                        ) : (
+                          services.map((service, index) => (
+                            <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                              {service}
+                              <button 
+                                onClick={() => handleRemoveService(service)}
+                                className="text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                <X size={14} />
+                              </button>
+                            </Badge>
+                          ))
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <Input 
+                          value={newService} 
+                          onChange={(e) => setNewService(e.target.value)}
+                          placeholder="Add a service" 
+                        />
+                        <Button onClick={handleAddService} size="sm" type="button">
+                          <Plus size={16} className="mr-1" /> Add
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Your Hourly Rate ($)</label>
+                        <Input 
+                          type="number" 
+                          value={hourlyRate} 
+                          onChange={(e) => setHourlyRate(Number(e.target.value))}
+                          min={0} 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Client Hourly Rate ($)</label>
+                        <Input 
+                          type="number" 
+                          value={clientRate} 
+                          onChange={(e) => setClientRate(Number(e.target.value))}
+                          min={0} 
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Knowledge Base</label>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        This information will be used to help the AI create better proposals for your business.
+                      </p>
+                      <Textarea 
+                        value={knowledgeBase} 
+                        onChange={(e) => setKnowledgeBase(e.target.value)}
+                        placeholder="Enter information about your business, expertise, preferred working style, etc."
+                        rows={6}
+                      />
+                    </div>
+                    
+                    <div className="pt-2">
+                      <Button onClick={handleSave} disabled={saving}>
+                        {saving ? "Saving..." : "Save Changes"}
                       </Button>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Your Hourly Rate ($)</label>
-                      <Input 
-                        type="number" 
-                        value={hourlyRate} 
-                        onChange={(e) => setHourlyRate(Number(e.target.value))}
-                        min={0} 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Client Hourly Rate ($)</label>
-                      <Input 
-                        type="number" 
-                        value={clientRate} 
-                        onChange={(e) => setClientRate(Number(e.target.value))}
-                        min={0} 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Knowledge Base</label>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      This information will be used to help the AI create better proposals for your business.
-                    </p>
-                    <Textarea 
-                      value={knowledgeBase} 
-                      onChange={(e) => setKnowledgeBase(e.target.value)}
-                      placeholder="Enter information about your business, expertise, preferred working style, etc."
-                      rows={6}
-                    />
-                  </div>
-                  
-                  <div className="pt-2">
-                    <Button onClick={handleSave} disabled={saving}>
-                      {saving ? "Saving..." : "Save Changes"}
-                    </Button>
-                  </div>
-                </div>
-              </>
-            )}
-          </TabsContent>
-        </Tabs>
-      </div>
-    </MainContent>
+                </>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </MainContent>
+    </div>
   );
 };
 
