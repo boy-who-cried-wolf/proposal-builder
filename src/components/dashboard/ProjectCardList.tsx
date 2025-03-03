@@ -1,3 +1,4 @@
+
 import React from "react";
 import { GripVertical, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ export const ProjectCardList: React.FC<ProjectCardListProps> = ({
   const daysRemaining = getDaysRemaining(project.date);
   const dueDateColorClass = getDueDateColor(project.date);
   const daysRemainingColorClass = getDaysRemainingColor(project.date);
-  return <Card className="mb-[15px] overflow-hidden hover:bg-gray-50 transition-colors" draggable={true} onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop}>
+  return <Card className="mb-[15px] overflow-hidden transition-all hover:bg-gray-50" draggable={true} onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop}>
       <CardContent className="p-0">
         <div className="grid grid-cols-7 gap-4 items-center text-sm border-b border-solid border-gray-100 max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px] py-[10px] px-[10px] rounded-sm">
           <div className="flex items-center">

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,8 +26,8 @@ export const ProjectCardGrid: React.FC<ProjectCardGridProps> = ({
   const daysRemaining = getDaysRemaining(project.date);
   const dueDateColorClass = getDueDateColor(project.date);
   const daysRemainingColorClass = getDaysRemainingColor(project.date);
-  return <Card className="overflow-hidden hover:bg-gray-50 transition-colors" draggable={true} onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop}>
-      <CardHeader className="pb-2 bg-white">
+  return <Card className="overflow-hidden transition-all hover:bg-gray-50" draggable={true} onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop}>
+      <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="flex items-center">
             
