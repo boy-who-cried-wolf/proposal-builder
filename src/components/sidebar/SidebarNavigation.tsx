@@ -47,7 +47,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         isExpanded={isExpanded}
         isActive={activeNavItem === 0}
         onClick={() => onNavItemClick(0)}
-        icon={<Home size={24} />}
+        icon={Home}
         label="Home"
         path="/"
       />
@@ -55,7 +55,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         isExpanded={isExpanded}
         isActive={activeNavItem === 1}
         onClick={() => onNavItemClick(1)}
-        icon={<FileText size={24} />}
+        icon={FileText}
         label="Proposals"
         path="/"
       />
@@ -63,7 +63,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         isExpanded={isExpanded}
         isActive={activeNavItem === 2}
         onClick={() => onNavItemClick(2)}
-        icon={<BarChart3 size={24} />}
+        icon={BarChart3}
         label="Dashboard"
         path="/dashboard"
       />
@@ -72,7 +72,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           isExpanded={isExpanded}
           isActive={activeNavItem === 3}
           onClick={() => onNavItemClick(3)}
-          icon={<ShieldCheck size={24} />}
+          icon={ShieldCheck}
           label="Admin"
           path="/admin"
         />
@@ -81,7 +81,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         isExpanded={isExpanded}
         isActive={activeNavItem === 4}
         onClick={() => onNavItemClick(4)}
-        icon={<Settings size={24} />}
+        icon={Settings}
         label="Settings"
         path="/account-settings"
       />

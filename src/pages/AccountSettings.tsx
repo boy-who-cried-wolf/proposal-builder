@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserProfile, updateUserProfile } from "@/integrations/supabase/client";
+import { getUserProfile, updateUserProfile } from "@/integrations/supabase/profileService";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
