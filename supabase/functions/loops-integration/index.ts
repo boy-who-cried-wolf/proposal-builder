@@ -29,21 +29,41 @@ interface LoopsRequest {
   transactionalId?: string;
 }
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
 const handler = async (req: Request): Promise<Response> => {
   try {
-    // Set CORS headers for all responses
-    const headers = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    };
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+      return new Response(null, { headers: corsHeaders });
+    }
 
     // Get Loops API key from environment variable
     const LOOPS_API_KEY = Deno.env.get("LOOPS_API_KEY");
     if (!LOOPS_API_KEY) {
-      throw new Error("LOOPS_API_KEY is not set");
+      console.error("LOOPS_API_KEY is not set");
+      return new Response(
+        JSON.stringify({ error: "LOOPS_API_KEY is not set" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      );
     }
 
-    const { action, userData, eventName, transactionalId } = await req.json() as LoopsRequest;
+    // Safely parse the request body
+    let requestData: LoopsRequest;
+    try {
+      requestData = await req.json() as LoopsRequest;
+    } catch (jsonError) {
+      console.error("Failed to parse request JSON:", jsonError);
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+
+    const { action, userData, eventName, transactionalId } = requestData;
     console.log(`Processing ${action} for user: ${userData.email}`);
 
     let endpoint = "";
@@ -72,7 +92,10 @@ const handler = async (req: Request): Promise<Response> => {
       
       case "triggerEvent":
         if (!eventName) {
-          throw new Error("eventName is required for triggerEvent action");
+          return new Response(
+            JSON.stringify({ error: "eventName is required for triggerEvent action" }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+          );
         }
         endpoint = "https://app.loops.so/api/v1/events/send";
         body = {
@@ -93,7 +116,10 @@ const handler = async (req: Request): Promise<Response> => {
       
       case "sendTransactional":
         if (!transactionalId) {
-          throw new Error("transactionalId is required for sendTransactional action");
+          return new Response(
+            JSON.stringify({ error: "transactionalId is required for sendTransactional action" }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+          );
         }
         endpoint = "https://app.loops.so/api/v1/transactional";
         body = {
@@ -104,11 +130,16 @@ const handler = async (req: Request): Promise<Response> => {
         break;
       
       default:
-        throw new Error(`Unsupported action: ${action}`);
+        return new Response(
+          JSON.stringify({ error: `Unsupported action: ${action}` }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        );
     }
 
     // Call Loops API
     console.log(`Calling Loops API at: ${endpoint}`);
+    console.log(`Request body:`, JSON.stringify(body));
+    
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
@@ -118,27 +149,50 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify(body),
     });
 
+    // Parse response body safely
+    let responseData: any;
+    let responseText: string;
+
+    try {
+      // First get the response as text
+      responseText = await response.text();
+      
+      // Try to parse as JSON if not empty
+      if (responseText.trim()) {
+        responseData = JSON.parse(responseText);
+      } else {
+        responseData = { message: "Empty response received" };
+      }
+    } catch (parseError) {
+      console.error(`Failed to parse response: ${responseText}`, parseError);
+      responseData = { 
+        rawResponse: responseText,
+        parseError: parseError.message 
+      };
+    }
+
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error(`Loops API error: ${response.status} ${response.statusText}`, errorData);
+      console.error(`Loops API error: ${response.status} ${response.statusText}`, responseData);
       return new Response(
-        JSON.stringify({ error: `Loops API error: ${response.status} ${response.statusText}` }),
-        { headers: { ...headers, "Content-Type": "application/json" }, status: response.status }
+        JSON.stringify({ 
+          error: `Loops API error: ${response.status} ${response.statusText}`,
+          details: responseData
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: response.status }
       );
     }
 
-    const data = await response.json();
-    console.log(`Loops API response:`, data);
+    console.log(`Loops API response:`, responseData);
 
     return new Response(
-      JSON.stringify({ success: true, data }),
-      { headers: { ...headers, "Content-Type": "application/json" } }
+      JSON.stringify({ success: true, data: responseData }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error(`Error in Loops integration:`, error.message);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: { "Content-Type": "application/json" }, status: 500 }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }
 };
