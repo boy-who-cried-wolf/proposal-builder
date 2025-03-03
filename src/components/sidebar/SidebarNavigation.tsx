@@ -85,8 +85,12 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
             <li className="cursor-pointer hover:text-primary">
               <a href="/account-settings">Account</a>
             </li>
-            <li className="cursor-pointer hover:text-primary">Organization</li>
-            <li className="cursor-pointer hover:text-primary">Plan</li>
+            <li className="cursor-pointer hover:text-primary">
+              <a href="/account-settings/organization">Organization</a>
+            </li>
+            <li className="cursor-pointer hover:text-primary">
+              <a href="/account-settings/plan">Plan</a>
+            </li>
           </ul>
         </div>
       ),

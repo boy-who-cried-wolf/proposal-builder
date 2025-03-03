@@ -11,24 +11,39 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          client_rate: number | null
+          company_name: string | null
           email: string
           first_name: string | null
+          hourly_rate: number | null
           id: string
+          knowledge_base: string | null
           last_name: string | null
+          services: string[] | null
           updated_at: string | null
         }
         Insert: {
+          client_rate?: number | null
+          company_name?: string | null
           email: string
           first_name?: string | null
+          hourly_rate?: number | null
           id: string
+          knowledge_base?: string | null
           last_name?: string | null
+          services?: string[] | null
           updated_at?: string | null
         }
         Update: {
+          client_rate?: number | null
+          company_name?: string | null
           email?: string
           first_name?: string | null
+          hourly_rate?: number | null
           id?: string
+          knowledge_base?: string | null
           last_name?: string | null
+          services?: string[] | null
           updated_at?: string | null
         }
         Relationships: []

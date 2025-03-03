@@ -22,12 +22,43 @@ export const generateProposal = async (
   onStreamUpdate?: (sections: ProposalSection[]) => void
 ): Promise<ProposalSection[]> => {
   try {
+    // Get the current user's knowledge base if they're logged in
+    let knowledgeBase = '';
+    let userServices: string[] = [];
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const profile = await supabase
+          .from('profiles')
+          .select('knowledge_base, services')
+          .eq('id', user.id)
+          .single();
+          
+        if (profile.data) {
+          knowledgeBase = profile.data.knowledge_base || '';
+          userServices = profile.data.services || [];
+          console.log('Loaded knowledge base and services for proposal generation');
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user profile for proposal generation:', error);
+      // Continue with generation even if we can't get the knowledge base
+    }
+    
+    // Add the knowledge base to the input
+    const enrichedInput = {
+      ...input,
+      knowledgeBase,
+      userServices
+    };
+    
     // Start with empty sections array
     let sections: ProposalSection[] = [];
     
     // Make the API call to our Supabase Edge Function
     const { data, error } = await supabase.functions.invoke('generate-proposal', {
-      body: { input },
+      body: { input: enrichedInput },
       // No responseType option for streaming - will handle manually
     });
 

@@ -11,6 +11,8 @@ import Dashboard from "./pages/Dashboard";
 import AccountSettings from "./pages/AccountSettings";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import OrganizationSettings from "./pages/OrganizationSettings";
+import PlanSettings from "./pages/PlanSettings";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/account-settings" element={<AccountSettings />} />
+              <Route path="/account-settings/organization" element={<OrganizationSettings />} />
+              <Route path="/account-settings/plan" element={<PlanSettings />} />
               {/* Add other protected routes here */}
             </Route>
             
