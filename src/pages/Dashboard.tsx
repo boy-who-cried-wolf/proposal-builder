@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -136,8 +137,8 @@ const Dashboard = () => {
     <div className="flex h-screen">
       <Sidebar />
       <div className="flex flex-col flex-grow">
-        <div className="grow p-6 overflow-y-auto">
-          <div className="flex justify-between items-center mb-6">
+        <header className="border-b border-black py-4 px-6">
+          <div className="flex justify-between items-center h-[42px]">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
               <p className="text-[9px] font-semibold tracking-[1.389px] uppercase text-muted-foreground">
@@ -165,7 +166,9 @@ const Dashboard = () => {
               </Button>
             </div>
           </div>
-          
+        </header>
+        
+        <div className="grow p-6 overflow-y-auto">
           <Tabs defaultValue="all" className="mb-6" onValueChange={setStatusFilter}>
             <TabsList className="rounded-none border-b border-solid border-[#F6F6F7] bg-transparent text-[#8E9196] w-full justify-start gap-[34px] p-0">
               <TabsTrigger value="all" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1.389px]">ALL PROPOSALS</TabsTrigger>
