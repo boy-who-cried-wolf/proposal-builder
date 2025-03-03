@@ -8,7 +8,7 @@ import { Check, Loader2 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { NavTab } from "@/components/ui/NavItem";
-import { getCurrentSubscription, createCheckoutSession } from "@/services/stripeService";
+import { getCurrentSubscription, createCheckoutSession, cancelSubscription } from "@/services/stripeService";
 
 const PlanSettings = () => {
   const { user } = useAuth();
@@ -17,6 +17,8 @@ const PlanSettings = () => {
   const [currentPlan, setCurrentPlan] = React.useState("free");
   const [loading, setLoading] = React.useState(true);
   const [checkoutLoading, setCheckoutLoading] = React.useState("");
+  const [cancelLoading, setCancelLoading] = React.useState(false);
+  const [subscriptionInfo, setSubscriptionInfo] = React.useState<any>(null);
   
   // Check for query parameters
   const searchParams = new URLSearchParams(location.search);
@@ -43,6 +45,7 @@ const PlanSettings = () => {
           const subscription = await getCurrentSubscription(user.id);
           if (subscription && subscription.plan_id) {
             setCurrentPlan(subscription.plan_id);
+            setSubscriptionInfo(subscription);
           }
         } catch (error) {
           console.error("Error fetching subscription:", error);
@@ -54,6 +57,52 @@ const PlanSettings = () => {
 
     fetchSubscription();
   }, [user]);
+
+  const handlePlanSelect = async (planId: string) => {
+    if (planId === currentPlan) {
+      return;
+    }
+    
+    if (!user?.id) {
+      toast.error("You must be logged in to change your plan");
+      return;
+    }
+    
+    try {
+      setCheckoutLoading(planId);
+      await createCheckoutSession(user.id, planId);
+    } catch (error) {
+      console.error("Error selecting plan:", error);
+    } finally {
+      setCheckoutLoading("");
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!user?.id) {
+      toast.error("You must be logged in to cancel your subscription");
+      return;
+    }
+    
+    if (currentPlan === "free") {
+      toast.info("You are already on the free plan");
+      return;
+    }
+    
+    try {
+      setCancelLoading(true);
+      await cancelSubscription(user.id);
+      // Refresh subscription data
+      const subscription = await getCurrentSubscription(user.id);
+      setCurrentPlan(subscription.plan_id);
+      setSubscriptionInfo(subscription);
+      toast.success("Your subscription has been cancelled");
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+    } finally {
+      setCancelLoading(false);
+    }
+  };
 
   const plans = [
     {
@@ -104,26 +153,6 @@ const PlanSettings = () => {
     }
   ];
 
-  const handlePlanSelect = async (planId: string) => {
-    if (planId === currentPlan) {
-      return;
-    }
-    
-    if (!user?.id) {
-      toast.error("You must be logged in to change your plan");
-      return;
-    }
-    
-    try {
-      setCheckoutLoading(planId);
-      await createCheckoutSession(user.id, planId);
-    } catch (error) {
-      console.error("Error selecting plan:", error);
-    } finally {
-      setCheckoutLoading("");
-    }
-  };
-
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -161,6 +190,38 @@ const PlanSettings = () => {
               <h2 className="text-xl font-semibold">Subscription Plan</h2>
               <p className="text-muted-foreground">Choose the plan that's right for you</p>
             </div>
+            
+            {subscriptionInfo && subscriptionInfo.status === "active" && currentPlan !== "free" && (
+              <div className="bg-muted p-4 rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Current Subscription</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {subscriptionInfo.current_period_end ? (
+                        <>Your plan renews on {new Date(subscriptionInfo.current_period_end).toLocaleDateString()}</>
+                      ) : (
+                        <>You are subscribed to the {currentPlan} plan</>
+                      )}
+                    </p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="mt-2 sm:mt-0" 
+                    onClick={handleCancelSubscription}
+                    disabled={cancelLoading}
+                  >
+                    {cancelLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Cancelling...
+                      </>
+                    ) : (
+                      "Cancel Subscription"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
             
             {loading ? (
               <div className="flex justify-center py-12">

@@ -169,6 +169,55 @@ serve(async (req) => {
       )
     }
 
+    // Cancel subscription
+    if (action === 'cancelSubscription') {
+      if (!userId) {
+        return new Response(
+          JSON.stringify({ error: 'User ID is required' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // Get the subscription from the database
+      const { data: subscriptionData, error: subscriptionError } = await supabase
+        .from('subscriptions')
+        .select('stripe_subscription_id')
+        .eq('user_id', userId)
+        .single()
+
+      if (subscriptionError) {
+        console.error('Error fetching subscription:', subscriptionError)
+        return new Response(
+          JSON.stringify({ error: 'Error fetching subscription' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      if (!subscriptionData?.stripe_subscription_id) {
+        return new Response(
+          JSON.stringify({ error: 'No active subscription found' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // Cancel the subscription in Stripe
+      const subscription = await stripe.subscriptions.cancel(subscriptionData.stripe_subscription_id)
+
+      // Update the subscription in the database
+      await supabase
+        .from('subscriptions')
+        .update({
+          status: 'canceled',
+          plan_id: 'free'
+        })
+        .eq('user_id', userId)
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Handle webhook event
     if (action === 'handleWebhook') {
       const signature = req.headers.get('stripe-signature')
