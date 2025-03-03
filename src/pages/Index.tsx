@@ -9,6 +9,7 @@ import { DateRange } from "react-day-picker";
 
 const Index = () => {
   const [generatedProposalSections, setGeneratedProposalSections] = useState<ProposalSection[]>([]);
+  const [proposalHistory, setProposalHistory] = useState<ProposalSection[][]>([]);
   const [projectDescription, setProjectDescription] = useState("");
   const [projectType, setProjectType] = useState("");
   const [hourlyRate, setHourlyRate] = useState(0);
@@ -23,6 +24,11 @@ const Index = () => {
     rate: number,
     freelancerRate: number
   ) => {
+    // Save the current proposal to history if it exists
+    if (generatedProposalSections.length > 0) {
+      setProposalHistory(prev => [...prev, [...generatedProposalSections]]);
+    }
+    
     setGeneratedProposalSections(sections);
     setProjectDescription(description);
     setProjectType(type);
@@ -54,6 +60,21 @@ const Index = () => {
     }
   };
 
+  const handleUpdateProposal = (updatedSections: ProposalSection[]) => {
+    // Save the current proposal to history before updating
+    setProposalHistory(prev => [...prev, [...generatedProposalSections]]);
+    setGeneratedProposalSections(updatedSections);
+  };
+
+  const handleRevertProposal = (index: number) => {
+    if (proposalHistory[index]) {
+      setGeneratedProposalSections([...proposalHistory[index]]);
+      
+      // Remove all history up to the reverted point
+      setProposalHistory(prev => prev.slice(0, index));
+    }
+  };
+
   return (
     <>
       <link
@@ -62,7 +83,11 @@ const Index = () => {
       />
       <div className="flex w-full h-screen bg-white max-md:flex-col">
         <Sidebar />
-        <MiddleSection onProposalGenerated={handleProposalGenerated} />
+        <MiddleSection 
+          onProposalGenerated={handleProposalGenerated} 
+          proposalSections={generatedProposalSections}
+          onUpdateProposal={handleUpdateProposal}
+        />
         <MainContent 
           generatedProposalSections={generatedProposalSections}
           projectDescription={projectDescription}
@@ -71,6 +96,8 @@ const Index = () => {
           freelancerRate={freelancerRate}
           projectBudget={projectBudget}
           dateRange={dateRange}
+          proposalHistory={proposalHistory}
+          onRevertProposal={handleRevertProposal}
         />
       </div>
       <Toaster />

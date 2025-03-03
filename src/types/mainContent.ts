@@ -1,6 +1,5 @@
 
-import { ProposalSection } from "@/utils/openaiProposal";
-import { DateRange } from "react-day-picker";
+import { ProposalSection } from "@/types/proposal";
 
 export interface MainContentProps {
   generatedProposalSections: ProposalSection[];
@@ -9,7 +8,9 @@ export interface MainContentProps {
   hourlyRate: number;
   freelancerRate?: number;
   projectBudget?: number;
-  dateRange?: DateRange;
+  dateRange?: { from: Date; to?: Date };
+  proposalHistory?: ProposalSection[][];
+  onRevertProposal?: (index: number) => void;
 }
 
 export interface EditingItem {
