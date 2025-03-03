@@ -15,20 +15,23 @@ export function formatProposalForFigma(
     return "No proposal data available";
   }
 
+  // Start with the proposal title and basic information
   let formattedText = `${title}\n\n`;
   formattedText += `Project Type: ${projectType}\n`;
   formattedText += `Hourly Rate: $${hourlyRate}\n\n`;
 
-  // Calculate total hours and value
+  // Calculate total hours and value for summary at the end
   let totalHours = 0;
   let totalValue = 0;
 
+  // Format table headers
+  formattedText += `Item\tDescription\tHours\tPrice\n`;
+  formattedText += `----\t-----------\t-----\t-----\n`;
+
   // Format each section
   sections.forEach((section) => {
-    formattedText += `${section.title.toUpperCase()}\n`;
-    formattedText += "Item\tDescription\tHours\tPrice\n";
-    formattedText += "----\t-----------\t-----\t-----\n";
-
+    formattedText += `\n${section.title.toUpperCase()}\n`;
+    
     // Add each item
     section.items.forEach((item) => {
       const hours = parseFloat(item.hours.toString());
@@ -45,12 +48,12 @@ export function formatProposalForFigma(
       formattedText += `${item.item}\t${item.description}\t${item.hours}\t${item.price}\n`;
     });
 
-    formattedText += `Subtotal: ${section.subtotal}\n\n`;
+    formattedText += `${section.title} Subtotal\t\t\t${section.subtotal}\n`;
   });
 
   // Add totals at the end
-  formattedText += `TOTALS\n`;
-  formattedText += `Total Hours: ${totalHours}\n`;
+  formattedText += `\nSUMMARY\n`;
+  formattedText += `Total Hours: ${totalHours.toFixed(1)}\n`;
   formattedText += `Hours Per Day: ${(totalHours / 5).toFixed(1)}\n`;
   formattedText += `Total Value: $${totalValue.toLocaleString()}\n`;
 

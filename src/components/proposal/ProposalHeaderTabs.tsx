@@ -1,7 +1,6 @@
-
 import React from "react";
 import { ExpandableTabs, Tab } from "@/components/ui/expandable-tabs";
-import { DiamondPlus, Timer, Eye, Send, Copy, Save, History } from "lucide-react";
+import { DiamondPlus, Timer, Eye, Send, Copy, Save, History, Figma } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProposalSection } from "@/types/proposal";
 
@@ -48,12 +47,12 @@ export const ProposalHeaderTabs: React.FC<ProposalHeaderTabsProps> = ({
       content: <div className="p-4">Send proposal to client</div> 
     },
     { 
-      title: "Copy", 
-      icon: Copy,
+      title: "Copy to Figma", 
+      icon: Figma,
       content: (
         <div className="p-4">
           <h2 className="text-xl font-bold mb-4">Copy Proposal to Figma</h2>
-          <p className="mb-4">Copy your proposal in a format optimized for pasting into Figma.</p>
+          <p className="mb-4">Copy your proposal in a format optimized for pasting into Figma or other design tools.</p>
           <Button 
             onClick={handleCopyToFigma} 
             disabled={isCopying}
