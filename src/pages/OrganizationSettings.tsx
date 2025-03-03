@@ -1,8 +1,16 @@
+
 import React, { useState, useEffect } from "react";
 import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserProfile, updateUserProfile, addServiceToProfile, removeServiceFromProfile } from "@/integrations/supabase/client";
+import { 
+  getUserProfile, 
+  updateOrganization, 
+  createOrganization, 
+  linkUserToOrganization,
+  addServiceToProfile, 
+  removeServiceFromProfile 
+} from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +32,7 @@ const OrganizationSettings = () => {
   const [knowledgeBase, setKnowledgeBase] = useState("");
   const [services, setServices] = useState<string[]>([]);
   const [newService, setNewService] = useState("");
+  const [organizationId, setOrganizationId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -39,11 +48,23 @@ const OrganizationSettings = () => {
       const profile = await getUserProfile(user.id);
       
       if (profile) {
-        setCompanyName(profile.company_name || "");
-        setHourlyRate(profile.hourly_rate || 100);
-        setClientRate(profile.client_rate || 75);
-        setKnowledgeBase(profile.knowledge_base || "");
-        setServices(profile.services || []);
+        // Check if user has an organization
+        if (profile.organizations) {
+          const org = profile.organizations;
+          setOrganizationId(org.id);
+          setCompanyName(org.name || "");
+          setHourlyRate(org.hourly_rate || 100);
+          setClientRate(org.client_rate || 75);
+          setKnowledgeBase(org.knowledge_base || "");
+          setServices(org.services || []);
+        } else {
+          // Use profile data as fallback
+          setCompanyName(profile.company_name || "");
+          setHourlyRate(profile.hourly_rate || 100);
+          setClientRate(profile.client_rate || 75);
+          setKnowledgeBase(profile.knowledge_base || "");
+          setServices(profile.services || []);
+        }
       }
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -58,14 +79,37 @@ const OrganizationSettings = () => {
     
     try {
       setSaving(true);
-      await updateUserProfile(user.id, {
-        company_name: companyName,
-        hourly_rate: hourlyRate,
-        client_rate: clientRate,
-        knowledge_base: knowledgeBase,
-      });
       
-      toast.success("Organization settings saved successfully");
+      // If user doesn't have an organization yet, create one
+      if (!organizationId) {
+        const newOrg = await createOrganization(companyName);
+        setOrganizationId(newOrg.id);
+        
+        // Link user to the new organization
+        await linkUserToOrganization(user.id, newOrg.id);
+        
+        // Update the organization with all settings
+        await updateOrganization(newOrg.id, {
+          name: companyName,
+          hourly_rate: hourlyRate,
+          client_rate: clientRate,
+          knowledge_base: knowledgeBase,
+          services: services
+        });
+        
+        toast.success("Organization created and settings saved successfully");
+      } else {
+        // Update existing organization
+        await updateOrganization(organizationId, {
+          name: companyName,
+          hourly_rate: hourlyRate,
+          client_rate: clientRate,
+          knowledge_base: knowledgeBase,
+          services: services
+        });
+        
+        toast.success("Organization settings saved successfully");
+      }
     } catch (error) {
       console.error("Error saving organization settings:", error);
       toast.error("Failed to save organization settings");

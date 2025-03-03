@@ -24,7 +24,14 @@ export const callGenerateProposalFunction = async (
   try {
     // Make the API call to our Supabase Edge Function
     const { data, error } = await supabase.functions.invoke('generate-proposal', {
-      body: { input: enrichedInput },
+      body: { 
+        prompt: enrichedInput.projectDescription,
+        hourlyRate: enrichedInput.hourlyRate,
+        projectBudget: enrichedInput.projectBudget,
+        freelancerRate: enrichedInput.freelancerRate,
+        knowledgeBase: enrichedInput.knowledgeBase,
+        userServices: enrichedInput.userServices
+      },
       // No responseType option for streaming - will handle manually
     });
 
@@ -59,14 +66,30 @@ export const fetchUserProfileForProposal = async (): Promise<{
     if (user) {
       const profile = await supabase
         .from('profiles')
-        .select('knowledge_base, services')
+        .select(`
+          knowledge_base, 
+          services,
+          organization_id,
+          organizations:organization_id (
+            knowledge_base,
+            services
+          )
+        `)
         .eq('id', user.id)
         .single();
         
       if (profile.data) {
-        knowledgeBase = profile.data.knowledge_base || '';
-        userServices = profile.data.services || [];
-        console.log('Loaded knowledge base and services for proposal generation');
+        // Prioritize organization data if available
+        if (profile.data.organizations) {
+          knowledgeBase = profile.data.organizations.knowledge_base || '';
+          userServices = profile.data.organizations.services || [];
+          console.log('Loaded organization knowledge base and services for proposal generation');
+        } else {
+          // Fall back to profile data
+          knowledgeBase = profile.data.knowledge_base || '';
+          userServices = profile.data.services || [];
+          console.log('Loaded user knowledge base and services for proposal generation');
+        }
       }
     }
   } catch (error) {

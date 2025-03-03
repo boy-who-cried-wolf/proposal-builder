@@ -62,7 +62,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, hourlyRate, projectBudget, freelancerRate } = await req.json();
+    const { prompt, hourlyRate, projectBudget, freelancerRate, knowledgeBase, userServices } = await req.json();
 
     if (!openAIApiKey) {
       throw new Error('OPENAI_API_KEY is not set in environment variables');
@@ -88,6 +88,17 @@ serve(async (req) => {
     let currentSection = null;
     let buffer = "";
     
+    // Build the system prompt with knowledge base if available
+    let enhancedSystemPrompt = systemPrompt;
+    
+    if (knowledgeBase && knowledgeBase.trim()) {
+      enhancedSystemPrompt += `\n\nAdditional context about the service provider:\n${knowledgeBase}\n\nImportant: Use this information to enhance your proposal but do NOT deviate from the required structure or rules above. The structure requirements above take precedence over any conflicting information in this additional context.`;
+    }
+    
+    if (userServices && userServices.length > 0) {
+      enhancedSystemPrompt += `\n\nThe service provider specializes in: ${userServices.join(', ')}. Consider these services when creating the proposal structure if applicable to the project.`;
+    }
+    
     // Start the OpenAI request
     fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -99,7 +110,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: enhancedSystemPrompt },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,

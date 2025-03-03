@@ -10,12 +10,73 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 export const getUserProfile = async (userId: string) => {
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select(`
+      *,
+      organizations:organization_id (
+        id,
+        name,
+        hourly_rate,
+        client_rate,
+        services,
+        knowledge_base
+      )
+    `)
     .eq('id', userId)
     .single();
 
   if (error) {
     console.error('Error fetching user profile:', error);
+    throw error;
+  }
+
+  return data;
+};
+
+// Helper function to create a new organization
+export const createOrganization = async (name: string) => {
+  const { data, error } = await supabase
+    .from('organizations')
+    .insert([{ name }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating organization:', error);
+    throw error;
+  }
+
+  return data;
+};
+
+// Helper function to update organization
+export const updateOrganization = async (orgId: string, updates: any) => {
+  console.log('Updating organization:', orgId, 'with data:', updates);
+  
+  const { data, error } = await supabase
+    .from('organizations')
+    .update(updates)
+    .eq('id', orgId)
+    .select();
+
+  if (error) {
+    console.error('Error updating organization:', error);
+    throw error;
+  }
+
+  console.log('Organization updated successfully:', data);
+  return data;
+};
+
+// Helper function to link user to organization
+export const linkUserToOrganization = async (userId: string, organizationId: string) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ organization_id: organizationId })
+    .eq('id', userId)
+    .select();
+
+  if (error) {
+    console.error('Error linking user to organization:', error);
     throw error;
   }
 
@@ -46,7 +107,7 @@ export const addServiceToProfile = async (userId: string, service: string) => {
   // First get current services
   const { data: profile } = await supabase
     .from('profiles')
-    .select('services')
+    .select('services, organization_id')
     .eq('id', userId)
     .single();
   
@@ -54,23 +115,55 @@ export const addServiceToProfile = async (userId: string, service: string) => {
     throw new Error('Profile not found');
   }
   
-  // Create updated services array, ensuring no duplicates
-  const currentServices = profile.services || [];
-  const updatedServices = [...new Set([...currentServices, service])];
-  
-  // Update the profile with new services
-  const { data, error } = await supabase
-    .from('profiles')
-    .update({ services: updatedServices })
-    .eq('id', userId)
-    .select();
+  if (profile.organization_id) {
+    // If user has organization, add service to organization
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('services')
+      .eq('id', profile.organization_id)
+      .single();
+      
+    if (!org) {
+      throw new Error('Organization not found');
+    }
     
-  if (error) {
-    console.error('Error adding service to profile:', error);
-    throw error;
+    // Create updated services array, ensuring no duplicates
+    const currentServices = org.services || [];
+    const updatedServices = [...new Set([...currentServices, service])];
+    
+    // Update the organization with new services
+    const { data, error } = await supabase
+      .from('organizations')
+      .update({ services: updatedServices })
+      .eq('id', profile.organization_id)
+      .select();
+      
+    if (error) {
+      console.error('Error adding service to organization:', error);
+      throw error;
+    }
+    
+    return data;
+  } else {
+    // If user doesn't have organization, add service to profile
+    // Create updated services array, ensuring no duplicates
+    const currentServices = profile.services || [];
+    const updatedServices = [...new Set([...currentServices, service])];
+    
+    // Update the profile with new services
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ services: updatedServices })
+      .eq('id', userId)
+      .select();
+      
+    if (error) {
+      console.error('Error adding service to profile:', error);
+      throw error;
+    }
+    
+    return data;
   }
-  
-  return data;
 };
 
 // Helper function to remove a service from user profile
@@ -78,7 +171,7 @@ export const removeServiceFromProfile = async (userId: string, service: string) 
   // First get current services
   const { data: profile } = await supabase
     .from('profiles')
-    .select('services')
+    .select('services, organization_id')
     .eq('id', userId)
     .single();
   
@@ -86,21 +179,53 @@ export const removeServiceFromProfile = async (userId: string, service: string) 
     throw new Error('Profile not found');
   }
   
-  // Filter out the service to remove
-  const currentServices = profile.services || [];
-  const updatedServices = currentServices.filter(s => s !== service);
-  
-  // Update the profile with new services
-  const { data, error } = await supabase
-    .from('profiles')
-    .update({ services: updatedServices })
-    .eq('id', userId)
-    .select();
+  if (profile.organization_id) {
+    // If user has organization, remove service from organization
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('services')
+      .eq('id', profile.organization_id)
+      .single();
+      
+    if (!org) {
+      throw new Error('Organization not found');
+    }
     
-  if (error) {
-    console.error('Error removing service from profile:', error);
-    throw error;
+    // Filter out the service to remove
+    const currentServices = org.services || [];
+    const updatedServices = currentServices.filter(s => s !== service);
+    
+    // Update the organization with new services
+    const { data, error } = await supabase
+      .from('organizations')
+      .update({ services: updatedServices })
+      .eq('id', profile.organization_id)
+      .select();
+      
+    if (error) {
+      console.error('Error removing service from organization:', error);
+      throw error;
+    }
+    
+    return data;
+  } else {
+    // If user doesn't have organization, remove service from profile
+    // Filter out the service to remove
+    const currentServices = profile.services || [];
+    const updatedServices = currentServices.filter(s => s !== service);
+    
+    // Update the profile with new services
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ services: updatedServices })
+      .eq('id', userId)
+      .select();
+      
+    if (error) {
+      console.error('Error removing service from profile:', error);
+      throw error;
+    }
+    
+    return data;
   }
-  
-  return data;
 };
