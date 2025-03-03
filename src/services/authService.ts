@@ -73,7 +73,7 @@ export const requestPasswordReset = async (email: string) => {
     
     if (error) throw error;
     
-    // Then, notify Loops.so about the password reset request
+    // Then, send a transactional email via Loops.so
     await notifyLoopsPasswordReset(email);
     
     toast.success('Password reset instructions sent to your email.');

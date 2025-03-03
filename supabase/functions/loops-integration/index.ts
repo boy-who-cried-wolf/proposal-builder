@@ -18,9 +18,10 @@ interface LoopsUser {
 }
 
 interface LoopsRequest {
-  action: "createContact" | "updateContact" | "triggerEvent" | "passwordReset";
+  action: "createContact" | "updateContact" | "triggerEvent" | "passwordReset" | "sendTransactional";
   userData: LoopsUser;
   eventName?: string;
+  transactionalId?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -35,7 +36,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("LOOPS_API_KEY is not set");
     }
 
-    const { action, userData, eventName } = await req.json() as LoopsRequest;
+    const { action, userData, eventName, transactionalId } = await req.json() as LoopsRequest;
     console.log(`Processing ${action} for user: ${userData.email}`);
 
     let endpoint = "";
@@ -72,6 +73,18 @@ const handler = async (req: Request): Promise<Response> => {
           email: userData.email,
           eventName: "password_reset_requested",
           ...userData.customFields && { properties: userData.customFields }
+        };
+        break;
+      
+      case "sendTransactional":
+        if (!transactionalId) {
+          throw new Error("transactionalId is required for sendTransactional action");
+        }
+        endpoint = "https://app.loops.so/api/v1/transactional";
+        body = {
+          email: userData.email,
+          transactionalId,
+          ...userData.customFields && { dataFields: userData.customFields }
         };
         break;
       

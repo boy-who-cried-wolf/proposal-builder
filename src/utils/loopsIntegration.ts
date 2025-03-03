@@ -93,15 +93,16 @@ export const notifyLoopsPasswordReset = async (email: string) => {
   try {
     const { data, error } = await supabase.functions.invoke('loops-integration', {
       body: {
-        action: 'passwordReset',
-        userData: { email }
+        action: 'sendTransactional',
+        userData: { email },
+        transactionalId: 'cm7t7msad024eyfcqcxz3wtgl'
       }
     });
 
     if (error) {
-      console.error('Error notifying Loops about password reset:', error);
+      console.error('Error sending password reset email via Loops:', error);
     } else {
-      console.log('Loops notified about password reset successfully:', data);
+      console.log('Password reset email sent via Loops successfully:', data);
     }
   } catch (error) {
     console.error('Error invoking Loops integration:', error);
