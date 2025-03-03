@@ -19,6 +19,9 @@ import {
   PieChart,
   Mail,
 } from "lucide-react";
+import { saveProposal, ProposalSection } from "@/utils/openaiProposal";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 // Sample data for tables
 const designItems = Array(7).fill({
@@ -36,8 +39,14 @@ const developmentItems = Array(5).fill({
 });
 
 export const MainContent: React.FC = () => {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState(0);
   const [activeHeaderTab, setActiveHeaderTab] = useState<number | null>(null);
+  const [generatedProposalSections, setGeneratedProposalSections] = useState<ProposalSection[]>([]);
+  const [projectDescription, setProjectDescription] = useState("");
+  const [projectType, setProjectType] = useState("");
+  const [hourlyRate, setHourlyRate] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
@@ -45,6 +54,71 @@ export const MainContent: React.FC = () => {
 
   const handleHeaderTabChange = (index: number | null) => {
     setActiveHeaderTab(index);
+  };
+
+  const handleProposalData = (sections: ProposalSection[], description: string, type: string, rate: number) => {
+    setGeneratedProposalSections(sections);
+    setProjectDescription(description);
+    setProjectType(type);
+    setHourlyRate(rate);
+  };
+
+  const handleSaveProposal = async () => {
+    try {
+      // Check if user is logged in
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to save proposals",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check if we have proposal data to save
+      if (generatedProposalSections.length === 0) {
+        toast({
+          title: "No proposal to save",
+          description: "Please generate a proposal first",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsSaving(true);
+
+      const result = await saveProposal({
+        title: `Proposal for ${projectType} project`,
+        projectDescription: projectDescription,
+        projectType: projectType,
+        hourlyRate: hourlyRate,
+        sections: generatedProposalSections,
+      });
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Proposal saved successfully!",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to save proposal",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error saving proposal:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+      setActiveHeaderTab(null);
+    }
   };
 
   const headerTabs: Tab[] = [
@@ -102,9 +176,16 @@ export const MainContent: React.FC = () => {
       title: "Save Proposal", 
       icon: Save,
       content: (
-        <div>
+        <div className="p-4">
           <h2 className="text-xl font-bold mb-4">Save Proposal</h2>
-          <p>Your proposal has been saved successfully.</p>
+          <p className="mb-4">Save your current proposal to your account.</p>
+          <button 
+            onClick={handleSaveProposal} 
+            disabled={isSaving}
+            className="bg-black text-white px-4 py-2 rounded flex items-center gap-2"
+          >
+            {isSaving ? 'Saving...' : 'Save Proposal'} <Save size={16} />
+          </button>
         </div>
       )
     },
@@ -115,9 +196,22 @@ export const MainContent: React.FC = () => {
       case 0:
         return (
           <>
-            <ProposalForm />
-            <TableSection title="design" items={designItems} subtotal="$25,000" />
-            <TableSection title="development" items={developmentItems} subtotal="$25,000" />
+            <ProposalForm onProposalGenerated={handleProposalData} />
+            {generatedProposalSections.length > 0 ? (
+              generatedProposalSections.map((section, index) => (
+                <TableSection 
+                  key={index}
+                  title={section.title} 
+                  items={section.items} 
+                  subtotal={section.subtotal} 
+                />
+              ))
+            ) : (
+              <>
+                <TableSection title="design" items={designItems} subtotal="$25,000" />
+                <TableSection title="development" items={developmentItems} subtotal="$25,000" />
+              </>
+            )}
           </>
         );
       case 1:

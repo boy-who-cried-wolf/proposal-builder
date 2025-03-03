@@ -27,6 +27,123 @@ export type Database = {
         }
         Relationships: []
       }
+      proposal_items: {
+        Row: {
+          created_at: string | null
+          description: string
+          hours: string
+          id: string
+          item: string
+          price: string
+          section_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          hours: string
+          id?: string
+          item: string
+          price: string
+          section_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          hours?: string
+          id?: string
+          item?: string
+          price?: string
+          section_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposal_items_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "proposal_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proposal_sections: {
+        Row: {
+          created_at: string | null
+          id: string
+          proposal_id: string | null
+          subtotal: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          proposal_id?: string | null
+          subtotal: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          proposal_id?: string | null
+          subtotal?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposal_sections_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proposals: {
+        Row: {
+          created_at: string | null
+          hourly_rate: number
+          id: string
+          project_description: string
+          project_type: string
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          hourly_rate: number
+          id?: string
+          project_description: string
+          project_type: string
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          hourly_rate?: number
+          id?: string
+          project_description?: string
+          project_type?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

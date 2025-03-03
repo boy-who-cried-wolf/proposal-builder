@@ -20,7 +20,11 @@ const projectTypes = [
   "Other"
 ];
 
-export const ProposalForm: React.FC = () => {
+interface ProposalFormProps {
+  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number) => void;
+}
+
+export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated }) => {
   const { toast } = useToast();
   const [projectDescription, setProjectDescription] = useState("");
   const [hourlyRate, setHourlyRate] = useState(100);
@@ -51,6 +55,11 @@ export const ProposalForm: React.FC = () => {
       
       const sections = await generateProposal(input);
       setProposalSections(sections);
+      
+      // Pass the generated proposal data back to the parent component
+      if (onProposalGenerated) {
+        onProposalGenerated(sections, projectDescription, projectType, hourlyRate);
+      }
       
       toast({
         title: "Success",
