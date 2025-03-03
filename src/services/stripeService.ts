@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -12,25 +11,37 @@ export const createCheckoutSession = async (userId: string, planId: string) => {
 
     if (error) {
       console.error('Error creating checkout session:', error);
-      toast.error('Failed to create checkout session');
+      toast.error('Failed to create checkout session. Please try again later.');
       throw error;
     }
 
+    if (!data) {
+      console.error('No data in response');
+      toast.error('Invalid response from server. Please try again later.');
+      return null;
+    }
+
     console.log('Checkout session response:', data);
+
+    if (data.error) {
+      console.error('Error from Stripe integration:', data.error);
+      toast.error(`Payment processing error: ${data.error}`);
+      return null;
+    }
 
     // Redirect to Stripe Checkout
     if (data?.url) {
       console.log('Redirecting to Stripe checkout:', data.url);
       window.location.href = data.url;
+      return data;
     } else {
       console.error('No URL in response:', data);
-      toast.error('Invalid response from server');
+      toast.error('Invalid response from payment processor. Please try again.');
+      return null;
     }
-
-    return data;
   } catch (error) {
     console.error('Error:', error);
-    toast.error('Something went wrong. Please try again.');
+    toast.error('Something went wrong with the payment process. Please try again.');
     throw error;
   }
 };

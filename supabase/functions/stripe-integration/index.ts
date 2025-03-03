@@ -16,17 +16,36 @@ serve(async (req) => {
 
   try {
     // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') || ''
+    if (!stripeKey) {
+      console.error('Missing STRIPE_SECRET_KEY environment variable')
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error: Missing API key' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const stripe = new Stripe(stripeKey, {
       apiVersion: '2023-10-16',
     })
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing Supabase environment variables')
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error: Missing Supabase credentials' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     // Parse request body
     const { action, userId, planId } = await req.json()
+    console.log(`Processing ${action} request for user ${userId}${planId ? ` and plan ${planId}` : ''}`)
 
     // Create a customer if needed
     if (action === 'createCheckoutSession') {
@@ -54,8 +73,16 @@ serve(async (req) => {
       if (profileError) {
         console.error('Error fetching user profile:', profileError)
         return new Response(
-          JSON.stringify({ error: 'Error fetching user profile' }),
+          JSON.stringify({ error: `Error fetching user profile: ${profileError.message}` }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      if (!profile || !profile.email) {
+        console.error('User profile not found or missing email')
+        return new Response(
+          JSON.stringify({ error: 'User profile not found or missing email' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
 
@@ -66,28 +93,47 @@ serve(async (req) => {
         .eq('user_id', userId)
         .single()
 
+      if (subscriptionError && subscriptionError.code !== 'PGRST116') {
+        console.error('Error fetching subscription:', subscriptionError)
+      }
+
       let customerId = subscription?.stripe_customer_id
 
       // Create a new customer if needed
       if (!customerId) {
-        const customer = await stripe.customers.create({
-          email: profile.email,
-          name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || undefined,
-          metadata: {
-            userId: userId
-          }
-        })
-        customerId = customer.id
-
-        // Save customer ID to database
-        await supabase
-          .from('subscriptions')
-          .upsert({
-            user_id: userId,
-            stripe_customer_id: customerId,
-            plan_id: 'free',  // Default plan
-            status: 'active'
+        try {
+          console.log(`Creating new Stripe customer for user ${userId}`)
+          const customer = await stripe.customers.create({
+            email: profile.email,
+            name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || undefined,
+            metadata: {
+              userId: userId
+            }
           })
+          customerId = customer.id
+          console.log(`Created Stripe customer: ${customerId}`)
+
+          // Save customer ID to database
+          const { error: upsertError } = await supabase
+            .from('subscriptions')
+            .upsert({
+              user_id: userId,
+              stripe_customer_id: customerId,
+              plan_id: 'free',  // Default plan
+              status: 'active'
+            })
+
+          if (upsertError) {
+            console.error('Error saving customer ID to database:', upsertError)
+            // Continue anyway as this is not critical
+          }
+        } catch (error) {
+          console.error('Error creating Stripe customer:', error)
+          return new Response(
+            JSON.stringify({ error: `Error creating Stripe customer: ${error.message}` }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          )
+        }
       }
 
       // Determine price ID based on plan
@@ -99,36 +145,47 @@ serve(async (req) => {
       }
 
       if (!priceId) {
+        console.error(`Invalid plan or missing price ID for plan: ${planId}`)
         return new Response(
-          JSON.stringify({ error: 'Invalid plan or missing price ID' }),
+          JSON.stringify({ error: `Invalid plan or missing price ID for: ${planId}` }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
 
       // Create checkout session
-      const session = await stripe.checkout.sessions.create({
-        customer: customerId,
-        line_items: [
-          {
-            price: priceId,
-            quantity: 1
+      try {
+        console.log(`Creating checkout session with price: ${priceId} for customer: ${customerId}`)
+        const session = await stripe.checkout.sessions.create({
+          customer: customerId,
+          line_items: [
+            {
+              price: priceId,
+              quantity: 1
+            }
+          ],
+          mode: 'subscription',
+          success_url: `${req.headers.get('origin')}/account-settings/plan?success=true`,
+          cancel_url: `${req.headers.get('origin')}/account-settings/plan?canceled=true`,
+          subscription_data: {
+            metadata: {
+              userId: userId,
+              planId: planId
+            }
           }
-        ],
-        mode: 'subscription',
-        success_url: `${req.headers.get('origin')}/account-settings/plan?success=true`,
-        cancel_url: `${req.headers.get('origin')}/account-settings/plan?canceled=true`,
-        subscription_data: {
-          metadata: {
-            userId: userId,
-            planId: planId
-          }
-        }
-      })
+        })
 
-      return new Response(
-        JSON.stringify({ url: session.url }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+        console.log(`Created checkout session: ${session.id}, URL: ${session.url}`)
+        return new Response(
+          JSON.stringify({ url: session.url }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      } catch (error) {
+        console.error('Error creating checkout session:', error)
+        return new Response(
+          JSON.stringify({ error: `Error creating checkout session: ${error.message}` }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
     }
 
     // Get current subscription

@@ -1,9 +1,10 @@
+
 import React, { useEffect } from "react";
 import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, AlertCircle } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { NavTab } from "@/components/ui/NavItem";
@@ -18,6 +19,7 @@ const PlanSettings = () => {
   const [checkoutLoading, setCheckoutLoading] = React.useState("");
   const [cancelLoading, setCancelLoading] = React.useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = React.useState<any>(null);
+  const [error, setError] = React.useState<string | null>(null);
   
   const searchParams = new URLSearchParams(location.search);
   const success = searchParams.get('success');
@@ -38,6 +40,7 @@ const PlanSettings = () => {
       if (user?.id) {
         try {
           setLoading(true);
+          setError(null);
           const subscription = await getCurrentSubscription(user.id);
           if (subscription && subscription.plan_id) {
             setCurrentPlan(subscription.plan_id);
@@ -45,6 +48,7 @@ const PlanSettings = () => {
           }
         } catch (error) {
           console.error("Error fetching subscription:", error);
+          setError("Unable to load your subscription information. Please refresh the page.");
         } finally {
           setLoading(false);
         }
@@ -66,14 +70,20 @@ const PlanSettings = () => {
     }
     
     console.log(`Selecting plan: ${planId} for user: ${user.id}`);
+    setError(null);
     
     try {
       setCheckoutLoading(planId);
       toast.info(`Preparing checkout for ${planId} plan...`);
-      await createCheckoutSession(user.id, planId);
+      const result = await createCheckoutSession(user.id, planId);
+      
+      if (!result) {
+        // The error has already been shown via toast in the service
+        console.log("Checkout failed or was cancelled");
+      }
     } catch (error) {
       console.error("Error selecting plan:", error);
-      toast.error("Failed to create checkout session");
+      setError("There was a problem connecting to our payment processor. Please try again later.");
     } finally {
       setCheckoutLoading("");
     }
@@ -92,6 +102,7 @@ const PlanSettings = () => {
     
     try {
       setCancelLoading(true);
+      setError(null);
       await cancelSubscription(user.id);
       const subscription = await getCurrentSubscription(user.id);
       setCurrentPlan(subscription.plan_id);
@@ -99,6 +110,7 @@ const PlanSettings = () => {
       toast.success("Your subscription has been cancelled");
     } catch (error) {
       console.error("Error cancelling subscription:", error);
+      setError("Unable to cancel your subscription. Please try again later.");
     } finally {
       setCancelLoading(false);
     }
@@ -190,6 +202,13 @@ const PlanSettings = () => {
               <h2 className="text-xl font-semibold">Subscription Plan</h2>
               <p className="text-muted-foreground">Choose the plan that's right for you</p>
             </div>
+            
+            {error && (
+              <div className="bg-destructive/15 text-destructive p-4 rounded-lg flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <p>{error}</p>
+              </div>
+            )}
             
             {subscriptionInfo && subscriptionInfo.status === "active" && currentPlan !== "free" && (
               <div className="bg-muted p-4 rounded-lg">
