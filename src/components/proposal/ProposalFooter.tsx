@@ -36,20 +36,20 @@ export const ProposalFooter: React.FC<ProposalFooterProps> = ({
   };
 
   return (
-    <footer className="flex justify-between bg-[#F7F6F2] px-[17px] py-[15px] border-t-black border-t border-solid max-sm:flex-col max-sm:gap-5">
-      <MetricItem value={totalHours} label="Total Hours" />
+    <footer className="flex justify-between bg-[#F1F0FB] px-[17px] py-[15px] border-t-[#C8C8C9] border-t border-solid max-sm:flex-col max-sm:gap-5">
+      <MetricItem value={totalHours} label="Total Hours" className="text-[#403E43]" />
       <MetricItem 
         value={hoursPerDay} 
         label="Hours/Day" 
-        className={getHoursPerDayColorClass()}
+        className={cn("text-[#403E43]", getHoursPerDayColorClass())}
       />
-      <MetricItem value={monthlyRevenue} label="Monthly Revenue" />
+      <MetricItem value={monthlyRevenue} label="Monthly Revenue" className="text-[#403E43]" />
       <MetricItem 
         value={profitMargin} 
         label="Profit Margin" 
-        className={getProfitMarginColorClass()}
+        className={cn("text-[#403E43]", getProfitMarginColorClass())}
       />
-      <MetricItem value={totalValue} label="Total Value" />
+      <MetricItem value={totalValue} label="Total Value" className="text-[#403E43]" />
     </footer>
   );
 };

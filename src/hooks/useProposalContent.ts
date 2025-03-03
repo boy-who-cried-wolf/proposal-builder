@@ -52,7 +52,7 @@ export function useProposalContent(
         }
       });
     });
-    return total;
+    return Math.round(total * 10) / 10;
   };
 
   const calculateTotalWorkingDays = (): number => {
@@ -65,7 +65,7 @@ export function useProposalContent(
   const calculateHoursPerDay = (): number => {
     const totalHours = calculateTotalHours();
     const workingDays = calculateTotalWorkingDays();
-    return workingDays > 0 ? parseFloat((totalHours / workingDays).toFixed(1)) : 0;
+    return workingDays > 0 ? Math.round((totalHours / workingDays) * 10) / 10 : 0;
   };
 
   const calculateTotalValue = (): number => {
@@ -78,7 +78,7 @@ export function useProposalContent(
         }
       });
     });
-    return total;
+    return Math.round(total);
   };
 
   const calculateMonthlyRevenue = (): string => {
@@ -92,7 +92,7 @@ export function useProposalContent(
     const monthlyWorkingDays = 22;
     const monthlyRevenue = totalValue * (monthlyWorkingDays / workingDays);
     
-    return `$${monthlyRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+    return `$${Math.round(monthlyRevenue).toLocaleString()}`;
   };
 
   const calculateProfitMargin = (): { display: string; value: number } => {
@@ -104,17 +104,17 @@ export function useProposalContent(
     const profitMarginPercent = (profitPerHour / hourlyRate) * 100;
     
     return { 
-      display: `${profitMarginPercent.toFixed(0)}%`,
+      display: `${Math.round(profitMarginPercent)}%`,
       value: Math.round(profitMarginPercent)
     };
   };
 
   const getTotalHoursDisplay = (): string => {
-    return calculateTotalHours().toString();
+    return calculateTotalHours().toFixed(1);
   };
 
   const getHoursPerDayDisplay = (): string => {
-    return calculateHoursPerDay().toString();
+    return calculateHoursPerDay().toFixed(1);
   };
 
   const getHoursPerDayValue = (): number => {
@@ -262,13 +262,11 @@ export function useProposalContent(
 
     const updatedItem = { ...editingItem.item, [field]: value };
 
-    const totalBudget = projectBudget;
-    
     if (field === 'hours' && isHoursPriceLocked) {
       const hours = parseFloat(value);
       if (!isNaN(hours)) {
         const priceValue = hours * hourlyRate;
-        updatedItem.price = `$${priceValue}`;
+        updatedItem.price = `$${Math.round(priceValue)}`;
       }
     }
 
@@ -283,6 +281,13 @@ export function useProposalContent(
 
     const { sectionIndex, itemIndex, item } = editingItem;
     const oldItem = sections[sectionIndex].items[itemIndex];
+    
+    if (item.hours) {
+      const hours = parseFloat(item.hours.toString());
+      if (!isNaN(hours)) {
+        item.hours = (Math.round(hours * 10) / 10).toFixed(1);
+      }
+    }
     
     const newSections = [...sections];
     newSections[sectionIndex] = {
@@ -302,7 +307,7 @@ export function useProposalContent(
           subtotal += price;
         }
       });
-      section.subtotal = `$${subtotal.toLocaleString()}`;
+      section.subtotal = `$${Math.round(subtotal).toLocaleString()}`;
     });
 
     if (projectBudget > 0) {
@@ -367,13 +372,13 @@ export function useProposalContent(
           sectionTotal += newPrice;
           
           if (isHoursPriceLocked && hourlyRate > 0) {
-            const newHours = (newPrice / hourlyRate).toFixed(1);
-            item.hours = newHours;
+            const newHours = Math.round((newPrice / hourlyRate) * 10) / 10;
+            item.hours = newHours.toFixed(1);
           }
         }
       });
       
-      section.subtotal = `$${sectionTotal.toLocaleString()}`;
+      section.subtotal = `$${Math.round(sectionTotal).toLocaleString()}`;
     });
   };
 

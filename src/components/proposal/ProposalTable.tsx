@@ -33,7 +33,7 @@ export const ProposalTable: React.FC<ProposalTableProps> = ({
             <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
               Item
             </div>
-            <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+            <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase px-4">
               Description
             </div>
             <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
@@ -55,7 +55,7 @@ export const ProposalTable: React.FC<ProposalTableProps> = ({
               <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
                 {item.item}
               </div>
-              <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+              <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase px-4 truncate">
                 {item.description}
               </div>
               <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">

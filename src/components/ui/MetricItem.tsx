@@ -1,3 +1,4 @@
+
 import React from "react";
 import { cn } from "@/lib/utils";
 
@@ -19,10 +20,10 @@ export const MetricItem: React.FC<MetricItemProps> = ({
         className,
       )}
     >
-      <div className="text-black text-lg font-bold tracking-[2.744px] uppercase mb-[5px]">
+      <div className="text-lg font-bold tracking-[2.744px] uppercase mb-[5px]">
         {value}
       </div>
-      <div className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+      <div className="text-[#8E9196] text-[9px] font-semibold tracking-[1.389px] uppercase">
         {label}
       </div>
     </div>
