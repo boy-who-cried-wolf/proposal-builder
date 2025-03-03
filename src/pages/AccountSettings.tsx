@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -95,9 +96,9 @@ const AccountSettings = () => {
     <div className="flex h-screen">
       <Sidebar />
       <MainContent>
-        <div className="border-b border-border pb-2 mb-6">
-          <div className="container px-4 py-2 flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Account Settings</h1>
+        <div className="border-b border-border pb-4">
+          <div className="container">
+            <h1 className="text-3xl font-bold py-4">Account Settings</h1>
           </div>
         </div>
         
