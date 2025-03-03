@@ -47,7 +47,7 @@ export const ProjectCardList: React.FC<ProjectCardListProps> = ({
       <CardContent className="p-0">
         <div className="grid grid-cols-7 gap-4 items-center text-sm px-[29px] py-[11px] border-b border-solid border-gray-100 max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
           <div className="flex items-center">
-            <GripVertical size={16} className="cursor-grab text-gray-400" />
+            <GripVertical size={16} className="text-gray-400" />
             <div className="ml-2">
               <p className="text-lg font-bold font-poppins">{project.title}</p>
               <p className="text-sm text-muted-foreground">{project.client}</p>
@@ -59,7 +59,7 @@ export const ProjectCardList: React.FC<ProjectCardListProps> = ({
             </Badge>
           </div>
           <div className="section_table_cell">
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{formattedValue}</p>
+            <p className="text-black text-xs font-semibold tracking-[1.389px] uppercase">{formattedValue}</p>
             <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">PROPOSAL AMOUNT</p>
           </div>
           <div className="section_table_cell">
