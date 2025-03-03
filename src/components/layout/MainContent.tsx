@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
 import { MetricItem } from "@/components/ui/MetricItem";
@@ -38,6 +39,50 @@ export const MainContent: React.FC<MainContentProps> = ({
 
   const handleHeaderTabChange = (index: number | null) => {
     setActiveHeaderTab(index);
+  };
+
+  // Calculate total hours from all tasks
+  const calculateTotalHours = (): number => {
+    let total = 0;
+    generatedProposalSections.forEach(section => {
+      section.items.forEach(item => {
+        const hours = parseFloat(item.hours.toString());
+        if (!isNaN(hours)) {
+          total += hours;
+        }
+      });
+    });
+    return total;
+  };
+
+  // Calculate hours per day (total hours / 5)
+  const calculateHoursPerDay = (): number => {
+    const totalHours = calculateTotalHours();
+    return totalHours > 0 ? parseFloat((totalHours / 5).toFixed(1)) : 0;
+  };
+
+  // Calculate total project value
+  const calculateTotalValue = (): string => {
+    let total = 0;
+    generatedProposalSections.forEach(section => {
+      section.items.forEach(item => {
+        const price = parseFloat(item.price.toString().replace(/[^0-9.-]+/g, ''));
+        if (!isNaN(price)) {
+          total += price;
+        }
+      });
+    });
+    return `$${total.toLocaleString()}`;
+  };
+
+  // Format total hours as string for display
+  const getTotalHoursDisplay = (): string => {
+    return calculateTotalHours().toString();
+  };
+
+  // Format hours per day as string for display
+  const getHoursPerDayDisplay = (): string => {
+    return calculateHoursPerDay().toString();
   };
 
   const handleSaveProposal = async () => {
@@ -293,11 +338,11 @@ export const MainContent: React.FC<MainContentProps> = ({
       </div>
 
       <footer className="flex justify-between bg-[#F7F6F2] px-[17px] py-[15px] border-t-black border-t border-solid max-sm:flex-col max-sm:gap-5">
-        <MetricItem value="165" label="Total Hours" />
-        <MetricItem value="2.6" label="Hours/Day" />
+        <MetricItem value={getTotalHoursDisplay()} label="Total Hours" />
+        <MetricItem value={getHoursPerDayDisplay()} label="Hours/Day" />
         <MetricItem value="$5,500" label="Monthly Revenue" />
         <MetricItem value="45%" label="Profit Margin" />
-        <MetricItem value="$15,000" label="Total Value" />
+        <MetricItem value={calculateTotalValue()} label="Total Value" />
       </footer>
     </main>
   );
