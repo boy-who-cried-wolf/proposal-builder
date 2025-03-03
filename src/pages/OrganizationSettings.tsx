@@ -4,13 +4,19 @@ import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
-  getUserProfile, 
+  getUserProfile
+} from "@/integrations/supabase/profileService"; 
+import {
   updateOrganization, 
-  createOrganization, 
-  linkUserToOrganization,
+  createOrganization
+} from "@/integrations/supabase/organizationService";
+import {
+  linkUserToOrganization
+} from "@/integrations/supabase/profileService";
+import {
   addServiceToProfile, 
   removeServiceFromProfile 
-} from "@/integrations/supabase/client";
+} from "@/integrations/supabase/serviceManagement";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
