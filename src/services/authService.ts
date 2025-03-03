@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { addUserToLoops, notifyLoopsPasswordReset } from '@/utils/loopsIntegration';
@@ -7,6 +8,7 @@ import { addUserToLoops, notifyLoopsPasswordReset } from '@/utils/loopsIntegrati
  */
 export const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
   try {
+    // Create the user with metadata properly set
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -14,6 +16,7 @@ export const signUp = async (email: string, password: string, firstName?: string
         data: {
           first_name: firstName,
           last_name: lastName,
+          full_name: firstName && lastName ? `${firstName} ${lastName}` : undefined,
         },
       },
     });

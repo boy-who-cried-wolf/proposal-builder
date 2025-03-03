@@ -15,6 +15,13 @@ export const addUserToLoops = async (
   lastName?: string
 ) => {
   try {
+    console.log('Adding user to Loops with data:', {
+      email,
+      userGroup,
+      firstName,
+      lastName
+    });
+    
     const { data, error } = await supabase.functions.invoke('loops-integration', {
       body: {
         action: 'createContact',
@@ -22,8 +29,8 @@ export const addUserToLoops = async (
           email,
           userGroup,
           source: 'website_signup',
-          ...(firstName && { firstName }),
-          ...(lastName && { lastName }),
+          firstName, // Directly pass firstName (undefined will be filtered out)
+          lastName,  // Directly pass lastName (undefined will be filtered out)
         }
       }
     });
