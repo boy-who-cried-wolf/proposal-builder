@@ -50,6 +50,7 @@ export type Database = {
           first_name: string | null
           hourly_rate: number | null
           id: string
+          is_admin: boolean | null
           knowledge_base: string | null
           last_name: string | null
           organization_id: string | null
@@ -63,6 +64,7 @@ export type Database = {
           first_name?: string | null
           hourly_rate?: number | null
           id: string
+          is_admin?: boolean | null
           knowledge_base?: string | null
           last_name?: string | null
           organization_id?: string | null
@@ -76,6 +78,7 @@ export type Database = {
           first_name?: string | null
           hourly_rate?: number | null
           id?: string
+          is_admin?: boolean | null
           knowledge_base?: string | null
           last_name?: string | null
           organization_id?: string | null
@@ -283,7 +286,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_and_downgrade_expired_subscriptions: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
