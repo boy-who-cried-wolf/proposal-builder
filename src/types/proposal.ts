@@ -29,6 +29,7 @@ export interface SaveProposalInput {
   projectDescription: string;
   projectType: string;
   hourlyRate: number;
+  freelancerRate: number;
   sections: ProposalSection[];
 }
 

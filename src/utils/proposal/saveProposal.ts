@@ -4,7 +4,7 @@ import { SaveProposalInput } from '@/types/proposal';
 
 export async function saveProposal(input: SaveProposalInput): Promise<{ success: boolean, id?: string, error?: string }> {
   try {
-    const { title, projectDescription, projectType, hourlyRate, sections } = input;
+    const { title, projectDescription, projectType, hourlyRate, freelancerRate, sections } = input;
     
     // Get the current user
     const { data: { user } } = await supabase.auth.getUser();
@@ -24,6 +24,7 @@ export async function saveProposal(input: SaveProposalInput): Promise<{ success:
         project_description: projectDescription,
         project_type: projectType,
         hourly_rate: hourlyRate,
+        freelancer_rate: freelancerRate,
         user_id: user.id
       })
       .select('id')

@@ -106,6 +106,7 @@ export type Database = {
       proposals: {
         Row: {
           created_at: string | null
+          freelancer_rate: number | null
           hourly_rate: number
           id: string
           project_description: string
@@ -116,6 +117,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          freelancer_rate?: number | null
           hourly_rate: number
           id?: string
           project_description: string
@@ -126,6 +128,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          freelancer_rate?: number | null
           hourly_rate?: number
           id?: string
           project_description?: string

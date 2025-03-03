@@ -154,6 +154,7 @@ export function useProposalContent(
         projectDescription: projectDescription,
         projectType: projectType,
         hourlyRate: hourlyRate,
+        freelancerRate: freelancerRate,
         sections: sections,
       });
 
