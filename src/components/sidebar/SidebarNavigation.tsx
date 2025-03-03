@@ -7,7 +7,7 @@ import {
   DocumentIcon, 
   ViewIcon
 } from "@/components/icons";
-import { MessageSquare, Settings, Users } from "lucide-react";
+import { MessageSquare, Settings, Users, LayoutDashboard } from "lucide-react";
 
 interface SidebarNavigationProps {
   activeNavItem: number | null;
@@ -23,11 +23,13 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   const navItems = [
     {
       title: "Dashboard",
-      icon: ArrowDownIcon,
+      icon: LayoutDashboard,
       content: (
         <div className="p-3 bg-muted/20 rounded-sm mt-1">
           <ul className="space-y-2 text-xs">
-            <li className="cursor-pointer hover:text-primary">Overview</li>
+            <li className="cursor-pointer hover:text-primary">
+              <a href="/dashboard">Overview</a>
+            </li>
             <li className="cursor-pointer hover:text-primary">Analytics</li>
             <li className="cursor-pointer hover:text-primary">Reports</li>
           </ul>
