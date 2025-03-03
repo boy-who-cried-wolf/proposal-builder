@@ -5,9 +5,15 @@ import { supabase } from '@/integrations/supabase/client';
  * Adds a new user to Loops.so
  * @param email User's email address
  * @param userGroup User group for segmentation (default: 'free')
- * @param fullName User's full name (optional)
+ * @param firstName User's first name (optional)
+ * @param lastName User's last name (optional)
  */
-export const addUserToLoops = async (email: string, userGroup: string = 'free', fullName?: string) => {
+export const addUserToLoops = async (
+  email: string, 
+  userGroup: string = 'free', 
+  firstName?: string,
+  lastName?: string
+) => {
   try {
     const { data, error } = await supabase.functions.invoke('loops-integration', {
       body: {
@@ -16,7 +22,8 @@ export const addUserToLoops = async (email: string, userGroup: string = 'free', 
           email,
           userGroup,
           source: 'website_signup',
-          ...(fullName && { fullName }),
+          ...(firstName && { firstName }),
+          ...(lastName && { lastName }),
         }
       }
     });

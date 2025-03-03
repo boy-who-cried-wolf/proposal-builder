@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { addUserToLoops, notifyLoopsPasswordReset } from '@/utils/loopsIntegration';
@@ -21,9 +20,8 @@ export const signUp = async (email: string, password: string, firstName?: string
 
     if (error) throw error;
     
-    // Add user to Loops.so with first and last name if available
-    const fullName = firstName && lastName ? `${firstName} ${lastName}` : undefined;
-    await addUserToLoops(email, 'free', fullName);
+    // Add user to Loops.so with first and last name as separate fields
+    await addUserToLoops(email, 'free', firstName, lastName);
     
     toast.success('Account created successfully! Check your email to confirm.');
   } catch (error: any) {
