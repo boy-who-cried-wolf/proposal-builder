@@ -86,7 +86,7 @@ export function ExpandableTabs({
           return <Separator key={`separator-${index}`} />;
         }
 
-        const Icon = tab.icon;
+        const TabIcon = tab.icon;
         const isExpanded = selected === index || hovered === index;
         
         return (
@@ -101,13 +101,13 @@ export function ExpandableTabs({
             onMouseLeave={() => setHovered(null)}
             transition={transition}
             className={cn(
-              "relative flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors duration-300",
+              "relative flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors duration-300 whitespace-nowrap",
               isExpanded
                 ? cn("bg-muted", activeColor)
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
-            <Icon size={20} />
+            <TabIcon size={20} />
             <AnimatePresence initial={false}>
               {isExpanded && (
                 <motion.span
@@ -116,7 +116,7 @@ export function ExpandableTabs({
                   animate="animate"
                   exit="exit"
                   transition={transition}
-                  className="overflow-hidden"
+                  className="overflow-hidden whitespace-nowrap"
                 >
                   {tab.title}
                 </motion.span>

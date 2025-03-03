@@ -10,6 +10,7 @@ import {
   Send,
   Timer,
   DiamondPlus,
+  Save,
 } from "lucide-react";
 
 // Sample data for tables
@@ -40,6 +41,7 @@ export const MainContent: React.FC = () => {
     { title: "Preview", icon: Eye },
     { title: "Send", icon: Send },
     { title: "Copy", icon: Copy },
+    { title: "Save Proposal", icon: Save },
   ];
 
   return (
