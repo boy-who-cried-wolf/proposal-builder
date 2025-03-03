@@ -1,3 +1,4 @@
+
 import React from "react";
 import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -5,6 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { NavTab } from "@/components/ui/NavItem";
 import { OrganizationSettingsForm } from "@/components/organization/OrganizationSettingsForm";
 import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
+
 const OrganizationSettings = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,7 +30,9 @@ const OrganizationSettings = () => {
     handleNumberChange,
     handleNumberFocus
   } = useOrganizationSettings();
-  return <div className="flex h-screen">
+
+  return (
+    <div className="flex min-h-screen">
       <Sidebar />
       <MainContent>
         <div className="border-b border-border pb-4">
@@ -53,6 +57,8 @@ const OrganizationSettings = () => {
           <OrganizationSettingsForm loading={loading} saving={saving} companyName={companyName} setCompanyName={setCompanyName} hourlyRate={hourlyRate} setHourlyRate={setHourlyRate} clientRate={clientRate} setClientRate={setClientRate} knowledgeBase={knowledgeBase} setKnowledgeBase={setKnowledgeBase} services={services} newService={newService} setNewService={setNewService} handleSave={handleSave} handleAddService={handleAddService} handleRemoveService={handleRemoveService} handleNumberChange={handleNumberChange} handleNumberFocus={handleNumberFocus} />
         </div>
       </MainContent>
-    </div>;
+    </div>
+  );
 };
+
 export default OrganizationSettings;
