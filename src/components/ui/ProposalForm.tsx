@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { generateProposal, ProposalSection, ProposalInput } from "@/utils/openaiProposal";
+import { ProposalSection, ProposalInput } from "@/types/proposal"; 
+import { generateProposal } from "@/utils/proposal/generateProposal";
 import { Send } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
@@ -30,6 +31,7 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
   const [proposalSections, setProposalSections] = useState<ProposalSection[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [streamProgress, setStreamProgress] = useState(0);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 14),
@@ -106,8 +108,24 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
     await generateProposalContent();
   };
 
+  const handleStreamUpdate = (sections: ProposalSection[]) => {
+    // Update the local state with the latest sections
+    setProposalSections(sections);
+    
+    // Calculate a progress indicator (this is just an estimate)
+    // You could make this more sophisticated based on the expected number of sections
+    setStreamProgress(Math.min(95, streamProgress + 5)); // Cap at 95% until fully complete
+    
+    // Send the current state up to parent component
+    if (onProposalGenerated) {
+      onProposalGenerated(sections, projectDescription, projectType, hourlyRate, freelancerRate);
+    }
+  };
+
   const generateProposalContent = async () => {
     setIsGenerating(true);
+    setStreamProgress(0);
+    setProposalSections([]);
     
     try {
       const input: ProposalInput = {
@@ -119,8 +137,11 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
         freelancerRate
       };
       
-      const sections = await generateProposal(input);
+      const sections = await generateProposal(input, handleStreamUpdate);
+      
+      // Final update with complete result
       setProposalSections(sections);
+      setStreamProgress(100);
       
       // Pass the generated proposal data back to the parent component
       if (onProposalGenerated) {
@@ -207,7 +228,13 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
               className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded"
             >
               {isGenerating ? (
-                <>Generating<span className="animate-pulse">...</span></>
+                <div className="flex items-center">
+                  <span>Generating</span>
+                  <span className="ml-1 animate-pulse">...</span>
+                  {streamProgress > 0 && (
+                    <span className="ml-2 text-xs">{streamProgress}%</span>
+                  )}
+                </div>
               ) : (
                 <>
                   Generate Proposal <Send size={16} />
@@ -215,6 +242,17 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
               )}
             </button>
           </div>
+          
+          {isGenerating && streamProgress > 0 && (
+            <div className="mt-2">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className="bg-black h-2.5 rounded-full transition-all duration-300 ease-in-out" 
+                  style={{ width: `${streamProgress}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
         </form>
       </div>
 
