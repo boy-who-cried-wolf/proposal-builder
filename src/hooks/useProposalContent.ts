@@ -6,12 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { saveProposal } from "@/utils/openaiProposal";
 import { Revision } from "@/components/proposal/RevisionsTab";
 import { formatProposalForFigma } from "@/utils/proposal/formatProposalForFigma";
+import { differenceInBusinessDays } from "date-fns";
 
 export function useProposalContent(
   generatedProposalSections: ProposalSection[],
   projectDescription: string,
   projectType: string,
-  hourlyRate: number
+  hourlyRate: number,
+  freelancerRate: number = 0,
+  projectBudget: number = 0,
+  dateRange?: { from: Date; to?: Date }
 ) {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState(0);
@@ -51,12 +55,20 @@ export function useProposalContent(
     return total;
   };
 
-  const calculateHoursPerDay = (): number => {
-    const totalHours = calculateTotalHours();
-    return totalHours > 0 ? parseFloat((totalHours / 5).toFixed(1)) : 0;
+  const calculateTotalWorkingDays = (): number => {
+    if (!dateRange?.from || !dateRange?.to) {
+      return 0;
+    }
+    return differenceInBusinessDays(dateRange.to, dateRange.from) + 1;
   };
 
-  const calculateTotalValue = (): string => {
+  const calculateHoursPerDay = (): number => {
+    const totalHours = calculateTotalHours();
+    const workingDays = calculateTotalWorkingDays();
+    return workingDays > 0 ? parseFloat((totalHours / workingDays).toFixed(1)) : 0;
+  };
+
+  const calculateTotalValue = (): number => {
     let total = 0;
     sections.forEach(section => {
       section.items.forEach(item => {
@@ -66,7 +78,35 @@ export function useProposalContent(
         }
       });
     });
-    return `$${total.toLocaleString()}`;
+    return total;
+  };
+
+  const calculateMonthlyRevenue = (): string => {
+    const totalValue = calculateTotalValue();
+    const workingDays = calculateTotalWorkingDays();
+    
+    if (workingDays <= 0) {
+      return "$0";
+    }
+    
+    const monthlyWorkingDays = 22;
+    const monthlyRevenue = totalValue * (monthlyWorkingDays / workingDays);
+    
+    return `$${monthlyRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  };
+
+  const calculateProfitMargin = (): { display: string; value: number } => {
+    if (freelancerRate <= 0 || hourlyRate <= 0) {
+      return { display: "0%", value: 0 };
+    }
+
+    const profitPerHour = hourlyRate - freelancerRate;
+    const profitMarginPercent = (profitPerHour / hourlyRate) * 100;
+    
+    return { 
+      display: `${profitMarginPercent.toFixed(0)}%`,
+      value: Math.round(profitMarginPercent)
+    };
   };
 
   const getTotalHoursDisplay = (): string => {
@@ -75,6 +115,15 @@ export function useProposalContent(
 
   const getHoursPerDayDisplay = (): string => {
     return calculateHoursPerDay().toString();
+  };
+
+  const getHoursPerDayValue = (): number => {
+    return calculateHoursPerDay();
+  };
+
+  const getTotalValueDisplay = (): string => {
+    const total = calculateTotalValue();
+    return `$${total.toLocaleString()}`;
   };
 
   const handleSaveProposal = async () => {
@@ -212,6 +261,8 @@ export function useProposalContent(
 
     const updatedItem = { ...editingItem.item, [field]: value };
 
+    const totalBudget = projectBudget;
+    
     if (field === 'hours' && isHoursPriceLocked) {
       const hours = parseFloat(value);
       if (!isNaN(hours)) {
@@ -242,6 +293,24 @@ export function useProposalContent(
       ],
     };
 
+    newSections.forEach(section => {
+      let subtotal = 0;
+      section.items.forEach(item => {
+        const price = parseFloat(item.price.toString().replace(/[^0-9.-]+/g, ''));
+        if (!isNaN(price)) {
+          subtotal += price;
+        }
+      });
+      section.subtotal = `$${subtotal.toLocaleString()}`;
+    });
+
+    if (projectBudget > 0) {
+      const currentTotal = calculateTotalFromSections(newSections);
+      if (currentTotal !== projectBudget) {
+        adjustSectionsToMatchBudget(newSections, projectBudget);
+      }
+    }
+
     Object.keys(item).forEach((key) => {
       const field = key as keyof typeof item;
       if (item[field] !== oldItem[field]) {
@@ -264,6 +333,46 @@ export function useProposalContent(
     toast({
       title: "Changes saved",
       description: `Updated ${item.item} in ${sections[sectionIndex].title}`,
+    });
+  };
+
+  const calculateTotalFromSections = (sections: ProposalSection[]): number => {
+    let total = 0;
+    sections.forEach(section => {
+      section.items.forEach(item => {
+        const price = parseFloat(item.price.toString().replace(/[^0-9.-]+/g, ''));
+        if (!isNaN(price)) {
+          total += price;
+        }
+      });
+    });
+    return total;
+  };
+
+  const adjustSectionsToMatchBudget = (sections: ProposalSection[], budget: number): void => {
+    const currentTotal = calculateTotalFromSections(sections);
+    if (currentTotal === 0) return;
+
+    const ratio = budget / currentTotal;
+    
+    sections.forEach(section => {
+      let sectionTotal = 0;
+      
+      section.items.forEach(item => {
+        const originalPrice = parseFloat(item.price.toString().replace(/[^0-9.-]+/g, ''));
+        if (!isNaN(originalPrice)) {
+          const newPrice = Math.round(originalPrice * ratio);
+          item.price = `$${newPrice}`;
+          sectionTotal += newPrice;
+          
+          if (isHoursPriceLocked && hourlyRate > 0) {
+            const newHours = (newPrice / hourlyRate).toFixed(1);
+            item.hours = newHours;
+          }
+        }
+      });
+      
+      section.subtotal = `$${sectionTotal.toLocaleString()}`;
     });
   };
 
@@ -366,7 +475,10 @@ export function useProposalContent(
     handleHeaderTabChange,
     getTotalHoursDisplay,
     getHoursPerDayDisplay,
-    calculateTotalValue,
+    getHoursPerDayValue,
+    getTotalValueDisplay,
+    calculateMonthlyRevenue,
+    calculateProfitMargin,
     handleSaveProposal,
     handleCopyToFigma,
     openEditDialog,

@@ -1,9 +1,10 @@
+
 import React, { useState } from "react";
 import { generateProposal, ProposalSection, ProposalInput } from "@/utils/openaiProposal";
 import { Send } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
-import { addDays } from "date-fns";
+import { addDays, differenceInBusinessDays } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,13 +32,14 @@ const projectTypes = [
 ];
 
 interface ProposalFormProps {
-  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number) => void;
+  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number) => void;
 }
 
 export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated }) => {
   const { toast } = useToast();
   const [projectDescription, setProjectDescription] = useState("");
   const [hourlyRate, setHourlyRate] = useState(100);
+  const [freelancerRate, setFreelancerRate] = useState(60);
   const [projectBudget, setProjectBudget] = useState(5000);
   const [projectType, setProjectType] = useState(projectTypes[0]);
   const [proposalSections, setProposalSections] = useState<ProposalSection[]>([]);
@@ -59,6 +61,15 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
       return;
     }
 
+    if (!dateRange?.from || !dateRange?.to) {
+      toast({
+        title: "Error",
+        description: "Please provide a project timeline with start and end dates",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGenerating(true);
     
     try {
@@ -67,7 +78,8 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
         hourlyRate,
         projectType,
         projectBudget,
-        dateRange
+        dateRange,
+        freelancerRate
       };
       
       const sections = await generateProposal(input);
@@ -75,7 +87,7 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
       
       // Pass the generated proposal data back to the parent component
       if (onProposalGenerated) {
-        onProposalGenerated(sections, projectDescription, projectType, hourlyRate);
+        onProposalGenerated(sections, projectDescription, projectType, hourlyRate, freelancerRate);
       }
       
       toast({
@@ -125,6 +137,19 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
                 min="1"
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(Number(e.target.value))}
+                className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
+              />
+            </div>
+
+            <div>
+              <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
+                Freelancer Rate ($)
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={freelancerRate}
+                onChange={(e) => setFreelancerRate(Number(e.target.value))}
                 className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
               />
             </div>

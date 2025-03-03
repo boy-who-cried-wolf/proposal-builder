@@ -16,6 +16,9 @@ export const MainContent: React.FC<MainContentProps> = ({
   projectDescription,
   projectType,
   hourlyRate,
+  freelancerRate = 0,
+  projectBudget = 0,
+  dateRange,
 }) => {
   const {
     activeTab,
@@ -33,7 +36,10 @@ export const MainContent: React.FC<MainContentProps> = ({
     handleHeaderTabChange,
     getTotalHoursDisplay,
     getHoursPerDayDisplay,
-    calculateTotalValue,
+    getHoursPerDayValue,
+    getTotalValueDisplay,
+    calculateMonthlyRevenue,
+    calculateProfitMargin,
     handleSaveProposal,
     handleCopyToFigma,
     openEditDialog,
@@ -50,7 +56,10 @@ export const MainContent: React.FC<MainContentProps> = ({
     generatedProposalSections,
     projectDescription,
     projectType,
-    hourlyRate
+    hourlyRate,
+    freelancerRate,
+    projectBudget,
+    dateRange
   );
 
   const renderTabContent = () => {
@@ -112,7 +121,11 @@ export const MainContent: React.FC<MainContentProps> = ({
       <ProposalFooter 
         totalHours={getTotalHoursDisplay()}
         hoursPerDay={getHoursPerDayDisplay()}
-        totalValue={calculateTotalValue()}
+        hoursPerDayValue={getHoursPerDayValue()}
+        totalValue={getTotalValueDisplay()}
+        monthlyRevenue={calculateMonthlyRevenue()}
+        profitMargin={calculateProfitMargin().display}
+        profitMarginValue={calculateProfitMargin().value}
       />
 
       <TaskEditor
@@ -137,4 +150,4 @@ export const MainContent: React.FC<MainContentProps> = ({
       />
     </main>
   );
-}
+};

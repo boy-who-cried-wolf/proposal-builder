@@ -17,6 +17,7 @@ export interface ProposalInput {
   hourlyRate: number;
   projectType: string;
   projectBudget?: number;
+  freelancerRate?: number;
   dateRange?: {
     from: Date;
     to?: Date;

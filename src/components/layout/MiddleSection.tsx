@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
 import { SendIcon } from "@/components/icons";
@@ -11,7 +12,7 @@ type Message = {
 };
 
 interface MiddleSectionProps {
-  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number) => void;
+  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number) => void;
 }
 
 export const MiddleSection: React.FC<MiddleSectionProps> = ({ onProposalGenerated }) => {
@@ -58,7 +59,7 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({ onProposalGenerate
     }
   };
 
-  const handleProposalGenerated = (sections: ProposalSection[], description: string, type: string, rate: number) => {
+  const handleProposalGenerated = (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number) => {
     // Add message about proposal being generated
     const proposalMessage: Message = {
       id: Date.now().toString(),
@@ -70,7 +71,7 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({ onProposalGenerate
     
     // Pass data to parent component
     if (onProposalGenerated) {
-      onProposalGenerated(sections, description, type, rate);
+      onProposalGenerated(sections, description, type, rate, freelancerRate);
     }
   };
 
