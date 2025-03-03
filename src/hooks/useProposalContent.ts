@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ProposalSection } from "@/utils/openaiProposal";
 import { EditingItem } from "@/types/mainContent";
@@ -282,10 +283,12 @@ export function useProposalContent(
     const { sectionIndex, itemIndex, item } = editingItem;
     const oldItem = sections[sectionIndex].items[itemIndex];
     
+    // Process hours to ensure it's formatted correctly
     if (item.hours) {
       const hours = parseFloat(item.hours.toString());
       if (!isNaN(hours)) {
-        item.hours = (Math.round(hours * 10) / 10).toFixed(1);
+        // Round to 1 decimal place
+        item.hours = Math.round(hours * 10) / 10 + '';
       }
     }
     
@@ -299,17 +302,10 @@ export function useProposalContent(
       ],
     };
 
-    newSections.forEach(section => {
-      let subtotal = 0;
-      section.items.forEach(item => {
-        const price = parseFloat(item.price.toString().replace(/[^0-9.-]+/g, ''));
-        if (!isNaN(price)) {
-          subtotal += price;
-        }
-      });
-      section.subtotal = `$${Math.round(subtotal).toLocaleString()}`;
-    });
+    // Recalculate subtotals for all sections
+    recalculateSubtotals(newSections);
 
+    // Match budget if needed
     if (projectBudget > 0) {
       const currentTotal = calculateTotalFromSections(newSections);
       if (currentTotal !== projectBudget) {
@@ -317,6 +313,7 @@ export function useProposalContent(
       }
     }
 
+    // Create revisions for changed fields
     Object.keys(item).forEach((key) => {
       const field = key as keyof typeof item;
       if (item[field] !== oldItem[field]) {
@@ -339,6 +336,19 @@ export function useProposalContent(
     toast({
       title: "Changes saved",
       description: `Updated ${item.item} in ${sections[sectionIndex].title}`,
+    });
+  };
+
+  const recalculateSubtotals = (sections: ProposalSection[]): void => {
+    sections.forEach(section => {
+      let subtotal = 0;
+      section.items.forEach(item => {
+        const price = parseFloat(item.price.toString().replace(/[^0-9.-]+/g, ''));
+        if (!isNaN(price)) {
+          subtotal += price;
+        }
+      });
+      section.subtotal = `$${Math.round(subtotal).toLocaleString()}`;
     });
   };
 
