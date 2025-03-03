@@ -2,10 +2,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,7 +32,7 @@ const Auth = () => {
       } else if (isLogin) {
         await signIn(email, password);
       } else {
-        await signUp(email, password);
+        await signUp(email, password, firstName, lastName);
         // After signup, switch to login view
         setIsLogin(true);
       }
@@ -52,11 +55,40 @@ const Auth = () => {
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {!isLogin && !isForgotPassword && (
+            <>
+              <div>
+                <label htmlFor="firstName" className="block text-sm font-semibold mb-2">
+                  First Name
+                </label>
+                <Input
+                  id="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full p-3 border border-black rounded"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-semibold mb-2">
+                  Last Name
+                </label>
+                <Input
+                  id="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full p-3 border border-black rounded"
+                  required
+                />
+              </div>
+            </>
+          )}
+          
           <div>
             <label htmlFor="email" className="block text-sm font-semibold mb-2">
               Email
             </label>
-            <input
+            <Input
               id="email"
               type="email"
               value={email}
@@ -71,7 +103,7 @@ const Auth = () => {
               <label htmlFor="password" className="block text-sm font-semibold mb-2">
                 Password
               </label>
-              <input
+              <Input
                 id="password"
                 type="password"
                 value={password}

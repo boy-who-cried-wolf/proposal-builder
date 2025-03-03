@@ -6,17 +6,24 @@ import { addUserToLoops, notifyLoopsPasswordReset } from '@/utils/loopsIntegrati
 /**
  * Registers a new user with email and password
  */
-export const signUp = async (email: string, password: string) => {
+export const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
   try {
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+        },
+      },
     });
 
     if (error) throw error;
     
-    // Add user to Loops.so
-    await addUserToLoops(email);
+    // Add user to Loops.so with first and last name if available
+    const fullName = firstName && lastName ? `${firstName} ${lastName}` : undefined;
+    await addUserToLoops(email, 'free', fullName);
     
     toast.success('Account created successfully! Check your email to confirm.');
   } catch (error: any) {

@@ -1,20 +1,25 @@
 
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-// CORS headers for browser requests
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
+// Define interfaces for typechecking
 interface LoopsUser {
   email: string;
-  firstName?: string;
-  lastName?: string;
-  userId?: string;
-  userGroup?: string; // e.g., "free", "premium"
+  userGroup?: string;
   source?: string;
-  customFields?: Record<string, string | number | boolean>;
+  customFields?: Record<string, any>;
+  fullName?: string;
+}
+
+interface LoopsEvent {
+  email: string;
+  eventName: string;
+  properties?: Record<string, any>;
+}
+
+interface LoopsTransactional {
+  email: string;
+  transactionalId: string;
+  dataFields?: Record<string, any>;
 }
 
 interface LoopsRequest {
@@ -25,12 +30,14 @@ interface LoopsRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
   try {
+    // Set CORS headers for all responses
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    };
+
+    // Get Loops API key from environment variable
     const LOOPS_API_KEY = Deno.env.get("LOOPS_API_KEY");
     if (!LOOPS_API_KEY) {
       throw new Error("LOOPS_API_KEY is not set");
@@ -40,18 +47,27 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Processing ${action} for user: ${userData.email}`);
 
     let endpoint = "";
-    let method = "POST";
-    let body: any = {};
+    let body: Record<string, any> = {};
 
     switch (action) {
       case "createContact":
         endpoint = "https://app.loops.so/api/v1/contacts/create";
-        body = userData;
+        body = {
+          email: userData.email,
+          ...userData.userGroup && { userGroup: userData.userGroup },
+          ...userData.source && { source: userData.source },
+          ...userData.fullName && { firstName: userData.fullName },
+          ...userData.customFields && { ...userData.customFields }
+        };
         break;
       
       case "updateContact":
         endpoint = "https://app.loops.so/api/v1/contacts/update";
-        body = userData;
+        body = {
+          email: userData.email,
+          ...userData.userGroup && { userGroup: userData.userGroup },
+          ...userData.customFields && { ...userData.customFields }
+        };
         break;
       
       case "triggerEvent":
@@ -67,7 +83,6 @@ const handler = async (req: Request): Promise<Response> => {
         break;
       
       case "passwordReset":
-        // For password reset, we'll trigger a specific event in Loops
         endpoint = "https://app.loops.so/api/v1/events/send";
         body = {
           email: userData.email,
@@ -89,13 +104,13 @@ const handler = async (req: Request): Promise<Response> => {
         break;
       
       default:
-        throw new Error(`Unknown action: ${action}`);
+        throw new Error(`Unsupported action: ${action}`);
     }
 
-    console.log(`Making request to Loops: ${endpoint}`);
-    
+    // Call Loops API
+    console.log(`Calling Loops API at: ${endpoint}`);
     const response = await fetch(endpoint, {
-      method,
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${LOOPS_API_KEY}`,
@@ -103,27 +118,27 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify(body),
     });
 
-    const responseData = await response.json();
-    
     if (!response.ok) {
-      console.error("Error from Loops API:", responseData);
-      throw new Error(`Loops API error: ${response.status} ${JSON.stringify(responseData)}`);
+      const errorData = await response.text();
+      console.error(`Loops API error: ${response.status} ${response.statusText}`, errorData);
+      return new Response(
+        JSON.stringify({ error: `Loops API error: ${response.status} ${response.statusText}` }),
+        { headers: { ...headers, "Content-Type": "application/json" }, status: response.status }
+      );
     }
 
-    console.log("Successful response from Loops API:", responseData);
+    const data = await response.json();
+    console.log(`Loops API response:`, data);
 
-    return new Response(JSON.stringify(responseData), {
-      status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
-  } catch (error) {
-    console.error("Error in loops-integration function:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Unknown error occurred" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      JSON.stringify({ success: true, data }),
+      { headers: { ...headers, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error(`Error in Loops integration:`, error.message);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { headers: { "Content-Type": "application/json" }, status: 500 }
     );
   }
 };

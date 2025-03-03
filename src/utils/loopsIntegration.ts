@@ -5,8 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
  * Adds a new user to Loops.so
  * @param email User's email address
  * @param userGroup User group for segmentation (default: 'free')
+ * @param fullName User's full name (optional)
  */
-export const addUserToLoops = async (email: string, userGroup: string = 'free') => {
+export const addUserToLoops = async (email: string, userGroup: string = 'free', fullName?: string) => {
   try {
     const { data, error } = await supabase.functions.invoke('loops-integration', {
       body: {
@@ -14,7 +15,8 @@ export const addUserToLoops = async (email: string, userGroup: string = 'free') 
         userData: {
           email,
           userGroup,
-          source: 'website_signup'
+          source: 'website_signup',
+          ...(fullName && { fullName }),
         }
       }
     });
@@ -91,10 +93,25 @@ export const triggerLoopsEvent = async (email: string, eventName: string, custom
  */
 export const notifyLoopsPasswordReset = async (email: string) => {
   try {
+    // Get the user's name from the profiles table if available
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('first_name, last_name')
+      .eq('email', email)
+      .single();
+    
+    const customFields = profileData ? {
+      firstName: profileData.first_name,
+      lastName: profileData.last_name
+    } : undefined;
+    
     const { data, error } = await supabase.functions.invoke('loops-integration', {
       body: {
         action: 'sendTransactional',
-        userData: { email },
+        userData: { 
+          email,
+          customFields
+        },
         transactionalId: 'cm7t7msad024eyfcqcxz3wtgl'
       }
     });
