@@ -32,11 +32,11 @@ export const PlanCard: React.FC<PlanCardProps> = ({
 
   return (
     <div 
-      className={`border rounded-lg p-6 ${
+      className={`border rounded-lg p-6 flex flex-col h-full ${
         plan.highlighted ? 'border-primary shadow-sm' : ''
       } ${isCurrentPlan ? 'bg-muted/50 border-primary' : ''}`}
     >
-      <div className="space-y-4">
+      <div className="space-y-4 flex-grow">
         <div>
           <h3 className="text-lg font-medium">{plan.name}</h3>
           <div className="mt-2 flex items-baseline">
@@ -56,26 +56,26 @@ export const PlanCard: React.FC<PlanCardProps> = ({
             </li>
           ))}
         </ul>
-        
-        <div className="pt-4">
-          <Button
-            variant={isCurrentPlan ? "secondary" : "default"}
-            className="w-full"
-            disabled={plan.disabled || isCurrentPlan || checkoutLoading !== ""}
-            onClick={() => onSelectPlan(plan.id)}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
-              </>
-            ) : isCurrentPlan ? (
-              "Current Plan"
-            ) : (
-              "Select Plan"
-            )}
-          </Button>
-        </div>
+      </div>
+      
+      <div className="pt-4 mt-auto">
+        <Button
+          variant={isCurrentPlan ? "secondary" : "default"}
+          className="w-full"
+          disabled={plan.disabled || isCurrentPlan || checkoutLoading !== ""}
+          onClick={() => onSelectPlan(plan.id)}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : isCurrentPlan ? (
+            "Current Plan"
+          ) : (
+            "Select Plan"
+          )}
+        </Button>
       </div>
     </div>
   );
