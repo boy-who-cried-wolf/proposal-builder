@@ -112,31 +112,31 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
   if (viewMode === "list") {
     return (
-      <div className="border-b border-gray-200 py-4">
-        <div className="grid grid-cols-6 gap-4 items-center text-sm">
-          <div>
-            <p className="font-bold text-lg uppercase font-poppins">{formattedValue}</p>
-            <p className="uppercase text-xs text-gray-500">PROPOSAL AMOUNT</p>
+      <div className="section_wrapper mb-[34px]">
+        <div className="section_table_row grid grid-cols-6 gap-4 items-center text-sm px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
+          <div className="section_table_cell">
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{formattedValue}</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">PROPOSAL AMOUNT</p>
           </div>
-          <div>
-            <p className="font-bold text-lg uppercase font-poppins">{project.client}</p>
-            <p className="uppercase text-xs text-gray-500">CLIENT NAME</p>
+          <div className="section_table_cell">
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{project.client}</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">CLIENT NAME</p>
           </div>
-          <div>
-            <p className="font-bold text-lg uppercase font-poppins">{project.hours}</p>
-            <p className="uppercase text-xs text-gray-500">HOURS</p>
+          <div className="section_table_cell">
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{project.hours}</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">HOURS</p>
           </div>
-          <div>
-            <p className={cn("font-bold text-lg uppercase font-poppins", dueDateColorClass)}>{dueDate}</p>
-            <p className="uppercase text-xs text-gray-500">DUE DATE</p>
+          <div className="section_table_cell">
+            <p className={cn("text-black text-[9px] font-semibold tracking-[1.389px] uppercase", dueDateColorClass)}>{dueDate}</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">DUE DATE</p>
           </div>
-          <div>
-            <p className={cn("font-bold text-lg uppercase font-poppins", daysRemainingColorClass)}>
+          <div className="section_table_cell">
+            <p className={cn("text-black text-[9px] font-semibold tracking-[1.389px] uppercase", daysRemainingColorClass)}>
               {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days` : `${daysRemaining} days`}
             </p>
-            <p className="uppercase text-xs text-gray-500">DAYS REMAINING</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">DAYS REMAINING</p>
           </div>
-          <div>
+          <div className="section_table_cell">
             <div className="flex flex-wrap gap-1">
               {["WEB DESIGN"].map((service, index) => (
                 <Badge 
