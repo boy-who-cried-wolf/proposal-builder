@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { generateProposal, ProposalSection, ProposalInput } from "@/utils/openaiProposal";
 import { Send } from "lucide-react";
@@ -99,7 +98,7 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
     <div className="mb-4">
       <div className="p-4 bg-white">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="space-y-4">
             <div>
               <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
                 Project Type
@@ -129,9 +128,7 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
                 className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
               />
             </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
             <div>
               <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
                 Project Budget ($)
