@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 export const Sidebar: React.FC = () => {
   const [activeNavItem, setActiveNavItem] = useState<number | null>(null);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false); // Changed to false to start collapsed
   const { user, signOut } = useAuth();
 
   const handleNavItemClick = (index: number) => {
