@@ -120,23 +120,14 @@ export const Sidebar: React.FC = () => {
             </div>
           </>
         ) : (
-          <>
-            <div className="flex flex-col items-center">
-              <img 
-                src="/lovable-uploads/8e073d5c-cebc-4046-a3c6-7861dda72ee8.png" 
-                alt="PM" 
-                className="h-8 mb-1" 
-              />
-              <div 
-                className="cursor-pointer" 
-                onClick={toggleExpand} 
-                role="button"
-                tabIndex={0}
-              >
-                <ChevronRight size={16} />
-              </div>
-            </div>
-          </>
+          <div className="cursor-pointer" onClick={toggleExpand} role="button" tabIndex={0}>
+            <img 
+              src="/lovable-uploads/8e073d5c-cebc-4046-a3c6-7861dda72ee8.png" 
+              alt="PM" 
+              className="h-8 mb-1" 
+            />
+            <ChevronRight size={16} />
+          </div>
         )}
       </div>
 

@@ -62,10 +62,10 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
     }
 
     // If we get here, user is authenticated, so proceed with proposal generation
-    await generateProposal();
+    await generateProposalContent();
   };
 
-  const generateProposal = async () => {
+  const generateProposalContent = async () => {
     setIsGenerating(true);
     
     try {
