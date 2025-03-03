@@ -91,12 +91,12 @@ export function ExpandableTabs({
             return <Separator key={`separator-${index}`} />;
           }
 
-          const TabIcon = tab.icon as LucideIcon;
+          const TabIcon = (tab as Tab).icon as LucideIcon;
           const isExpanded = selected === index || hovered === index;
           
           return (
             <motion.button
-              key={tab.title}
+              key={(tab as Tab).title}
               variants={buttonVariants}
               initial={false}
               animate="animate"
@@ -123,7 +123,7 @@ export function ExpandableTabs({
                     transition={transition}
                     className="overflow-hidden whitespace-nowrap"
                   >
-                    {tab.title}
+                    {(tab as Tab).title}
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -134,7 +134,7 @@ export function ExpandableTabs({
       
       {showTabContent && selected !== null && (
         <div className="mt-4 p-4 bg-muted/20 rounded-lg">
-          {tabs[selected] && !('type' in tabs[selected]) && tabs[selected].content}
+          {tabs[selected] && !(tabs[selected] as any).type && (tabs[selected] as Tab).content}
         </div>
       )}
     </div>

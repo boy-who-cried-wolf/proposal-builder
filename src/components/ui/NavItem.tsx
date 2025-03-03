@@ -1,5 +1,7 @@
+
 import React from "react";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface NavItemProps {
   active?: boolean;
@@ -7,7 +9,17 @@ interface NavItemProps {
   icon?: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  isExpanded?: boolean;
 }
+
+const buttonVariants = {
+  initial: {
+    gap: 0,
+  },
+  animate: (isExpanded: boolean) => ({
+    gap: isExpanded ? ".5rem" : 0,
+  }),
+};
 
 export const NavItem: React.FC<NavItemProps> = ({
   active = false,
@@ -15,14 +27,24 @@ export const NavItem: React.FC<NavItemProps> = ({
   icon,
   className,
   onClick,
+  isExpanded = true,
 }) => {
-  const baseClasses = "flex rounded items-center gap-[11px] p-[11px]";
-  const textClasses =
-    "text-black text-[9px] font-semibold tracking-[1.389px] uppercase";
+  const baseClasses = "flex rounded items-center cursor-pointer transition-all duration-300";
+  const textClasses = "text-black text-[9px] font-semibold tracking-[1.389px] uppercase";
 
   return (
-    <div
-      className={cn(baseClasses, className, active ? "bg-transparent" : "")}
+    <motion.div
+      variants={buttonVariants}
+      initial="initial"
+      animate="animate"
+      custom={isExpanded}
+      transition={{ duration: 0.3 }}
+      className={cn(
+        baseClasses, 
+        className,
+        isExpanded ? "p-[11px]" : "p-[11px] justify-center",
+        active && isExpanded ? "bg-muted" : ""
+      )}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -30,17 +52,29 @@ export const NavItem: React.FC<NavItemProps> = ({
       {icon && (
         <div
           className={cn(
-            "w-[39px] h-[39px] flex items-center justify-center rounded",
-            !active && "bg-[#F7F6F2]",
+            "flex items-center justify-center rounded transition-all duration-300",
+            !active && isExpanded ? "w-[39px] h-[39px] bg-[#F7F6F2]" : "w-[39px] h-[39px]",
+            !isExpanded ? "w-[39px] h-[39px]" : ""
           )}
         >
           <div className="text-black">{icon}</div>
         </div>
       )}
-      <div className={cn(textClasses, active ? "text-black" : "text-black")}>
-        {children}
-      </div>
-    </div>
+      
+      {isExpanded && (
+        <AnimatePresence>
+          <motion.div 
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: "auto", opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className={cn(textClasses, active ? "text-black" : "text-black")}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      )}
+    </motion.div>
   );
 };
 
