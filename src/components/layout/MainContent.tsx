@@ -1,7 +1,9 @@
+
 import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
 import { TableSection } from "@/components/ui/TableSection";
 import { MetricItem } from "@/components/ui/MetricItem";
+import { ExpandableTabs } from "@/components/ui/expandable-tabs";
 import {
   DownloadIcon,
   ViewIcon,
@@ -33,6 +35,16 @@ export const MainContent: React.FC = () => {
     setActiveTab(index);
   };
 
+  const headerTabs = [
+    { title: "Download", icon: DownloadIcon },
+    { title: "View", icon: ViewIcon },
+    { type: "separator" },
+    { title: "Add", icon: PlusIcon },
+    { title: "File", icon: FileIcon },
+    { title: "Share", icon: ShareIcon },
+    { title: "Copy", icon: CopyIcon },
+  ];
+
   return (
     <main className="grow flex flex-col max-md:h-screen">
       <header className="h-[69px] flex justify-between items-center px-[23px] py-[15px] border-b-black border-b border-solid">
@@ -40,46 +52,11 @@ export const MainContent: React.FC = () => {
           proposal 1.0
         </h1>
 
-        <div className="flex gap-[17px] items-center max-sm:hidden">
-          <button className="flex items-center gap-[11px] rounded text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#E1E1DC] p-[11px]">
-            <DownloadIcon />
-            <span>download</span>
-          </button>
-
-          <button
-            className="w-[39px] h-[39px] rounded flex items-center justify-center bg-[#F7F6F2]"
-            aria-label="View"
-          >
-            <ViewIcon />
-          </button>
-
-          <button
-            className="w-[39px] h-[39px] rounded flex items-center justify-center bg-[#F7F6F2]"
-            aria-label="Add"
-          >
-            <PlusIcon />
-          </button>
-
-          <button
-            className="w-[39px] h-[39px] rounded flex items-center justify-center bg-[#F7F6F2]"
-            aria-label="File"
-          >
-            <FileIcon />
-          </button>
-
-          <button
-            className="w-[39px] h-[39px] rounded flex items-center justify-center bg-[#F7F6F2]"
-            aria-label="Share"
-          >
-            <ShareIcon />
-          </button>
-
-          <button
-            className="w-[39px] h-[39px] rounded flex items-center justify-center bg-[#F7F6F2]"
-            aria-label="Copy"
-          >
-            <CopyIcon />
-          </button>
+        <div className="flex items-center">
+          <ExpandableTabs 
+            tabs={headerTabs}
+            className="border-gray-200"
+          />
         </div>
       </header>
 
