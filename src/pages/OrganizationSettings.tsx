@@ -174,12 +174,18 @@ const OrganizationSettings = () => {
     
     // Remove leading zeros
     if (value.startsWith('0') && value.length > 1) {
-      const newValue = parseInt(value, 10);
-      setter(newValue);
+      setter(parseInt(value.replace(/^0+/, ''), 10));
       return;
     }
     
     setter(parseInt(value, 10));
+  };
+
+  // Handle focus on number inputs to clear placeholder
+  const handleNumberFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.value === '0') {
+      e.target.value = '';
+    }
   };
 
   return (
@@ -255,6 +261,7 @@ const OrganizationSettings = () => {
                       value={newService} 
                       onChange={(e) => setNewService(e.target.value)}
                       placeholder="Add a service" 
+                      className="h-10"
                     />
                     <Button onClick={handleAddService} size="default" type="button" className="h-10">
                       <Plus size={16} className="mr-1" /> Add
@@ -269,6 +276,7 @@ const OrganizationSettings = () => {
                       type="number" 
                       value={hourlyRate === null ? "" : hourlyRate} 
                       onChange={(e) => handleNumberChange(e, setHourlyRate)}
+                      onFocus={handleNumberFocus}
                       min={1} 
                       placeholder="Enter hourly rate"
                     />
@@ -279,6 +287,7 @@ const OrganizationSettings = () => {
                       type="number" 
                       value={clientRate === null ? "" : clientRate} 
                       onChange={(e) => handleNumberChange(e, setClientRate)}
+                      onFocus={handleNumberFocus}
                       min={1} 
                       placeholder="Enter client rate"
                     />

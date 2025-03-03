@@ -62,10 +62,10 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       <SidebarNavItem
         isExpanded={isExpanded}
         isActive={activeNavItem === 1 || location.pathname.includes("proposals")}
-        onClick={() => handleNavigation(1, "/")}
+        onClick={() => handleNavigation(1, "/proposals")}
         icon={FileText}
         label="Proposals"
-        path="/"
+        path="/proposals"
       />
       <SidebarNavItem
         isExpanded={isExpanded}
