@@ -27,21 +27,21 @@ interface ExpandableTabsProps {
   tabs: TabItem[];
   className?: string;
   activeColor?: string;
-  activeTab?: number | null; // Updated to match ProposalHeaderTabs
+  activeTab?: number | null;
   onTabChange?: (index: number | null) => void;
   showTabContent?: boolean;
 }
 
 const buttonVariants = {
   initial: {
-    gap: 0,
-    paddingLeft: ".5rem",
-    paddingRight: ".5rem",
+    gap: "0px",
+    paddingLeft: "0.5rem",
+    paddingRight: "0.5rem",
   },
   animate: (isSelected: boolean) => ({
-    gap: isSelected ? ".5rem" : 0,
-    paddingLeft: isSelected ? "1rem" : ".5rem",
-    paddingRight: isSelected ? "1rem" : ".5rem",
+    gap: isSelected ? "0.5rem" : "0px",
+    paddingLeft: isSelected ? "1rem" : "0.5rem",
+    paddingRight: isSelected ? "1rem" : "0.5rem",
   }),
 };
 
@@ -57,7 +57,7 @@ export function ExpandableTabs({
   tabs,
   className,
   activeColor = "text-primary",
-  activeTab = null, // Updated to match ProposalHeaderTabs
+  activeTab = null,
   onTabChange,
   showTabContent = false,
 }: ExpandableTabsProps) {
@@ -76,8 +76,14 @@ export function ExpandableTabs({
   });
 
   const handleSelect = (index: number) => {
+    // Only update if the tab is a real tab (not a separator)
+    const tabItem = tabs[index];
+    if (!tabItem || (tabItem as Separator).type === "separator") return;
+    
     setSelected(index);
-    onTabChange?.(index);
+    if (onTabChange) {
+      onTabChange(index);
+    }
   };
 
   const Separator = () => (
@@ -103,17 +109,21 @@ export function ExpandableTabs({
           
           return (
             <motion.button
-              key={(tab as Tab).title}
+              key={`tab-${index}-${(tab as Tab).title}`}
               variants={buttonVariants}
-              initial={false}
+              initial="initial"
               animate="animate"
               custom={isExpanded}
-              onClick={() => handleSelect(index)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSelect(index);
+              }}
               onMouseEnter={() => setHovered(index)}
               onMouseLeave={() => setHovered(null)}
               transition={transition}
               className={cn(
-                "relative flex items-center px-4 py-2 text-sm font-medium transition-colors duration-300 whitespace-nowrap",
+                "relative flex items-center rounded-md text-sm font-medium transition-colors duration-300 whitespace-nowrap",
                 isExpanded
                   ? cn("bg-muted", activeColor)
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
