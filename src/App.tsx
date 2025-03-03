@@ -12,8 +12,10 @@ import AccountSettings from "./pages/AccountSettings";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PlanProtectedRoute } from "./components/PlanProtectedRoute";
+import { AdminRoute } from "./components/AdminRoute";
 import OrganizationSettings from "./pages/OrganizationSettings";
 import PlanSettings from "./pages/PlanSettings";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,11 @@ const App = () => (
               <Route path="/account-settings" element={<AccountSettings />} />
               <Route path="/account-settings/organization" element={<OrganizationSettings />} />
               <Route path="/account-settings/plan" element={<PlanSettings />} />
+            </Route>
+            
+            {/* Admin route - requires admin rights */}
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<AdminDashboard />} />
             </Route>
             
             {/* Plan-specific protected routes */}

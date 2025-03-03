@@ -1,16 +1,16 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SidebarNavItem } from "./SidebarNavItem";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { usePlanSubscription } from "@/hooks/usePlanSubscription";
 import { 
-  ArrowDownIcon, 
-  DiamondIcon, 
-  DocumentIcon, 
-  ViewIcon
-} from "@/components/icons";
-import { MessageSquare, Settings, Users, LayoutDashboard, Lock } from "lucide-react";
+  Home,
+  BarChart3,
+  Settings,
+  Users,
+  FileText,
+  ShieldCheck
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { getUserProfile } from "@/integrations/supabase/profileService";
 
 interface SidebarNavigationProps {
   activeNavItem: number | null;
@@ -23,120 +23,68 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   isExpanded,
   onNavItemClick,
 }) => {
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const { currentPlan } = usePlanSubscription(user?.id);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const handleItemClick = (path: string, index: number, requiredPlans: string[] = []) => {
-    // Check if user has access to this feature based on their plan
-    if (requiredPlans.length > 0 && !requiredPlans.includes(currentPlan)) {
-      // Redirect to plan page instead
-      navigate('/account-settings/plan');
-      return;
-    }
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) return;
+      
+      try {
+        const profile = await getUserProfile(user.id);
+        setIsAdmin(profile?.is_admin || false);
+      } catch (error) {
+        console.error("Error checking admin status:", error);
+      }
+    };
     
-    onNavItemClick(index);
-    if (path) {
-      navigate(path);
-    }
-  };
-  
-  // Helper to determine if an item should be locked
-  const isLocked = (requiredPlans: string[]) => {
-    return requiredPlans.length > 0 && !requiredPlans.includes(currentPlan);
-  };
-
-  const navItems = [
-    {
-      title: "Dashboard",
-      icon: LayoutDashboard,
-      path: "/dashboard",
-      requiredPlans: ['freelancer', 'pro'],
-      content: (
-        <div className="p-3 bg-muted/20 rounded-sm mt-1">
-          <ul className="space-y-2 text-xs">
-            <li className="cursor-pointer hover:text-primary">
-              <a href="/dashboard">Overview</a>
-            </li>
-            <li className="cursor-pointer hover:text-primary">Analytics</li>
-            <li className="cursor-pointer hover:text-primary">Reports</li>
-          </ul>
-        </div>
-      ),
-    },
-    {
-      title: "Clients",
-      icon: Users,
-      path: "",
-      requiredPlans: ['freelancer', 'pro'],
-      content: (
-        <div className="p-3 bg-muted/20 rounded-sm mt-1">
-          <ul className="space-y-2 text-xs">
-            <li className="cursor-pointer hover:text-primary">All Clients</li>
-            <li className="cursor-pointer hover:text-primary">Add Client</li>
-            <li className="cursor-pointer hover:text-primary">Client Groups</li>
-          </ul>
-        </div>
-      ),
-    },
-    {
-      title: "Assistant",
-      icon: MessageSquare,
-      path: "",
-      requiredPlans: ['pro'],
-      content: (
-        <div className="p-3 bg-muted/20 rounded-sm mt-1">
-          <ul className="space-y-2 text-xs">
-            <li className="cursor-pointer hover:text-primary">Chat</li>
-            <li className="cursor-pointer hover:text-primary">Templates</li>
-            <li className="cursor-pointer hover:text-primary">History</li>
-          </ul>
-        </div>
-      ),
-    },
-    {
-      title: "Settings",
-      icon: Settings,
-      path: "/account-settings",
-      requiredPlans: [],
-      content: (
-        <div className="p-3 bg-muted/20 rounded-sm mt-1">
-          <ul className="space-y-2 text-xs">
-            <li className="cursor-pointer hover:text-primary">
-              <a href="/account-settings">Account</a>
-            </li>
-            <li className="cursor-pointer hover:text-primary">
-              <a href="/account-settings/organization">Organization</a>
-            </li>
-            <li className="cursor-pointer hover:text-primary">
-              <a href="/account-settings/plan">Plan</a>
-            </li>
-          </ul>
-        </div>
-      ),
-    },
-  ];
+    checkAdmin();
+  }, [user]);
 
   return (
-    <nav className="grow flex flex-col gap-3 p-[11px] overflow-hidden">
-      {navItems.map((item, index) => (
-        <div key={index} className="relative">
-          <SidebarNavItem
-            title={item.title}
-            icon={item.icon}
-            content={item.content}
-            isActive={activeNavItem === index}
-            isExpanded={isExpanded}
-            onItemClick={() => handleItemClick(item.path, index, item.requiredPlans)}
-          />
-          
-          {isLocked(item.requiredPlans) && isExpanded && (
-            <div className="absolute top-2 right-2 text-amber-500" title={`Requires ${item.requiredPlans.join(' or ')} plan`}>
-              <Lock size={16} />
-            </div>
-          )}
-        </div>
-      ))}
-    </nav>
+    <div className="flex-grow overflow-y-auto">
+      <SidebarNavItem
+        isExpanded={isExpanded}
+        isActive={activeNavItem === 0}
+        onClick={() => onNavItemClick(0)}
+        icon={<Home size={24} />}
+        label="Home"
+        path="/"
+      />
+      <SidebarNavItem
+        isExpanded={isExpanded}
+        isActive={activeNavItem === 1}
+        onClick={() => onNavItemClick(1)}
+        icon={<FileText size={24} />}
+        label="Proposals"
+        path="/"
+      />
+      <SidebarNavItem
+        isExpanded={isExpanded}
+        isActive={activeNavItem === 2}
+        onClick={() => onNavItemClick(2)}
+        icon={<BarChart3 size={24} />}
+        label="Dashboard"
+        path="/dashboard"
+      />
+      {isAdmin && (
+        <SidebarNavItem
+          isExpanded={isExpanded}
+          isActive={activeNavItem === 3}
+          onClick={() => onNavItemClick(3)}
+          icon={<ShieldCheck size={24} />}
+          label="Admin"
+          path="/admin"
+        />
+      )}
+      <SidebarNavItem
+        isExpanded={isExpanded}
+        isActive={activeNavItem === 4}
+        onClick={() => onNavItemClick(4)}
+        icon={<Settings size={24} />}
+        label="Settings"
+        path="/account-settings"
+      />
+    </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -6,6 +5,7 @@ import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { getSavedProposalFormData } from '@/utils/localStorage';
 import { signUp, signIn, signOut, requestPasswordReset } from '@/services/authService';
+import { checkForExpiredSubscriptions } from '@/utils/subscriptionUtils';
 
 interface AuthContextType {
   session: Session | null;
@@ -27,19 +27,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const location = useLocation();
 
   useEffect(() => {
-    // Set up initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      if (session?.user) {
+        checkForExpiredSubscriptions();
+      }
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        if (session?.user) {
+          checkForExpiredSubscriptions();
+        }
       }
     );
 
@@ -50,7 +56,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await signIn(email, password);
       
-      // Check if we have saved form data that would indicate we should redirect to index
       const savedData = getSavedProposalFormData();
       if (savedData && location.pathname === '/auth') {
         navigate('/');
@@ -59,7 +64,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         navigate('/');
       }
     } catch (error) {
-      // Error is already handled in the service
       console.error(error);
     }
   };
@@ -69,7 +73,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signOut();
       navigate('/auth');
     } catch (error) {
-      // Error is already handled in the service
       console.error(error);
     }
   };
