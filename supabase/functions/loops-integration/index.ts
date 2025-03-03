@@ -1,6 +1,12 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+// CORS headers for all responses
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
 // Define interfaces for typechecking
 interface LoopsUser {
   email: string;
@@ -8,18 +14,8 @@ interface LoopsUser {
   source?: string;
   customFields?: Record<string, any>;
   fullName?: string;
-}
-
-interface LoopsEvent {
-  email: string;
-  eventName: string;
-  properties?: Record<string, any>;
-}
-
-interface LoopsTransactional {
-  email: string;
-  transactionalId: string;
-  dataFields?: Record<string, any>;
+  firstName?: string;
+  lastName?: string;
 }
 
 interface LoopsRequest {
@@ -29,11 +25,150 @@ interface LoopsRequest {
   transactionalId?: string;
 }
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+// Common response helpers
+const responseHelpers = {
+  error: (message, status = 500, details = null) => {
+    console.error(`Error: ${message}`, details || '');
+    return new Response(
+      JSON.stringify({ error: message, details }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status }
+    );
+  },
+  
+  success: (data) => {
+    return new Response(
+      JSON.stringify({ success: true, data }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
 };
 
+// Contact management service
+const contactService = {
+  // Create a new contact in Loops
+  createContact: async (userData, apiKey) => {
+    console.log(`Creating contact in Loops for ${userData.email}`);
+    
+    const body = {
+      email: userData.email,
+      ...userData.userGroup && { userGroup: userData.userGroup },
+      ...userData.source && { source: userData.source },
+      ...userData.firstName && { firstName: userData.firstName },
+      ...userData.lastName && { lastName: userData.lastName },
+      ...userData.customFields && { ...userData.customFields }
+    };
+    
+    return await callLoopsApi("https://app.loops.so/api/v1/contacts/create", body, apiKey);
+  },
+  
+  // Update an existing contact in Loops
+  updateContact: async (userData, apiKey) => {
+    console.log(`Updating contact in Loops for ${userData.email}`);
+    
+    const body = {
+      email: userData.email,
+      ...userData.userGroup && { userGroup: userData.userGroup },
+      ...userData.customFields && { ...userData.customFields }
+    };
+    
+    return await callLoopsApi("https://app.loops.so/api/v1/contacts/update", body, apiKey);
+  }
+};
+
+// Event service
+const eventService = {
+  // Trigger a custom event in Loops
+  triggerEvent: async (userData, eventName, apiKey) => {
+    console.log(`Triggering "${eventName}" event in Loops for ${userData.email}`);
+    
+    const body = {
+      email: userData.email,
+      eventName,
+      ...userData.customFields && { properties: userData.customFields }
+    };
+    
+    return await callLoopsApi("https://app.loops.so/api/v1/events/send", body, apiKey);
+  },
+  
+  // Trigger a password reset event in Loops
+  triggerPasswordReset: async (userData, apiKey) => {
+    console.log(`Triggering password reset event in Loops for ${userData.email}`);
+    
+    return await eventService.triggerEvent(
+      userData, 
+      "password_reset_requested", 
+      apiKey
+    );
+  }
+};
+
+// Transactional email service
+const emailService = {
+  // Send a transactional email via Loops
+  sendTransactional: async (userData, transactionalId, apiKey) => {
+    console.log(`Sending transactional email (${transactionalId}) for ${userData.email}`);
+    
+    const body = {
+      email: userData.email,
+      transactionalId,
+      dataVariables: userData.customFields || {}
+    };
+    
+    console.log("Transactional email body:", JSON.stringify(body));
+    
+    return await callLoopsApi("https://app.loops.so/api/v1/transactional", body, apiKey);
+  }
+};
+
+// Helper function to call Loops API
+async function callLoopsApi(endpoint, body, apiKey) {
+  console.log(`Calling Loops API at: ${endpoint}`);
+  console.log(`Request body:`, JSON.stringify(body));
+  
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    // Get the response text first
+    const responseText = await response.text();
+    console.log("Raw response text:", responseText);
+    
+    // Try to parse as JSON if not empty
+    let responseData = {};
+    if (responseText.trim()) {
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error(`Failed to parse response: ${responseText}`, parseError);
+        responseData = { 
+          rawResponse: responseText,
+          parseError: parseError.message 
+        };
+      }
+    } else {
+      responseData = { message: "Empty response received" };
+    }
+    
+    console.log("Parsed response data:", JSON.stringify(responseData));
+
+    if (!response.ok) {
+      throw new Error(`Loops API error: ${response.status} ${response.statusText}`);
+    }
+
+    return { success: true, data: responseData };
+  } catch (error) {
+    console.error(`Error calling Loops API: ${error.message}`);
+    throw error;
+  }
+}
+
+// Main request handler
 const handler = async (req: Request): Promise<Response> => {
   try {
     console.log("Loops integration function called");
@@ -48,10 +183,7 @@ const handler = async (req: Request): Promise<Response> => {
     const LOOPS_API_KEY = Deno.env.get("LOOPS_API_KEY");
     if (!LOOPS_API_KEY) {
       console.error("LOOPS_API_KEY is not set");
-      return new Response(
-        JSON.stringify({ error: "LOOPS_API_KEY is not set" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-      );
+      return responseHelpers.error("LOOPS_API_KEY is not set", 500);
     }
 
     // Safely parse the request body
@@ -64,179 +196,73 @@ const handler = async (req: Request): Promise<Response> => {
       
       if (!requestBody || requestBody.trim() === "") {
         console.error("Empty request body received");
-        return new Response(
-          JSON.stringify({ error: "Empty request body" }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-        );
+        return responseHelpers.error("Empty request body", 400);
       }
       
       requestData = JSON.parse(requestBody) as LoopsRequest;
       console.log("Request data parsed:", JSON.stringify(requestData));
     } catch (jsonError) {
       console.error("Failed to parse request JSON:", jsonError, "Raw request body:", requestBody);
-      return new Response(
-        JSON.stringify({ error: `Invalid JSON in request body: ${jsonError.message}`, rawBody: requestBody }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-      );
+      return responseHelpers.error(`Invalid JSON in request body: ${jsonError.message}`, 400, { rawBody: requestBody });
     }
 
     // Validate required fields
     if (!requestData.action) {
       console.error("Missing action in request");
-      return new Response(
-        JSON.stringify({ error: "Missing action in request" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-      );
+      return responseHelpers.error("Missing action in request", 400);
     }
     
     if (!requestData.userData || !requestData.userData.email) {
       console.error("Missing email in request userData");
-      return new Response(
-        JSON.stringify({ error: "Missing email in request userData" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-      );
+      return responseHelpers.error("Missing email in request userData", 400);
     }
 
     const { action, userData, eventName, transactionalId } = requestData;
     console.log(`Processing ${action} for user: ${userData.email}`);
 
-    let endpoint = "";
-    let body: Record<string, any> = {};
-
-    switch (action) {
-      case "createContact":
-        endpoint = "https://app.loops.so/api/v1/contacts/create";
-        body = {
-          email: userData.email,
-          ...userData.userGroup && { userGroup: userData.userGroup },
-          ...userData.source && { source: userData.source },
-          ...userData.fullName && { firstName: userData.fullName },
-          ...userData.customFields && { ...userData.customFields }
-        };
-        break;
-      
-      case "updateContact":
-        endpoint = "https://app.loops.so/api/v1/contacts/update";
-        body = {
-          email: userData.email,
-          ...userData.userGroup && { userGroup: userData.userGroup },
-          ...userData.customFields && { ...userData.customFields }
-        };
-        break;
-      
-      case "triggerEvent":
-        if (!eventName) {
-          return new Response(
-            JSON.stringify({ error: "eventName is required for triggerEvent action" }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-          );
-        }
-        endpoint = "https://app.loops.so/api/v1/events/send";
-        body = {
-          email: userData.email,
-          eventName,
-          ...userData.customFields && { properties: userData.customFields }
-        };
-        break;
-      
-      case "passwordReset":
-        endpoint = "https://app.loops.so/api/v1/events/send";
-        body = {
-          email: userData.email,
-          eventName: "password_reset_requested",
-          ...userData.customFields && { properties: userData.customFields }
-        };
-        break;
-      
-      case "sendTransactional":
-        if (!transactionalId) {
-          return new Response(
-            JSON.stringify({ error: "transactionalId is required for sendTransactional action" }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-          );
-        }
-        
-        console.log("Preparing sendTransactional request body");
-        
-        // For transactional emails, Loops requires dataVariables instead of dataFields
-        endpoint = "https://app.loops.so/api/v1/transactional";
-        body = {
-          email: userData.email,
-          transactionalId,
-          dataVariables: userData.customFields || {}
-        };
-        
-        console.log("Transactional email body:", JSON.stringify(body));
-        break;
-      
-      default:
-        return new Response(
-          JSON.stringify({ error: `Unsupported action: ${action}` }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-        );
-    }
-
-    // Call Loops API
-    console.log(`Calling Loops API at: ${endpoint}`);
-    console.log(`Request body:`, JSON.stringify(body));
+    // Process the request based on the action
+    let result;
     
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${LOOPS_API_KEY}`,
-      },
-      body: JSON.stringify(body),
-    });
-
-    // Parse response body safely
-    let responseData: any;
-    let responseText: string;
-
     try {
-      // First get the response as text
-      responseText = await response.text();
-      console.log("Raw response text:", responseText);
-      
-      // Try to parse as JSON if not empty
-      if (responseText.trim()) {
-        responseData = JSON.parse(responseText);
-      } else {
-        responseData = { message: "Empty response received" };
+      switch (action) {
+        case "createContact":
+          result = await contactService.createContact(userData, LOOPS_API_KEY);
+          break;
+        
+        case "updateContact":
+          result = await contactService.updateContact(userData, LOOPS_API_KEY);
+          break;
+        
+        case "triggerEvent":
+          if (!eventName) {
+            return responseHelpers.error("eventName is required for triggerEvent action", 400);
+          }
+          result = await eventService.triggerEvent(userData, eventName, LOOPS_API_KEY);
+          break;
+        
+        case "passwordReset":
+          result = await eventService.triggerPasswordReset(userData, LOOPS_API_KEY);
+          break;
+        
+        case "sendTransactional":
+          if (!transactionalId) {
+            return responseHelpers.error("transactionalId is required for sendTransactional action", 400);
+          }
+          result = await emailService.sendTransactional(userData, transactionalId, LOOPS_API_KEY);
+          break;
+        
+        default:
+          return responseHelpers.error(`Unsupported action: ${action}`, 400);
       }
       
-      console.log("Parsed response data:", JSON.stringify(responseData));
-    } catch (parseError) {
-      console.error(`Failed to parse response: ${responseText}`, parseError);
-      responseData = { 
-        rawResponse: responseText,
-        parseError: parseError.message 
-      };
+      return responseHelpers.success(result.data);
+    } catch (error) {
+      console.error(`Error processing ${action} request:`, error);
+      return responseHelpers.error(error.message, 500);
     }
-
-    if (!response.ok) {
-      console.error(`Loops API error: ${response.status} ${response.statusText}`, responseData);
-      return new Response(
-        JSON.stringify({ 
-          error: `Loops API error: ${response.status} ${response.statusText}`,
-          details: responseData
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: response.status }
-      );
-    }
-
-    console.log(`Loops API response success:`, JSON.stringify(responseData));
-
-    return new Response(
-      JSON.stringify({ success: true, data: responseData }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
   } catch (error) {
     console.error(`Error in Loops integration:`, error.message, error.stack);
-    return new Response(
-      JSON.stringify({ error: error.message, stack: error.stack }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-    );
+    return responseHelpers.error(error.message, 500, { stack: error.stack });
   }
 };
 
