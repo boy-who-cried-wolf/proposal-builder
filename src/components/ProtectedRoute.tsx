@@ -16,7 +16,11 @@ export const ProtectedRoute: React.FC = () => {
     );
   }
 
-  // Allow access to the main routes - authentication checks will happen within components
-  // for specific actions like generating proposals
+  // If user is not logged in, redirect to auth page
+  if (!user) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // User is authenticated, allow access
   return <Outlet />;
 };

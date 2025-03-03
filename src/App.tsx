@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import AccountSettings from "./pages/AccountSettings";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { PlanProtectedRoute } from "./components/PlanProtectedRoute";
 import OrganizationSettings from "./pages/OrganizationSettings";
 import PlanSettings from "./pages/PlanSettings";
 
@@ -26,14 +27,34 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<Auth />} />
             
-            {/* Protected routes */}
+            {/* Basic protected routes - just require authentication */}
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/account-settings" element={<AccountSettings />} />
               <Route path="/account-settings/organization" element={<OrganizationSettings />} />
               <Route path="/account-settings/plan" element={<PlanSettings />} />
-              {/* Add other protected routes here */}
+            </Route>
+            
+            {/* Plan-specific protected routes */}
+            {/* Dashboard - requires freelancer or pro plan */}
+            <Route element={
+              <PlanProtectedRoute 
+                requiredPlans={['freelancer', 'pro']} 
+                featureName="Dashboard"
+              />
+            }>
+              <Route path="/dashboard" element={<Dashboard />} />
+            </Route>
+            
+            {/* Assistant - requires pro plan */}
+            <Route element={
+              <PlanProtectedRoute 
+                requiredPlans={['pro']} 
+                featureName="AI Assistant"
+              />
+            }>
+              {/* The assistant is embedded in the Index page, so we don't need to protect
+                  a specific route, but we'll need to add checks in the component itself */}
             </Route>
             
             {/* Catch-all route */}

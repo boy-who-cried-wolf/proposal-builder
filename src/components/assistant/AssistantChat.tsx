@@ -1,10 +1,12 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SendIcon } from "@/components/icons";
 import { ProposalSection } from "@/utils/openaiProposal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { usePlanSubscription } from "@/hooks/usePlanSubscription";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 type Message = {
   id: string;
@@ -26,13 +28,20 @@ export const AssistantChat: React.FC<AssistantChatProps> = ({
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showPlanDialog, setShowPlanDialog] = useState(false);
+  const { currentPlan, loading: planLoading } = usePlanSubscription(user?.id);
+  
+  useEffect(() => {
+    if (user && !planLoading && currentPlan !== 'pro') {
+      setShowPlanDialog(true);
+    }
+  }, [user, currentPlan, planLoading]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
   const processProposalRequest = async (userMessage: string) => {
-    // Check authentication before processing
     if (!user) {
       setShowAuthDialog(true);
       return {
@@ -209,6 +218,11 @@ export const AssistantChat: React.FC<AssistantChatProps> = ({
       setShowAuthDialog(true);
       return;
     }
+    
+    if (currentPlan !== 'pro') {
+      setShowPlanDialog(true);
+      return;
+    }
 
     if (inputValue.trim()) {
       const userMessage: Message = {
@@ -234,6 +248,34 @@ export const AssistantChat: React.FC<AssistantChatProps> = ({
   const handleGoToAuth = () => {
     navigate('/auth');
   };
+
+  const handleGoToPlan = () => {
+    navigate('/account-settings/plan');
+  };
+
+  if (planLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p>Loading subscription information...</p>
+      </div>
+    );
+  }
+
+  if (!user || (user && currentPlan !== 'pro')) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-4">
+        <div className="bg-amber-50 border border-amber-200 rounded-md p-6 max-w-md text-center">
+          <h3 className="font-bold text-amber-800 text-lg mb-2">Pro Plan Required</h3>
+          <p className="text-amber-700 mb-4">
+            The AI Assistant feature is available exclusively to Pro plan subscribers.
+          </p>
+          <Button onClick={handleGoToPlan} className="bg-black text-white hover:bg-black/80">
+            Upgrade to Pro
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -296,6 +338,29 @@ export const AssistantChat: React.FC<AssistantChatProps> = ({
               className="bg-black text-white px-4 py-2 rounded"
             >
               Sign In or Create Account
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Plan Upgrade Dialog */}
+      <Dialog open={showPlanDialog} onOpenChange={setShowPlanDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Pro Plan Required</DialogTitle>
+            <DialogDescription>
+              This feature is available exclusively with our Pro plan.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col space-y-3 mt-4">
+            <p className="text-sm text-gray-500">
+              The AI Assistant requires a Pro plan subscription. Please upgrade to access this feature.
+            </p>
+            <button
+              onClick={handleGoToPlan}
+              className="bg-black text-white px-4 py-2 rounded"
+            >
+              View Plans & Pricing
             </button>
           </div>
         </DialogContent>
