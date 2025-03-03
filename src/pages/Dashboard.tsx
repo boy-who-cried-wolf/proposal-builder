@@ -147,21 +147,21 @@ const Dashboard = () => {
             <div className="flex gap-2">
               <Button 
                 variant="outline" 
-                size="sm" 
+                size="icon" 
                 className={viewMode === "grid" ? "bg-muted" : ""}
                 onClick={() => setViewMode("grid")}
+                title="Grid View"
               >
-                <Grid size={16} className="mr-2" />
-                Grid
+                <Grid size={16} />
               </Button>
               <Button 
                 variant="outline" 
-                size="sm" 
+                size="icon" 
                 className={viewMode === "list" ? "bg-muted" : ""}
                 onClick={() => setViewMode("list")}
+                title="List View"
               >
-                <List size={16} className="mr-2" />
-                List
+                <List size={16} />
               </Button>
             </div>
           </div>
