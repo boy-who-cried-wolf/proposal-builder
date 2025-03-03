@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface Project {
   id: string;
@@ -18,9 +19,13 @@ interface Project {
 
 interface ProjectCardProps {
   project: Project;
+  viewMode?: "grid" | "list";
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({ 
+  project, 
+  viewMode = "grid" 
+}) => {
   // Format currency
   const formattedValue = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -42,6 +47,50 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         return '';
     }
   };
+
+  if (viewMode === "list") {
+    return (
+      <Card className="overflow-hidden hover:shadow-md transition-shadow">
+        <div className="flex flex-col md:flex-row md:items-center p-4">
+          <div className="flex-grow md:flex md:items-center">
+            <div className="md:w-1/3">
+              <h3 className="text-lg font-bold">{project.title}</h3>
+              <p className="text-sm text-muted-foreground">{project.client}</p>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mt-2 md:mt-0 md:w-2/3">
+              <div>
+                <p className="text-sm text-muted-foreground">Value</p>
+                <p className="font-semibold">{formattedValue}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Hours</p>
+                <p className="font-semibold">{project.hours}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Date</p>
+                <p className="font-semibold">{project.date}</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 mt-4 md:mt-0">
+            <Badge className={getBadgeVariant(project.status)}>
+              {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+            </Badge>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Eye size={16} className="mr-2" />
+                View
+              </Button>
+              <Button variant="outline" size="sm">
+                <Edit size={16} className="mr-2" />
+                Edit
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow">

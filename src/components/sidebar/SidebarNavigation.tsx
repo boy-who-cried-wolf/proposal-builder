@@ -1,6 +1,7 @@
 
 import React from "react";
 import { SidebarNavItem } from "./SidebarNavItem";
+import { useNavigate } from "react-router-dom";
 import { 
   ArrowDownIcon, 
   DiamondIcon, 
@@ -20,10 +21,20 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   isExpanded,
   onNavItemClick,
 }) => {
+  const navigate = useNavigate();
+
+  const handleItemClick = (path: string, index: number) => {
+    onNavItemClick(index);
+    if (path) {
+      navigate(path);
+    }
+  };
+
   const navItems = [
     {
       title: "Dashboard",
       icon: LayoutDashboard,
+      path: "/dashboard",
       content: (
         <div className="p-3 bg-muted/20 rounded-sm mt-1">
           <ul className="space-y-2 text-xs">
@@ -39,6 +50,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     {
       title: "Clients",
       icon: Users,
+      path: "",
       content: (
         <div className="p-3 bg-muted/20 rounded-sm mt-1">
           <ul className="space-y-2 text-xs">
@@ -52,6 +64,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     {
       title: "Assistant",
       icon: MessageSquare,
+      path: "",
       content: (
         <div className="p-3 bg-muted/20 rounded-sm mt-1">
           <ul className="space-y-2 text-xs">
@@ -65,6 +78,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     {
       title: "Settings",
       icon: Settings,
+      path: "",
       content: (
         <div className="p-3 bg-muted/20 rounded-sm mt-1">
           <ul className="space-y-2 text-xs">
@@ -87,7 +101,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           content={item.content}
           isActive={activeNavItem === index}
           isExpanded={isExpanded}
-          onItemClick={() => onNavItemClick(index)}
+          onItemClick={() => handleItemClick(item.path, index)}
         />
       ))}
     </nav>
