@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,16 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, Eye, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Project } from "./types/projectTypes";
-import {
-  formatCurrency,
-  formatDate,
-  getDaysRemaining,
-  getDueDateColor,
-  getDaysRemainingColor,
-  getBadgeVariant,
-  getServiceTagColor
-} from "./utils/projectCardUtils";
-
+import { formatCurrency, formatDate, getDaysRemaining, getDueDateColor, getDaysRemainingColor, getBadgeVariant, getServiceTagColor } from "./utils/projectCardUtils";
 interface ProjectCardGridProps {
   project: Project;
   onDragStart?: (e: React.DragEvent) => void;
@@ -23,7 +13,6 @@ interface ProjectCardGridProps {
   onDrop?: (e: React.DragEvent) => void;
   onView?: () => void;
 }
-
 export const ProjectCardGrid: React.FC<ProjectCardGridProps> = ({
   project,
   onDragStart,
@@ -36,26 +25,18 @@ export const ProjectCardGrid: React.FC<ProjectCardGridProps> = ({
   const daysRemaining = getDaysRemaining(project.date);
   const dueDateColorClass = getDueDateColor(project.date);
   const daysRemainingColorClass = getDaysRemainingColor(project.date);
-
-  return (
-    <Card 
-      className="overflow-hidden hover:bg-gray-50 transition-colors"
-      draggable={true}
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-    >
+  return <Card className="overflow-hidden hover:bg-gray-50 transition-colors" draggable={true} onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop}>
       <CardHeader className="pb-2 bg-white">
         <div className="flex justify-between items-start">
           <div className="flex items-center">
-            <GripVertical size={16} className="mr-2 cursor-grab text-gray-400" />
+            
             <CardTitle className="text-lg font-bold font-poppins">{project.title}</CardTitle>
           </div>
           <Badge className={getBadgeVariant(project.status)}>
             {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
           </Badge>
         </div>
-        <p className="text-sm text-muted-foreground ml-6">{project.client}</p>
+        <p className="text-sm text-muted-foreground ml-6 mx-px">{project.client}</p>
       </CardHeader>
       <CardContent className="pt-4">
         <div className="grid grid-cols-2 gap-4">
@@ -80,14 +61,9 @@ export const ProjectCardGrid: React.FC<ProjectCardGridProps> = ({
         </div>
         
         <div className="mt-4 flex flex-wrap gap-1">
-          {["WEB DESIGN"].map((service, index) => (
-            <Badge 
-              key={index} 
-              className={cn("font-poppins text-xs", getServiceTagColor(service))}
-            >
+          {["WEB DESIGN"].map((service, index) => <Badge key={index} className={cn("font-poppins text-xs", getServiceTagColor(service))}>
               {service}
-            </Badge>
-          ))}
+            </Badge>)}
         </div>
         
         <div className="mt-4 flex justify-end gap-2">
@@ -99,6 +75,5 @@ export const ProjectCardGrid: React.FC<ProjectCardGridProps> = ({
           </Button>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
