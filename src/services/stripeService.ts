@@ -1,10 +1,13 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getEnvironmentMode } from '@/utils/environment';
 
 export const createCheckoutSession = async (userId: string, planId: string) => {
   try {
     console.log(`Creating checkout session for user ${userId} and plan ${planId}`);
+    const mode = getEnvironmentMode();
+    console.log(`Using ${mode} mode for Stripe`);
     
     // Check connectivity to Supabase Functions - without using process.env
     try {
@@ -23,7 +26,7 @@ export const createCheckoutSession = async (userId: string, planId: string) => {
     }
     
     const { data, error } = await supabase.functions.invoke('stripe-integration', {
-      body: { action: 'createCheckoutSession', userId, planId }
+      body: { action: 'createCheckoutSession', userId, planId, mode }
     });
 
     if (error) {
@@ -66,8 +69,9 @@ export const createCheckoutSession = async (userId: string, planId: string) => {
 export const getCurrentSubscription = async (userId: string) => {
   try {
     console.log(`Fetching subscription for user ${userId}`);
+    const mode = getEnvironmentMode();
     const { data, error } = await supabase.functions.invoke('stripe-integration', {
-      body: { action: 'getCurrentSubscription', userId }
+      body: { action: 'getCurrentSubscription', userId, mode }
     });
 
     if (error) {
@@ -86,8 +90,9 @@ export const getCurrentSubscription = async (userId: string) => {
 export const cancelSubscription = async (userId: string) => {
   try {
     console.log(`Cancelling subscription for user ${userId}`);
+    const mode = getEnvironmentMode();
     const { data, error } = await supabase.functions.invoke('stripe-integration', {
-      body: { action: 'cancelSubscription', userId }
+      body: { action: 'cancelSubscription', userId, mode }
     });
 
     if (error) {
@@ -108,8 +113,9 @@ export const cancelSubscription = async (userId: string) => {
 export const createCustomerPortalSession = async (userId: string) => {
   try {
     console.log(`Creating customer portal session for user ${userId}`);
+    const mode = getEnvironmentMode();
     const { data, error } = await supabase.functions.invoke('stripe-integration', {
-      body: { action: 'createCustomerPortalSession', userId }
+      body: { action: 'createCustomerPortalSession', userId, mode }
     });
 
     if (error) {
@@ -152,8 +158,9 @@ export const createCustomerPortalSession = async (userId: string) => {
 export const getPlansWithPricing = async () => {
   try {
     console.log('Fetching plans with pricing from Stripe');
+    const mode = getEnvironmentMode();
     const { data, error } = await supabase.functions.invoke('stripe-integration', {
-      body: { action: 'getPlansWithPricing' }
+      body: { action: 'getPlansWithPricing', mode }
     });
 
     if (error) {

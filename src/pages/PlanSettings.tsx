@@ -4,7 +4,7 @@ import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Loader2 } from "lucide-react";
+import { RefreshCw, Loader2, AlertTriangle } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { NavTab } from "@/components/ui/NavItem";
@@ -13,11 +13,13 @@ import { ErrorDetailsDialog } from "@/components/subscription/ErrorDetailsDialog
 import { CurrentSubscription } from "@/components/subscription/CurrentSubscription";
 import { ErrorMessage } from "@/components/subscription/ErrorMessage";
 import { PlansGrid } from "@/components/subscription/PlansGrid";
+import { isTestEnvironment } from "@/utils/environment";
 
 const PlanSettings = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isTestMode = isTestEnvironment();
   
   const {
     currentPlan,
@@ -63,6 +65,16 @@ const PlanSettings = () => {
         <div className="border-b border-border pb-4">
           <div className="container">
             <h1 className="text-3xl font-bold py-4">Account Settings</h1>
+            
+            {isTestMode && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4 flex items-start gap-2">
+                <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-yellow-800">Test Mode Active</p>
+                  <p className="text-yellow-700 text-sm">You are in a test environment. All subscription actions will use Stripe test mode.</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         

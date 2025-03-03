@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { PlanCard } from "./PlanCard";
 import { getPlansWithPricing } from "@/services/stripeService";
+import { isTestEnvironment } from "@/utils/environment";
 
 // Define the base plans data structure
 const defaultPlans = [
@@ -68,6 +70,7 @@ export const PlansGrid: React.FC<PlansGridProps> = ({
 }) => {
   const [plans, setPlans] = useState(defaultPlans);
   const [loadingPrices, setLoadingPrices] = useState(false);
+  const isTestMode = isTestEnvironment();
 
   useEffect(() => {
     const fetchPlansPricing = async () => {
@@ -111,16 +114,25 @@ export const PlansGrid: React.FC<PlansGridProps> = ({
   }
 
   return (
-    <div className="grid md:grid-cols-3 gap-6 mt-6">
-      {plans.map((plan) => (
-        <PlanCard
-          key={plan.id}
-          plan={plan}
-          currentPlan={currentPlan}
-          checkoutLoading={checkoutLoading}
-          onSelectPlan={onSelectPlan}
-        />
-      ))}
+    <div className="space-y-4">
+      {isTestMode && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 text-sm text-yellow-800 mb-4">
+          <p className="font-medium">Test Mode Active</p>
+          <p>This is a test environment. Any subscriptions created will use Stripe test mode.</p>
+        </div>
+      )}
+      
+      <div className="grid md:grid-cols-3 gap-6">
+        {plans.map((plan) => (
+          <PlanCard
+            key={plan.id}
+            plan={plan}
+            currentPlan={currentPlan}
+            checkoutLoading={checkoutLoading}
+            onSelectPlan={onSelectPlan}
+          />
+        ))}
+      </div>
     </div>
   );
 };

@@ -52,6 +52,8 @@ export const addUserToLoops = async (
  */
 export const updateUserInLoops = async (email: string, userGroup: string) => {
   try {
+    console.log(`Updating user in Loops: ${email} to group: ${userGroup}`);
+    
     const { data, error } = await supabase.functions.invoke('loops-integration', {
       body: {
         action: 'updateContact',
@@ -64,11 +66,22 @@ export const updateUserInLoops = async (email: string, userGroup: string) => {
 
     if (error) {
       console.error('Error updating user in Loops:', error);
+      throw error;
     } else {
       console.log('User updated in Loops successfully:', data);
+      
+      // Also trigger an event for the plan change
+      const eventName = userGroup === 'free' ? 'plan_downgraded' : 'plan_upgraded';
+      await triggerLoopsEvent(email, eventName, { 
+        planType: userGroup,
+        timestamp: new Date().toISOString()
+      });
+      
+      return data;
     }
   } catch (error) {
     console.error('Error invoking Loops integration:', error);
+    throw error;
   }
 };
 

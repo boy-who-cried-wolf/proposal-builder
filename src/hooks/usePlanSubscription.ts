@@ -7,6 +7,7 @@ import {
   cancelSubscription,
   createCustomerPortalSession
 } from "@/services/stripeService";
+import { updateUserInLoops } from "@/utils/loopsIntegration";
 
 export function usePlanSubscription(userId: string | undefined) {
   const [currentPlan, setCurrentPlan] = useState("free");
@@ -19,6 +20,31 @@ export function usePlanSubscription(userId: string | undefined) {
   const [errorDetails, setErrorDetails] = useState<string>("");
   const [refreshing, setRefreshing] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  // Get user email for Loops integration
+  const fetchUserEmail = async () => {
+    if (userId) {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('id', userId)
+          .single();
+          
+        if (error) {
+          console.error("Error fetching user email:", error);
+          return;
+        }
+        
+        if (data?.email) {
+          setUserEmail(data.email);
+        }
+      } catch (error) {
+        console.error("Error fetching user email:", error);
+      }
+    }
+  };
 
   const fetchSubscription = async () => {
     if (userId) {
@@ -97,6 +123,18 @@ export function usePlanSubscription(userId: string | undefined) {
       setCancelLoading(true);
       setError(null);
       await cancelSubscription(userId);
+      
+      // Update Loops contact when subscription is cancelled
+      if (userEmail) {
+        try {
+          await updateUserInLoops(userEmail, 'free');
+          console.log("User downgraded to free plan in Loops:", userEmail);
+        } catch (loopsError) {
+          console.error("Error updating Loops contact:", loopsError);
+          // Continue anyway as this is not critical
+        }
+      }
+      
       await fetchSubscription();
       toast.success("Your subscription has been cancelled");
     } catch (error) {
@@ -133,6 +171,13 @@ export function usePlanSubscription(userId: string | undefined) {
       setPortalLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (userId) {
+      fetchSubscription();
+      fetchUserEmail();
+    }
+  }, [userId]);
 
   return {
     currentPlan,

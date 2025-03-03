@@ -26,20 +26,40 @@ const successResponse = (data) => {
 }
 
 // Initialize clients
-const initializeClients = () => {
+const initializeClients = (mode = 'live') => {
   // Log environment variables availability
   console.log('Environment variables check:');
   console.log('STRIPE_SECRET_KEY available:', !!Deno.env.get('STRIPE_SECRET_KEY'));
+  console.log('STRIPE_TEST_SECRET_KEY available:', !!Deno.env.get('STRIPE_TEST_SECRET_KEY'));
   console.log('SUPABASE_URL available:', !!Deno.env.get('SUPABASE_URL'));
   console.log('SUPABASE_SERVICE_ROLE_KEY available:', !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
-  console.log('STRIPE_FREELANCER_PRICE_ID available:', !!Deno.env.get('STRIPE_FREELANCER_PRICE_ID'));
-  console.log('STRIPE_PRO_PRICE_ID available:', !!Deno.env.get('STRIPE_PRO_PRICE_ID'));
   
-  // Initialize Stripe
-  const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
+  // Test mode check
+  const isTestMode = mode === 'test';
+  console.log(`Using ${isTestMode ? 'TEST' : 'LIVE'} mode for Stripe`);
+  
+  // Initialize Stripe with appropriate key based on mode
+  const stripeKey = isTestMode 
+    ? Deno.env.get('STRIPE_TEST_SECRET_KEY') 
+    : Deno.env.get('STRIPE_SECRET_KEY');
+  
   if (!stripeKey) {
-    throw new Error('Missing STRIPE_SECRET_KEY environment variable');
+    throw new Error(`Missing ${isTestMode ? 'STRIPE_TEST_SECRET_KEY' : 'STRIPE_SECRET_KEY'} environment variable`);
   }
+
+  // Get appropriate price IDs based on mode
+  const freelancerPriceId = isTestMode
+    ? Deno.env.get('STRIPE_TEST_FREELANCER_PRICE_ID')
+    : Deno.env.get('STRIPE_FREELANCER_PRICE_ID');
+    
+  const proPriceId = isTestMode
+    ? Deno.env.get('STRIPE_TEST_PRO_PRICE_ID')
+    : Deno.env.get('STRIPE_PRO_PRICE_ID');
+  
+  // Log price IDs
+  console.log('Using price IDs:');
+  console.log('Freelancer:', freelancerPriceId);
+  console.log('Pro:', proPriceId);
 
   const stripe = new Stripe(stripeKey, {
     apiVersion: '2023-10-16',
@@ -55,23 +75,31 @@ const initializeClients = () => {
   
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  return { stripe, supabase };
+  return { 
+    stripe, 
+    supabase,
+    priceIds: {
+      freelancer: freelancerPriceId,
+      pro: proPriceId
+    },
+    mode
+  };
 }
 
 // Health check endpoint
-const handleHealthCheck = () => {
-  console.log('Health check requested');
-  return successResponse({ status: 'ok', timestamp: new Date().toISOString() });
+const handleHealthCheck = (mode) => {
+  console.log(`Health check requested in ${mode} mode`);
+  return successResponse({ status: 'ok', mode, timestamp: new Date().toISOString() });
 }
 
 // Get plans with pricing
-const getPlansWithPricing = async (stripe) => {
+const getPlansWithPricing = async (stripe, priceIds, mode) => {
   try {
-    console.log('Fetching plans with pricing from Stripe');
+    console.log(`Fetching plans with pricing from Stripe in ${mode} mode`);
     
     // Get price information from Stripe
-    const freelancerPriceId = Deno.env.get('STRIPE_FREELANCER_PRICE_ID');
-    const proPriceId = Deno.env.get('STRIPE_PRO_PRICE_ID');
+    const freelancerPriceId = priceIds.freelancer;
+    const proPriceId = priceIds.pro;
     
     if (!freelancerPriceId || !proPriceId) {
       console.error('Missing price IDs in environment variables');
@@ -136,7 +164,7 @@ const getPlansWithPricing = async (stripe) => {
     ];
     
     console.log('Returning formatted plans data:', plans);
-    return successResponse({ plans });
+    return successResponse({ plans, mode });
   } catch (error) {
     console.error('Error fetching plans with pricing:', error);
     return errorResponse(`Error fetching plans with pricing: ${error.message}`);
@@ -144,10 +172,12 @@ const getPlansWithPricing = async (stripe) => {
 }
 
 // Customer Portal Session creation
-const createCustomerPortalSession = async (stripe, supabase, userId, origin) => {
+const createCustomerPortalSession = async (stripe, supabase, userId, origin, mode) => {
   if (!userId) {
     return errorResponse('User ID is required', 400);
   }
+
+  console.log(`Creating customer portal session for user ${userId} in ${mode} mode`);
 
   // Get the customer ID from the database
   const { data: subscription, error: subscriptionError } = await supabase
@@ -175,15 +205,53 @@ const createCustomerPortalSession = async (stripe, supabase, userId, origin) => 
     });
 
     console.log(`Created customer portal session: ${session.id}, URL: ${session.url}`);
-    return successResponse({ url: session.url });
+    return successResponse({ url: session.url, mode });
   } catch (error) {
     console.error('Error creating customer portal session:', error);
     return errorResponse(`Error creating customer portal session: ${error.message}`);
   }
 }
 
+// Helper function to update user in Loops
+const updateLoopsContact = async (supabase, email, userGroup) => {
+  try {
+    console.log(`Updating Loops contact for ${email} to group: ${userGroup}`);
+    await supabase.functions.invoke('loops-integration', {
+      body: {
+        action: 'updateContact',
+        userData: {
+          email,
+          userGroup
+        }
+      }
+    });
+    
+    // Also trigger an event for analytics
+    await supabase.functions.invoke('loops-integration', {
+      body: {
+        action: 'triggerEvent',
+        userData: {
+          email,
+          customFields: {
+            planType: userGroup,
+            timestamp: new Date().toISOString()
+          }
+        },
+        eventName: userGroup === 'free' ? 'plan_downgraded' : 'plan_upgraded'
+      }
+    });
+    
+    console.log(`Successfully updated Loops for ${email}`);
+    return true;
+  } catch (error) {
+    console.error('Error updating Loops contact:', error);
+    // Don't throw error, as this is not critical for subscription flow
+    return false;
+  }
+}
+
 // Checkout Session creation
-const createCheckoutSession = async (stripe, supabase, userId, planId, origin) => {
+const createCheckoutSession = async (stripe, supabase, userId, planId, origin, priceIds, mode) => {
   if (!userId) {
     return errorResponse('User ID is required', 400);
   }
@@ -191,6 +259,8 @@ const createCheckoutSession = async (stripe, supabase, userId, planId, origin) =
   if (!planId) {
     return errorResponse('Plan ID is required', 400);
   }
+
+  console.log(`Creating checkout session for user ${userId}, plan ${planId} in ${mode} mode`);
 
   // Get user profile
   const { data: profile, error: profileError } = await supabase
@@ -259,9 +329,9 @@ const createCheckoutSession = async (stripe, supabase, userId, planId, origin) =
   // Determine price ID based on plan
   let priceId;
   if (planId === 'freelancer') {
-    priceId = Deno.env.get('STRIPE_FREELANCER_PRICE_ID');
+    priceId = priceIds.freelancer;
   } else if (planId === 'pro') {
-    priceId = Deno.env.get('STRIPE_PRO_PRICE_ID');
+    priceId = priceIds.pro;
   }
 
   if (!priceId) {
@@ -286,13 +356,14 @@ const createCheckoutSession = async (stripe, supabase, userId, planId, origin) =
       subscription_data: {
         metadata: {
           userId: userId,
-          planId: planId
+          planId: planId,
+          userEmail: profile.email
         }
       }
     });
 
     console.log(`Created checkout session: ${session.id}, URL: ${session.url}`);
-    return successResponse({ url: session.url });
+    return successResponse({ url: session.url, mode });
   } catch (error) {
     console.error('Error creating checkout session:', error);
     return errorResponse(`Error creating checkout session: ${error.message}`);
@@ -300,10 +371,12 @@ const createCheckoutSession = async (stripe, supabase, userId, planId, origin) =
 }
 
 // Get current subscription
-const getCurrentSubscription = async (supabase, userId) => {
+const getCurrentSubscription = async (supabase, userId, mode) => {
   if (!userId) {
     return errorResponse('User ID is required', 400);
   }
+
+  console.log(`Getting current subscription for user ${userId} in ${mode} mode`);
 
   const { data, error } = await supabase
     .from('subscriptions')
@@ -318,19 +391,21 @@ const getCurrentSubscription = async (supabase, userId) => {
 
   // If no subscription found, return free plan
   if (!data) {
-    return successResponse({ plan_id: 'free', status: 'active' });
+    return successResponse({ plan_id: 'free', status: 'active', mode });
   }
 
-  return successResponse(data);
+  return successResponse({ ...data, mode });
 }
 
 // Cancel subscription
-const cancelSubscription = async (stripe, supabase, userId) => {
+const cancelSubscription = async (stripe, supabase, userId, mode) => {
   if (!userId) {
     return errorResponse('User ID is required', 400);
   }
 
-  // Get the subscription from the database
+  console.log(`Cancelling subscription for user ${userId} in ${mode} mode`);
+
+  // Get the subscription and user email from the database
   const { data: subscriptionData, error: subscriptionError } = await supabase
     .from('subscriptions')
     .select('stripe_subscription_id')
@@ -346,6 +421,18 @@ const cancelSubscription = async (stripe, supabase, userId) => {
     return errorResponse('No active subscription found', 400);
   }
 
+  // Get user email for Loops update
+  const { data: userData, error: userError } = await supabase
+    .from('profiles')
+    .select('email')
+    .eq('id', userId)
+    .single();
+
+  if (userError) {
+    console.error('Error fetching user email:', userError);
+    // Continue anyway, as we can still cancel the subscription
+  }
+
   // Cancel the subscription in Stripe
   await stripe.subscriptions.cancel(subscriptionData.stripe_subscription_id);
 
@@ -358,13 +445,25 @@ const cancelSubscription = async (stripe, supabase, userId) => {
     })
     .eq('user_id', userId);
 
-  return successResponse({ success: true });
+  // Update Loops if we have the user email
+  if (userData?.email) {
+    try {
+      await updateLoopsContact(supabase, userData.email, 'free');
+    } catch (loopsError) {
+      console.error('Error updating Loops after cancellation:', loopsError);
+      // Continue anyway as this is not critical
+    }
+  }
+
+  return successResponse({ success: true, mode });
 }
 
 // Handle webhook events
-const handleWebhook = async (stripe, supabase, req) => {
+const handleWebhook = async (stripe, supabase, req, mode) => {
   const signature = req.headers.get('stripe-signature');
-  const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+  const webhookSecret = mode === 'test' 
+    ? Deno.env.get('STRIPE_TEST_WEBHOOK_SECRET')
+    : Deno.env.get('STRIPE_WEBHOOK_SECRET');
   
   if (!signature || !webhookSecret) {
     return errorResponse('Missing signature or webhook secret', 400);
@@ -381,6 +480,8 @@ const handleWebhook = async (stripe, supabase, req) => {
 
   // Handle the event
   try {
+    console.log(`Processing webhook event: ${event.type} in ${mode} mode`);
+    
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
@@ -391,6 +492,7 @@ const handleWebhook = async (stripe, supabase, req) => {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         const userId = subscription.metadata.userId;
         const planId = subscription.metadata.planId;
+        const userEmail = subscription.metadata.userEmail;
 
         if (userId && planId) {
           // Update subscription in database
@@ -404,12 +506,24 @@ const handleWebhook = async (stripe, supabase, req) => {
               status: 'active',
               current_period_end: new Date(subscription.current_period_end * 1000).toISOString()
             });
+            
+          // Update user in Loops if email is available
+          if (userEmail) {
+            try {
+              await updateLoopsContact(supabase, userEmail, planId);
+            } catch (loopsError) {
+              console.error('Error updating Loops contact after checkout:', loopsError);
+              // Continue anyway as this is not critical
+            }
+          }
         }
         break;
       }
       case 'customer.subscription.updated': {
         const subscription = event.data.object;
         const userId = subscription.metadata.userId;
+        const userEmail = subscription.metadata.userEmail;
+        const planId = subscription.metadata.planId;
         
         if (userId) {
           await supabase
@@ -419,11 +533,22 @@ const handleWebhook = async (stripe, supabase, req) => {
               current_period_end: new Date(subscription.current_period_end * 1000).toISOString()
             })
             .eq('stripe_subscription_id', subscription.id);
+            
+          // Update Loops with subscription change if email is available
+          if (userEmail && planId && subscription.status === 'active') {
+            try {
+              await updateLoopsContact(supabase, userEmail, planId);
+            } catch (loopsError) {
+              console.error('Error updating Loops contact after subscription update:', loopsError);
+              // Continue anyway as this is not critical
+            }
+          }
         }
         break;
       }
       case 'customer.subscription.deleted': {
         const subscription = event.data.object;
+        const userEmail = subscription.metadata.userEmail;
         
         await supabase
           .from('subscriptions')
@@ -432,12 +557,22 @@ const handleWebhook = async (stripe, supabase, req) => {
             plan_id: 'free'
           })
           .eq('stripe_subscription_id', subscription.id);
+          
+        // Update Loops if email is available  
+        if (userEmail) {
+          try {
+            await updateLoopsContact(supabase, userEmail, 'free');
+          } catch (loopsError) {
+            console.error('Error updating Loops contact after subscription deletion:', loopsError);
+            // Continue anyway as this is not critical
+          }
+        }
         
         break;
       }
     }
     
-    return successResponse({ received: true });
+    return successResponse({ received: true, mode });
   } catch (error) {
     console.error('Error processing webhook:', error);
     return errorResponse(`Error processing webhook: ${error.message}`);
@@ -451,57 +586,63 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Health check endpoint
-  const url = new URL(req.url);
-  if (url.pathname.endsWith('/health')) {
-    return successResponse({ status: 'ok', timestamp: new Date().toISOString() });
-  }
-
   try {
     // Log for debugging
     console.log('Request URL:', req.url);
     console.log('Request method:', req.method);
 
-    // Initialize clients
-    const { stripe, supabase } = initializeClients();
-
     // Parse request body for non-GET requests
     let body = {};
+    let mode = 'live'; // Default to live mode
+    
     if (req.method !== 'GET') {
       try {
         body = await req.json();
         console.log('Request body:', JSON.stringify(body));
+        
+        // Extract mode from request body, default to live
+        mode = body.mode || 'live';
+        console.log(`Using ${mode} mode for Stripe`);
       } catch (error) {
         console.error('Error parsing request body:', error);
         return errorResponse('Invalid request body', 400);
       }
     }
+    
+    // Health check endpoint
+    const url = new URL(req.url);
+    if (url.pathname.endsWith('/health')) {
+      return handleHealthCheck(mode);
+    }
+
+    // Initialize clients with the specified mode
+    const { stripe, supabase, priceIds } = initializeClients(mode);
 
     // Extract action and params
     const { action, userId, planId } = body;
-    console.log(`Processing ${action || 'unknown'} request for user ${userId || 'unknown'}${planId ? ` and plan ${planId}` : ''}`);
+    console.log(`Processing ${action || 'unknown'} request for user ${userId || 'unknown'}${planId ? ` and plan ${planId}` : ''} in ${mode} mode`);
 
     const origin = req.headers.get('origin') || 'https://app.example.com'; // Fallback origin if not provided
 
     // Route to the appropriate handler based on action
     switch (action) {
       case 'getPlansWithPricing':
-        return await getPlansWithPricing(stripe);
+        return await getPlansWithPricing(stripe, priceIds, mode);
       
       case 'createCustomerPortalSession':
-        return await createCustomerPortalSession(stripe, supabase, userId, origin);
+        return await createCustomerPortalSession(stripe, supabase, userId, origin, mode);
       
       case 'createCheckoutSession':
-        return await createCheckoutSession(stripe, supabase, userId, planId, origin);
+        return await createCheckoutSession(stripe, supabase, userId, planId, origin, priceIds, mode);
       
       case 'getCurrentSubscription':
-        return await getCurrentSubscription(supabase, userId);
+        return await getCurrentSubscription(supabase, userId, mode);
       
       case 'cancelSubscription':
-        return await cancelSubscription(stripe, supabase, userId);
+        return await cancelSubscription(stripe, supabase, userId, mode);
       
       case 'handleWebhook':
-        return await handleWebhook(stripe, supabase, req);
+        return await handleWebhook(stripe, supabase, req, mode);
       
       default:
         return errorResponse('Unknown action', 400);
