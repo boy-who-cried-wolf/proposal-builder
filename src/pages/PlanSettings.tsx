@@ -1,13 +1,12 @@
-
 import React from "react";
 import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
+import { NavTab } from "@/components/ui/NavItem";
 
 const PlanSettings = () => {
   const { user } = useAuth();
@@ -84,87 +83,81 @@ const PlanSettings = () => {
         </div>
         
         <div className="container px-4">
-          <Tabs defaultValue="plan" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger 
-                value="account" 
-                onClick={() => navigate("/account-settings")}
-                className={`${location.pathname === "/account-settings" ? "bg-primary text-primary-foreground" : ""}`}
-              >
-                Account
-              </TabsTrigger>
-              <TabsTrigger 
-                value="organization" 
-                onClick={() => navigate("/account-settings/organization")}
-                className={`${location.pathname === "/account-settings/organization" ? "bg-primary text-primary-foreground" : ""}`}
-              >
-                Organization
-              </TabsTrigger>
-              <TabsTrigger 
-                value="plan"
-                className={`${location.pathname === "/account-settings/plan" ? "bg-primary text-primary-foreground" : ""}`}
-              >
-                Plan
-              </TabsTrigger>
-            </TabsList>
+          <div className="flex gap-[34px] px-[23px] py-[15px] mb-4">
+            <NavTab 
+              active={location.pathname === "/account-settings"} 
+              onClick={() => navigate("/account-settings")}
+            >
+              Account
+            </NavTab>
+            <NavTab 
+              active={location.pathname === "/account-settings/organization"} 
+              onClick={() => navigate("/account-settings/organization")}
+            >
+              Organization
+            </NavTab>
+            <NavTab 
+              active={location.pathname === "/account-settings/plan"} 
+              onClick={() => navigate("/account-settings/plan")}
+            >
+              Plan
+            </NavTab>
+          </div>
             
-            <TabsContent value="plan">
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-xl font-semibold">Subscription Plan</h2>
-                  <p className="text-muted-foreground">Choose the plan that's right for you</p>
-                </div>
-                
-                <div className="grid md:grid-cols-3 gap-6 mt-6">
-                  {plans.map((plan) => (
-                    <div 
-                      key={plan.id}
-                      className={`border rounded-lg p-6 ${
-                        plan.highlighted ? 'border-primary shadow-sm' : ''
-                      } ${currentPlan === plan.id ? 'bg-muted/50 border-primary' : ''}`}
-                    >
-                      <div className="space-y-4">
-                        <div>
-                          <h3 className="text-lg font-medium">{plan.name}</h3>
-                          <div className="mt-2 flex items-baseline">
-                            <span className="text-2xl font-bold">{plan.price}</span>
-                            {plan.period && (
-                              <span className="ml-1 text-sm text-muted-foreground">{plan.period}</span>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
-                        </div>
-                        
-                        <ul className="space-y-2">
-                          {plan.features.map((feature, i) => (
-                            <li key={i} className="flex items-center">
-                              <Check className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
-                              <span className="text-sm">{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        
-                        <div className="pt-4">
-                          <Button
-                            variant={currentPlan === plan.id ? "secondary" : "default"}
-                            className="w-full"
-                            disabled={plan.disabled || currentPlan === plan.id}
-                            onClick={() => handlePlanSelect(plan.id)}
-                          >
-                            {currentPlan === plan.id ? "Current Plan" : "Select Plan"}
-                          </Button>
-                        </div>
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold">Subscription Plan</h2>
+              <p className="text-muted-foreground">Choose the plan that's right for you</p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-6 mt-6">
+              {plans.map((plan) => (
+                <div 
+                  key={plan.id}
+                  className={`border rounded-lg p-6 ${
+                    plan.highlighted ? 'border-primary shadow-sm' : ''
+                  } ${currentPlan === plan.id ? 'bg-muted/50 border-primary' : ''}`}
+                >
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-medium">{plan.name}</h3>
+                      <div className="mt-2 flex items-baseline">
+                        <span className="text-2xl font-bold">{plan.price}</span>
+                        {plan.period && (
+                          <span className="ml-1 text-sm text-muted-foreground">{plan.period}</span>
+                        )}
                       </div>
+                      <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
                     </div>
-                  ))}
+                    
+                    <ul className="space-y-2">
+                      {plan.features.map((feature, i) => (
+                        <li key={i} className="flex items-center">
+                          <Check className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <div className="pt-4">
+                      <Button
+                        variant={currentPlan === plan.id ? "secondary" : "default"}
+                        className="w-full"
+                        disabled={plan.disabled || currentPlan === plan.id}
+                        onClick={() => handlePlanSelect(plan.id)}
+                      >
+                        {currentPlan === plan.id ? "Current Plan" : "Select Plan"}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="text-sm text-muted-foreground mt-8">
-                  <p>Need a custom plan for your business? <a href="#" className="text-primary underline">Contact us</a> for enterprise pricing.</p>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+              ))}
+            </div>
+            
+            <div className="text-sm text-muted-foreground mt-8">
+              <p>Need a custom plan for your business? <a href="#" className="text-primary underline">Contact us</a> for enterprise pricing.</p>
+            </div>
+          </div>
         </div>
       </MainContent>
     </div>

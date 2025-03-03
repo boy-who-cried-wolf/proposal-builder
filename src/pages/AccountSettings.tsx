@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -19,6 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { NavTab } from "@/components/ui/NavItem";
 
 const AccountSettings = () => {
   const { user, signOut, requestPasswordReset } = useAuth();
@@ -102,103 +102,97 @@ const AccountSettings = () => {
         </div>
         
         <div className="container px-4">
-          <Tabs defaultValue="account" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger 
-                value="account"
-                className={`${location.pathname === "/account-settings" ? "bg-primary text-primary-foreground" : ""}`}
-              >
-                Account
-              </TabsTrigger>
-              <TabsTrigger 
-                value="organization" 
-                onClick={() => navigate("/account-settings/organization")}
-                className={`${location.pathname === "/account-settings/organization" ? "bg-primary text-primary-foreground" : ""}`}
-              >
-                Organization
-              </TabsTrigger>
-              <TabsTrigger 
-                value="plan" 
-                onClick={() => navigate("/account-settings/plan")}
-                className={`${location.pathname === "/account-settings/plan" ? "bg-primary text-primary-foreground" : ""}`}
-              >
-                Plan
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="account" className="space-y-6">
-              {loading ? (
-                <div className="text-center py-8">Loading account settings...</div>
-              ) : (
-                <>
-                  <div className="grid gap-4 max-w-xl">
-                    <h2 className="text-xl font-semibold">Personal Information</h2>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">First Name</label>
-                        <Input 
-                          value={firstName} 
-                          onChange={(e) => setFirstName(e.target.value)}
-                          placeholder="Your first name" 
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Last Name</label>
-                        <Input 
-                          value={lastName} 
-                          onChange={(e) => setLastName(e.target.value)}
-                          placeholder="Your last name" 
-                        />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Email Address</label>
-                      <Input 
-                        value={user?.email || ""} 
-                        disabled 
-                        className="bg-muted/30" 
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Email address cannot be changed.
-                      </p>
-                    </div>
-                    
-                    <div className="pt-2">
-                      <Button onClick={handleSave} disabled={saving}>
-                        {saving ? "Saving..." : "Save Changes"}
-                      </Button>
-                    </div>
+          <div className="flex gap-[34px] px-[23px] py-[15px] mb-4">
+            <NavTab 
+              active={location.pathname === "/account-settings"} 
+              onClick={() => navigate("/account-settings")}
+            >
+              Account
+            </NavTab>
+            <NavTab 
+              active={location.pathname === "/account-settings/organization"} 
+              onClick={() => navigate("/account-settings/organization")}
+            >
+              Organization
+            </NavTab>
+            <NavTab 
+              active={location.pathname === "/account-settings/plan"} 
+              onClick={() => navigate("/account-settings/plan")}
+            >
+              Plan
+            </NavTab>
+          </div>
+          
+          {loading ? (
+            <div className="text-center py-8">Loading account settings...</div>
+          ) : (
+            <>
+              <div className="grid gap-4 max-w-xl">
+                <h2 className="text-xl font-semibold">Personal Information</h2>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">First Name</label>
+                    <Input 
+                      value={firstName} 
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="Your first name" 
+                    />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Last Name</label>
+                    <Input 
+                      value={lastName} 
+                      onChange={(e) => setLastName(e.target.value)}
+                      placeholder="Your last name" 
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Email Address</label>
+                  <Input 
+                    value={user?.email || ""} 
+                    disabled 
+                    className="bg-muted/30" 
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Email address cannot be changed.
+                  </p>
+                </div>
+                
+                <div className="pt-2">
+                  <Button onClick={handleSave} disabled={saving}>
+                    {saving ? "Saving..." : "Save Changes"}
+                  </Button>
+                </div>
+              </div>
 
-                  <div className="pt-8 border-t max-w-xl">
-                    <h2 className="text-xl font-semibold mb-4">Security</h2>
-                    
-                    <div className="space-y-4">
-                      <div>
-                        <Button variant="outline" onClick={handleRequestPasswordReset}>
-                          Reset Password
-                        </Button>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          You'll receive an email with instructions to reset your password.
-                        </p>
-                      </div>
-                      
-                      <div className="pt-4">
-                        <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
-                          Delete Account
-                        </Button>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          This action cannot be undone. All your data will be permanently deleted.
-                        </p>
-                      </div>
-                    </div>
+              <div className="pt-8 border-t max-w-xl">
+                <h2 className="text-xl font-semibold mb-4">Security</h2>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Button variant="outline" onClick={handleRequestPasswordReset}>
+                      Reset Password
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      You'll receive an email with instructions to reset your password.
+                    </p>
                   </div>
-                </>
-              )}
-            </TabsContent>
-          </Tabs>
+                  
+                  <div className="pt-4">
+                    <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
+                      Delete Account
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This action cannot be undone. All your data will be permanently deleted.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
