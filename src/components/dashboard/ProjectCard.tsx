@@ -32,6 +32,52 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     currency: 'USD',
   }).format(project.value);
   
+  // Format date and calculate days remaining
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: '2-digit', 
+      day: '2-digit', 
+      year: '2-digit' 
+    });
+  };
+
+  const getDaysRemaining = (dateString: string) => {
+    const dueDate = new Date(dateString);
+    const today = new Date();
+    
+    // Reset time portion for accurate day calculation
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+    
+    const diffTime = dueDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays;
+  };
+
+  const getDueDateColor = (dateString: string) => {
+    const daysRemaining = getDaysRemaining(dateString);
+    
+    if (daysRemaining < 0) return "text-red-600"; // Past due
+    if (daysRemaining <= 7) return "text-orange-500"; // Approaching (within 7 days)
+    return "text-green-600"; // Plenty of time
+  };
+
+  const getDaysRemainingColor = (dateString: string) => {
+    const daysRemaining = getDaysRemaining(dateString);
+    
+    if (daysRemaining < 0) return "text-red-600"; // Past due
+    if (daysRemaining <= 3) return "text-red-500"; // Very close
+    if (daysRemaining <= 7) return "text-orange-500"; // Approaching
+    return "text-green-600"; // Plenty of time
+  };
+
+  const dueDate = formatDate(project.date);
+  const daysRemaining = getDaysRemaining(project.date);
+  const dueDateColorClass = getDueDateColor(project.date);
+  const daysRemainingColorClass = getDaysRemainingColor(project.date);
+
   // Get badge color based on status
   const getBadgeVariant = (status: string) => {
     switch (status) {
@@ -81,11 +127,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             <p className="uppercase text-xs text-gray-500">HOURS</p>
           </div>
           <div>
-            <p className="font-bold text-lg uppercase font-poppins">{project.date}</p>
+            <p className={cn("font-bold text-lg uppercase font-poppins", dueDateColorClass)}>{dueDate}</p>
             <p className="uppercase text-xs text-gray-500">DUE DATE</p>
           </div>
           <div>
-            <p className="font-bold text-lg uppercase font-poppins">--</p>
+            <p className={cn("font-bold text-lg uppercase font-poppins", daysRemainingColorClass)}>
+              {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days overdue` : `${daysRemaining} days`}
+            </p>
             <p className="uppercase text-xs text-gray-500">DAYS REMAINING</p>
           </div>
           <div>
@@ -123,21 +171,18 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             <p className="text-muted-foreground">Value</p>
           </div>
           <div>
-            <p className="font-semibold font-poppins">{project.date}</p>
-            <p className="text-muted-foreground">Date</p>
+            <p className={cn("font-semibold font-poppins", dueDateColorClass)}>{dueDate}</p>
+            <p className="text-muted-foreground">Due Date</p>
           </div>
           <div>
             <p className="font-semibold font-poppins">{project.hours}</p>
             <p className="text-muted-foreground">Hours</p>
           </div>
           <div>
-            <p className="font-semibold font-poppins">
-              {new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-              }).format(project.value / project.hours)}/hr
+            <p className={cn("font-semibold font-poppins", daysRemainingColorClass)}>
+              {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days overdue` : `${daysRemaining} days`}
             </p>
-            <p className="text-muted-foreground">Rate</p>
+            <p className="text-muted-foreground">Remaining</p>
           </div>
         </div>
         

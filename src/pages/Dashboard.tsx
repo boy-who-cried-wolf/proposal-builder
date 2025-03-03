@@ -107,11 +107,11 @@ const Dashboard = () => {
           </div>
           
           <Tabs defaultValue="all" className="mb-6" onValueChange={setStatusFilter}>
-            <TabsList className="bg-[#F6F6F7] text-[#8E9196]">
-              <TabsTrigger value="all" className="data-[state=active]:bg-white">ALL PROPOSALS</TabsTrigger>
-              <TabsTrigger value="draft" className="data-[state=active]:bg-white">DRAFTS</TabsTrigger>
-              <TabsTrigger value="completed" className="data-[state=active]:bg-white">COMPLETED</TabsTrigger>
-              <TabsTrigger value="pending" className="data-[state=active]:bg-white">PENDING</TabsTrigger>
+            <TabsList className="rounded-none border-b border-solid border-[#F6F6F7] bg-transparent text-[#8E9196] w-full justify-start gap-[34px] p-0">
+              <TabsTrigger value="all" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1.389px]">ALL PROPOSALS</TabsTrigger>
+              <TabsTrigger value="draft" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1.389px]">DRAFTS</TabsTrigger>
+              <TabsTrigger value="completed" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1.389px]">COMPLETED</TabsTrigger>
+              <TabsTrigger value="pending" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1.389px]">PENDING</TabsTrigger>
             </TabsList>
             
             <div className="bg-[#F1F1F1] px-4 py-3 mt-4 mb-2">
