@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { NavTab } from "@/components/ui/NavItem";
 import { MetricItem } from "@/components/ui/MetricItem";
@@ -10,10 +9,25 @@ import {
   Timer,
   DiamondPlus,
   Save,
+  Pencil,
+  Lock,
+  Unlock,
+  Check,
 } from "lucide-react";
 import { saveProposal, ProposalSection } from "@/utils/openaiProposal";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+interface TaskItem {
+  item: string;
+  description: string;
+  hours: number | string;
+  price: string | number;
+}
 
 interface MainContentProps {
   generatedProposalSections: ProposalSection[];
@@ -21,6 +35,16 @@ interface MainContentProps {
   projectType: string;
   hourlyRate: number;
 }
+
+type Revision = {
+  id: string;
+  date: Date;
+  sectionTitle: string;
+  itemName: string;
+  field: string;
+  oldValue: string;
+  newValue: string;
+};
 
 export const MainContent: React.FC<MainContentProps> = ({
   generatedProposalSections,
@@ -32,6 +56,19 @@ export const MainContent: React.FC<MainContentProps> = ({
   const [activeTab, setActiveTab] = useState(0);
   const [activeHeaderTab, setActiveHeaderTab] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [sections, setSections] = useState<ProposalSection[]>(generatedProposalSections);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<{
+    sectionIndex: number;
+    itemIndex: number;
+    item: TaskItem;
+  } | null>(null);
+  const [isHoursPriceLocked, setIsHoursPriceLocked] = useState(true);
+  const [revisions, setRevisions] = useState<Revision[]>([]);
+
+  React.useEffect(() => {
+    setSections(generatedProposalSections);
+  }, [generatedProposalSections]);
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
@@ -41,10 +78,9 @@ export const MainContent: React.FC<MainContentProps> = ({
     setActiveHeaderTab(index);
   };
 
-  // Calculate total hours from all tasks
   const calculateTotalHours = (): number => {
     let total = 0;
-    generatedProposalSections.forEach(section => {
+    sections.forEach(section => {
       section.items.forEach(item => {
         const hours = parseFloat(item.hours.toString());
         if (!isNaN(hours)) {
@@ -55,16 +91,14 @@ export const MainContent: React.FC<MainContentProps> = ({
     return total;
   };
 
-  // Calculate hours per day (total hours / 5)
   const calculateHoursPerDay = (): number => {
     const totalHours = calculateTotalHours();
     return totalHours > 0 ? parseFloat((totalHours / 5).toFixed(1)) : 0;
   };
 
-  // Calculate total project value
   const calculateTotalValue = (): string => {
     let total = 0;
-    generatedProposalSections.forEach(section => {
+    sections.forEach(section => {
       section.items.forEach(item => {
         const price = parseFloat(item.price.toString().replace(/[^0-9.-]+/g, ''));
         if (!isNaN(price)) {
@@ -75,19 +109,16 @@ export const MainContent: React.FC<MainContentProps> = ({
     return `$${total.toLocaleString()}`;
   };
 
-  // Format total hours as string for display
   const getTotalHoursDisplay = (): string => {
     return calculateTotalHours().toString();
   };
 
-  // Format hours per day as string for display
   const getHoursPerDayDisplay = (): string => {
     return calculateHoursPerDay().toString();
   };
 
   const handleSaveProposal = async () => {
     try {
-      // Check if user is logged in
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
         toast({
@@ -98,7 +129,6 @@ export const MainContent: React.FC<MainContentProps> = ({
         return;
       }
 
-      // Check if we have proposal data to save
       if (generatedProposalSections.length === 0) {
         toast({
           title: "No proposal to save",
@@ -140,6 +170,82 @@ export const MainContent: React.FC<MainContentProps> = ({
     } finally {
       setIsSaving(false);
       setActiveHeaderTab(null);
+    }
+  };
+
+  const openEditDialog = (sectionIndex: number, itemIndex: number) => {
+    const item = { ...sections[sectionIndex].items[itemIndex] };
+    setEditingItem({
+      sectionIndex,
+      itemIndex,
+      item: item as TaskItem,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleItemChange = (field: keyof TaskItem, value: string) => {
+    if (!editingItem) return;
+
+    const updatedItem = { ...editingItem.item, [field]: value };
+
+    if (field === 'hours' && isHoursPriceLocked) {
+      const hours = parseFloat(value);
+      if (!isNaN(hours)) {
+        const priceValue = hours * hourlyRate;
+        updatedItem.price = `$${priceValue}`;
+      }
+    }
+
+    setEditingItem({
+      ...editingItem,
+      item: updatedItem,
+    });
+  };
+
+  const saveItemChanges = () => {
+    if (!editingItem) return;
+
+    const { sectionIndex, itemIndex, item } = editingItem;
+    const oldItem = sections[sectionIndex].items[itemIndex];
+    
+    const newSections = [...sections];
+    newSections[sectionIndex] = {
+      ...newSections[sectionIndex],
+      items: [
+        ...newSections[sectionIndex].items.slice(0, itemIndex),
+        item as TaskItem,
+        ...newSections[sectionIndex].items.slice(itemIndex + 1),
+      ],
+    };
+
+    Object.keys(item).forEach((key) => {
+      const field = key as keyof TaskItem;
+      if (item[field] !== oldItem[field]) {
+        const newRevision: Revision = {
+          id: Date.now().toString(),
+          date: new Date(),
+          sectionTitle: sections[sectionIndex].title,
+          itemName: item.item,
+          field,
+          oldValue: String(oldItem[field]),
+          newValue: String(item[field]),
+        };
+        setRevisions(prev => [newRevision, ...prev]);
+      }
+    });
+
+    setSections(newSections);
+    setIsEditDialogOpen(false);
+    
+    toast({
+      title: "Changes saved",
+      description: `Updated ${item.item} in ${sections[sectionIndex].title}`,
+    });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      saveItemChanges();
     }
   };
 
@@ -218,16 +324,15 @@ export const MainContent: React.FC<MainContentProps> = ({
       case 0:
         return (
           <>
-            {generatedProposalSections.length > 0 && (
+            {sections.length > 0 && (
               <div className="space-y-6">
-                {generatedProposalSections.map((section, index) => (
+                {sections.map((section, index) => (
                   <div key={index} className="section_wrapper mb-[34px]">
                     <div className="text-black text-lg font-bold bg-[#E1E1DC] px-[17px] py-[11px] rounded-[4px_4px_0_0]">
                       {section.title}
                     </div>
                     
-                    {/* Table Header */}
-                    <div className="section_table_header grid grid-cols-[2fr_4fr_1fr_1fr] text-black text-[9px] font-semibold tracking-[1.389px] uppercase px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
+                    <div className="section_table_header grid grid-cols-[2fr_4fr_1fr_1fr_0.5fr] text-black text-[9px] font-semibold tracking-[1.389px] uppercase px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
                       <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
                         Item
                       </div>
@@ -240,13 +345,15 @@ export const MainContent: React.FC<MainContentProps> = ({
                       <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
                         Price
                       </div>
+                      <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                        Edit
+                      </div>
                     </div>
 
-                    {/* Table Rows */}
                     {section.items.map((item, itemIndex) => (
                       <div
                         key={itemIndex}
-                        className="section_table_row grid grid-cols-[2fr_4fr_1fr_1fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]"
+                        className="section_table_row grid grid-cols-[2fr_4fr_1fr_1fr_0.5fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]"
                       >
                         <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
                           {item.item}
@@ -260,11 +367,19 @@ export const MainContent: React.FC<MainContentProps> = ({
                         <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
                           {item.price}
                         </div>
+                        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+                          <button 
+                            onClick={() => openEditDialog(index, itemIndex)} 
+                            className="p-1 rounded bg-gray-100 hover:bg-gray-200"
+                            aria-label="Edit item"
+                          >
+                            <Pencil size={14} />
+                          </button>
+                        </div>
                       </div>
                     ))}
 
-                    {/* Table Footer */}
-                    <div className="section_table_footer grid grid-cols-[2fr_4fr_1fr_1fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
+                    <div className="section_table_footer grid grid-cols-[2fr_4fr_1fr_1fr_0.5fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
                       <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
                         Subtotal
                       </div>
@@ -276,7 +391,7 @@ export const MainContent: React.FC<MainContentProps> = ({
                 ))}
               </div>
             )}
-            {generatedProposalSections.length === 0 && (
+            {sections.length === 0 && (
               <div className="p-6 bg-[#F7F6F2] rounded-md text-center">
                 <p className="text-gray-600">No proposal generated yet. Use the Project Settings tab to generate a proposal.</p>
               </div>
@@ -287,7 +402,25 @@ export const MainContent: React.FC<MainContentProps> = ({
         return (
           <div className="p-4">
             <h2 className="text-xl font-bold mb-4">Revisions</h2>
-            <p>Track and manage revisions to your proposal here.</p>
+            {revisions.length > 0 ? (
+              <div className="space-y-4">
+                {revisions.map(revision => (
+                  <div key={revision.id} className="bg-[#F7F6F2] p-4 rounded-md border border-gray-200">
+                    <div className="text-sm text-gray-500 mb-1">
+                      {revision.date.toLocaleString()}
+                    </div>
+                    <div className="font-medium">
+                      {revision.sectionTitle} - {revision.itemName}
+                    </div>
+                    <div className="text-sm">
+                      Changed {revision.field} from <span className="line-through">{revision.oldValue}</span> to <span className="font-semibold">{revision.newValue}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No revisions yet. Edit items in the proposal to track changes here.</p>
+            )}
           </div>
         );
       case 2:
@@ -344,6 +477,93 @@ export const MainContent: React.FC<MainContentProps> = ({
         <MetricItem value="45%" label="Profit Margin" />
         <MetricItem value={calculateTotalValue()} label="Total Value" />
       </footer>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+          </DialogHeader>
+          
+          {editingItem && (
+            <div className="grid gap-4 py-4" onKeyDown={handleKeyDown}>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="item" className="text-right">
+                  Task
+                </Label>
+                <Input
+                  id="item"
+                  value={editingItem.item.item}
+                  onChange={(e) => handleItemChange('item', e.target.value)}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="description" className="text-right">
+                  Description
+                </Label>
+                <Input
+                  id="description"
+                  value={editingItem.item.description}
+                  onChange={(e) => handleItemChange('description', e.target.value)}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <div className="text-right flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsHoursPriceLocked(!isHoursPriceLocked)}
+                    className="p-1 rounded hover:bg-gray-100"
+                    aria-label={isHoursPriceLocked ? "Unlock hours and price" : "Lock hours and price"}
+                  >
+                    {isHoursPriceLocked ? <Lock size={14} /> : <Unlock size={14} />}
+                  </button>
+                  <Label htmlFor="hours" className="">
+                    Hours
+                  </Label>
+                </div>
+                <Input
+                  id="hours"
+                  type="number"
+                  value={editingItem.item.hours.toString()}
+                  onChange={(e) => handleItemChange('hours', e.target.value)}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="price" className="text-right">
+                  Price
+                </Label>
+                <Input
+                  id="price"
+                  value={editingItem.item.price.toString()}
+                  onChange={(e) => handleItemChange('price', e.target.value)}
+                  className="col-span-3"
+                  disabled={isHoursPriceLocked}
+                />
+              </div>
+              
+              {isHoursPriceLocked && (
+                <div className="text-xs text-gray-500 italic">
+                  Price is calculated automatically based on hours at ${hourlyRate}/hour. Unlock to set custom price.
+                </div>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={saveItemChanges} className="flex items-center gap-2">
+              Save Changes <Check size={14} />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };
