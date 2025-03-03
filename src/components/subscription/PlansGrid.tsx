@@ -1,10 +1,10 @@
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { PlanCard } from "./PlanCard";
+import { getPlansWithPricing } from "@/services/stripeService";
 
-// Define the plans data
-const plans = [
+// Define the base plans data structure
+const defaultPlans = [
   {
     id: "free",
     name: "Free",
@@ -66,7 +66,43 @@ export const PlansGrid: React.FC<PlansGridProps> = ({
   checkoutLoading,
   onSelectPlan,
 }) => {
-  if (loading) {
+  const [plans, setPlans] = useState(defaultPlans);
+  const [loadingPrices, setLoadingPrices] = useState(false);
+
+  useEffect(() => {
+    const fetchPlansPricing = async () => {
+      setLoadingPrices(true);
+      try {
+        const pricingData = await getPlansWithPricing();
+        
+        if (pricingData && pricingData.plans) {
+          // Update plans with dynamic pricing from Stripe
+          const updatedPlans = defaultPlans.map(plan => {
+            const planPricing = pricingData.plans.find(p => p.id === plan.id);
+            if (planPricing) {
+              return {
+                ...plan,
+                price: planPricing.price,
+                period: planPricing.period || plan.period
+              };
+            }
+            return plan;
+          });
+          
+          setPlans(updatedPlans);
+        }
+      } catch (error) {
+        console.error("Error fetching plan pricing:", error);
+        // Keep using default pricing if there's an error
+      } finally {
+        setLoadingPrices(false);
+      }
+    };
+
+    fetchPlansPricing();
+  }, []);
+
+  if (loading || loadingPrices) {
     return (
       <div className="flex justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

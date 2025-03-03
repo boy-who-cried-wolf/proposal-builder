@@ -64,6 +64,85 @@ const handleHealthCheck = () => {
   return successResponse({ status: 'ok', timestamp: new Date().toISOString() });
 }
 
+// Get plans with pricing
+const getPlansWithPricing = async (stripe) => {
+  try {
+    console.log('Fetching plans with pricing from Stripe');
+    
+    // Get price information from Stripe
+    const freelancerPriceId = Deno.env.get('STRIPE_FREELANCER_PRICE_ID');
+    const proPriceId = Deno.env.get('STRIPE_PRO_PRICE_ID');
+    
+    if (!freelancerPriceId || !proPriceId) {
+      console.error('Missing price IDs in environment variables');
+      return errorResponse('Missing Stripe price configuration');
+    }
+    
+    // Fetch prices from Stripe
+    const [freelancerPrice, proPrice] = await Promise.all([
+      stripe.prices.retrieve(freelancerPriceId),
+      stripe.prices.retrieve(proPriceId)
+    ]);
+    
+    console.log('Fetched Stripe prices:', { 
+      freelancer: `${freelancerPrice.id} - ${freelancerPrice.unit_amount}`, 
+      pro: `${proPrice.id} - ${proPrice.unit_amount}` 
+    });
+    
+    // Format prices for display
+    const formatPrice = (price) => {
+      const amount = price.unit_amount / 100; // Convert from cents to dollars
+      const currency = price.currency.toUpperCase();
+      const formatted = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
+      }).format(amount);
+      
+      return formatted;
+    };
+    
+    const getPeriod = (price) => {
+      if (price.type === 'recurring') {
+        switch (price.recurring.interval) {
+          case 'month':
+            return 'per month';
+          case 'year':
+            return 'per year';
+          default:
+            return `per ${price.recurring.interval}`;
+        }
+      }
+      return '';
+    };
+    
+    // Construct plans data with pricing
+    const plans = [
+      {
+        id: 'free',
+        price: '$0',
+        period: ''
+      },
+      {
+        id: 'freelancer',
+        price: formatPrice(freelancerPrice),
+        period: getPeriod(freelancerPrice)
+      },
+      {
+        id: 'pro',
+        price: formatPrice(proPrice),
+        period: getPeriod(proPrice)
+      }
+    ];
+    
+    console.log('Returning formatted plans data:', plans);
+    return successResponse({ plans });
+  } catch (error) {
+    console.error('Error fetching plans with pricing:', error);
+    return errorResponse(`Error fetching plans with pricing: ${error.message}`);
+  }
+}
+
 // Customer Portal Session creation
 const createCustomerPortalSession = async (stripe, supabase, userId, origin) => {
   if (!userId) {
@@ -406,6 +485,9 @@ serve(async (req) => {
 
     // Route to the appropriate handler based on action
     switch (action) {
+      case 'getPlansWithPricing':
+        return await getPlansWithPricing(stripe);
+      
       case 'createCustomerPortalSession':
         return await createCustomerPortalSession(stripe, supabase, userId, origin);
       

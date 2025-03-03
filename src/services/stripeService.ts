@@ -148,3 +148,25 @@ export const createCustomerPortalSession = async (userId: string) => {
     throw error;
   }
 };
+
+export const getPlansWithPricing = async () => {
+  try {
+    console.log('Fetching plans with pricing from Stripe');
+    const { data, error } = await supabase.functions.invoke('stripe-integration', {
+      body: { action: 'getPlansWithPricing' }
+    });
+
+    if (error) {
+      console.error('Error fetching plans with pricing:', error);
+      toast.error('Failed to load subscription plans. Using default pricing.');
+      return null;
+    }
+
+    console.log('Plans with pricing data retrieved:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching plans with pricing:', error);
+    toast.error('Something went wrong loading plan details. Using default pricing.');
+    return null;
+  }
+};
