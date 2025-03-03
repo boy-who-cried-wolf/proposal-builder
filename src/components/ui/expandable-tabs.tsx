@@ -27,7 +27,8 @@ interface ExpandableTabsProps {
   tabs: TabItem[];
   className?: string;
   activeColor?: string;
-  onChange?: (index: number | null) => void;
+  activeTab?: number | null; // Updated to match ProposalHeaderTabs
+  onTabChange?: (index: number | null) => void;
   showTabContent?: boolean;
 }
 
@@ -56,21 +57,27 @@ export function ExpandableTabs({
   tabs,
   className,
   activeColor = "text-primary",
-  onChange,
+  activeTab = null, // Updated to match ProposalHeaderTabs
+  onTabChange,
   showTabContent = false,
 }: ExpandableTabsProps) {
-  const [selected, setSelected] = React.useState<number | null>(null);
+  const [selected, setSelected] = React.useState<number | null>(activeTab);
   const [hovered, setHovered] = React.useState<number | null>(null);
   const outsideClickRef = React.useRef(null);
 
+  // Update selected state when activeTab prop changes
+  React.useEffect(() => {
+    setSelected(activeTab);
+  }, [activeTab]);
+
   useOnClickOutside(outsideClickRef, () => {
     setSelected(null);
-    onChange?.(null);
+    onTabChange?.(null);
   });
 
   const handleSelect = (index: number) => {
     setSelected(index);
-    onChange?.(index);
+    onTabChange?.(index);
   };
 
   const Separator = () => (

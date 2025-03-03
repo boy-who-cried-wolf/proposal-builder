@@ -1,5 +1,6 @@
 
-import { useToast } from "@/hooks/use-toast"
+"use client"
+
 import {
   Toast,
   ToastClose,
@@ -8,12 +9,13 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
+import { useToast } from "@/components/ui/use-toast"
 
 export function Toaster() {
   const { toasts } = useToast()
 
   return (
-    <ToastProvider>
+    <ToastProvider duration={5000}> {/* Reduced from default to 5 seconds */}
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
           <Toast key={id} {...props}>
@@ -28,7 +30,7 @@ export function Toaster() {
           </Toast>
         )
       })}
-      <ToastViewport className="fixed bottom-0 left-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:left-0 sm:top-auto sm:flex-col md:max-w-[420px]" />
+      <ToastViewport className="fixed bottom-0 left-0 flex flex-col p-4 gap-2 w-full md:max-w-[420px] sm:left-4 bottom-4" />
     </ToastProvider>
   )
 }

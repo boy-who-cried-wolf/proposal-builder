@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ExpandableTabs, Tab } from "@/components/ui/expandable-tabs";
 import { DiamondPlus, Timer, Eye, Send, Copy, Save } from "lucide-react";
@@ -66,6 +67,7 @@ export const ProposalHeaderTabs: React.FC<ProposalHeaderTabsProps> = ({
       tabs={tabs}
       activeTab={activeHeaderTab}
       onTabChange={handleHeaderTabChange}
+      showTabContent={activeHeaderTab !== null}
     />
   );
 };
