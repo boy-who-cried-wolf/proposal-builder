@@ -3,35 +3,69 @@ import { supabase } from './client';
 
 // Helper function to create a new organization
 export const createOrganization = async (name: string) => {
-  const { data, error } = await supabase
-    .from('organizations')
-    .insert([{ name }])
-    .select()
-    .single();
+  try {
+    console.log('Creating organization with name:', name);
+    
+    const { data, error } = await supabase
+      .from('organizations')
+      .insert([{ name }])
+      .select()
+      .single();
 
-  if (error) {
-    console.error('Error creating organization:', error);
+    if (error) {
+      console.error('Error creating organization:', error);
+      throw error;
+    }
+
+    console.log('Organization created successfully:', data);
+    return data;
+  } catch (error) {
+    console.error('Error in createOrganization:', error);
     throw error;
   }
-
-  return data;
 };
 
 // Helper function to update organization
 export const updateOrganization = async (orgId: string, updates: any) => {
-  console.log('Updating organization:', orgId, 'with data:', updates);
-  
-  const { data, error } = await supabase
-    .from('organizations')
-    .update(updates)
-    .eq('id', orgId)
-    .select();
+  try {
+    console.log('Updating organization:', orgId, 'with data:', updates);
+    
+    const { data, error } = await supabase
+      .from('organizations')
+      .update(updates)
+      .eq('id', orgId)
+      .select();
 
-  if (error) {
-    console.error('Error updating organization:', error);
+    if (error) {
+      console.error('Error updating organization:', error);
+      throw error;
+    }
+
+    console.log('Organization updated successfully:', data);
+    return data;
+  } catch (error) {
+    console.error('Error in updateOrganization:', error);
     throw error;
   }
+};
 
-  console.log('Organization updated successfully:', data);
-  return data;
+// Helper function to get organization by ID
+export const getOrganization = async (orgId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('organizations')
+      .select('*')
+      .eq('id', orgId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching organization:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in getOrganization:', error);
+    throw error;
+  }
 };

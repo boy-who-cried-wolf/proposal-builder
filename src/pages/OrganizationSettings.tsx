@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate, useLocation } from "react-router-dom";
 import { NavTab } from "@/components/ui/NavItem";
@@ -88,6 +88,7 @@ const OrganizationSettings = () => {
       
       // If user doesn't have an organization yet, create one
       if (!organizationId) {
+        toast.info("Creating new organization...");
         const newOrg = await createOrganization(companyName);
         setOrganizationId(newOrg.id);
         
@@ -128,8 +129,13 @@ const OrganizationSettings = () => {
     if (!newService.trim() || !user?.id) return;
     
     try {
-      await addServiceToProfile(user.id, newService.trim());
-      setServices([...services, newService.trim()]);
+      // Only use the service management API if we have an organization
+      if (organizationId) {
+        await addServiceToProfile(user.id, newService.trim());
+      } else {
+        // Just update the local state if no organization exists yet
+        setServices([...services, newService.trim()]);
+      }
       setNewService("");
       toast.success("Service added successfully");
     } catch (error) {
@@ -142,8 +148,13 @@ const OrganizationSettings = () => {
     if (!user?.id) return;
     
     try {
-      await removeServiceFromProfile(user.id, service);
-      setServices(services.filter(s => s !== service));
+      // Only use the service management API if we have an organization
+      if (organizationId) {
+        await removeServiceFromProfile(user.id, service);
+      } else {
+        // Just update the local state if no organization exists yet
+        setServices(services.filter(s => s !== service));
+      }
       toast.success("Service removed successfully");
     } catch (error) {
       console.error("Error removing service:", error);
@@ -184,7 +195,10 @@ const OrganizationSettings = () => {
           </div>
           
           {loading ? (
-            <div className="text-center py-8">Loading organization settings...</div>
+            <div className="text-center py-8 flex items-center justify-center">
+              <Loader2 className="animate-spin mr-2" />
+              <span>Loading organization settings...</span>
+            </div>
           ) : (
             <>
               <div className="grid gap-4 max-w-2xl">
@@ -264,7 +278,12 @@ const OrganizationSettings = () => {
                 
                 <div className="pt-2">
                   <Button onClick={handleSave} disabled={saving}>
-                    {saving ? "Saving..." : "Save Changes"}
+                    {saving ? (
+                      <>
+                        <Loader2 size={16} className="mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : "Save Changes"}
                   </Button>
                 </div>
               </div>
