@@ -77,7 +77,7 @@ export function ExpandableTabs({
     <div
       ref={outsideClickRef}
       className={cn(
-        "flex flex-wrap items-center gap-2 rounded-lg bg-background p-1 shadow-sm",
+        "flex flex-wrap items-center gap-2 rounded-lg bg-background p-1",
         className
       )}
     >
@@ -86,7 +86,7 @@ export function ExpandableTabs({
           return <Separator key={`separator-${index}`} />;
         }
 
-        const TabIcon = tab.icon;
+        const TabIcon = tab.icon as LucideIcon;
         const isExpanded = selected === index || hovered === index;
         
         return (
