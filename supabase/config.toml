@@ -17,4 +17,3 @@ enabled = true
 verify_jwt = false
 [functions.loops-integration]
 verify_jwt = false
-

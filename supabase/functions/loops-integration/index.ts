@@ -36,8 +36,11 @@ const corsHeaders = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
+    console.log("Loops integration function called");
+    
     // Handle CORS preflight requests
     if (req.method === "OPTIONS") {
+      console.log("Handling OPTIONS request");
       return new Response(null, { headers: corsHeaders });
     }
 
@@ -53,12 +56,43 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Safely parse the request body
     let requestData: LoopsRequest;
+    let requestBody: string;
+    
     try {
-      requestData = await req.json() as LoopsRequest;
+      requestBody = await req.text();
+      console.log("Request body raw:", requestBody);
+      
+      if (!requestBody || requestBody.trim() === "") {
+        console.error("Empty request body received");
+        return new Response(
+          JSON.stringify({ error: "Empty request body" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        );
+      }
+      
+      requestData = JSON.parse(requestBody) as LoopsRequest;
+      console.log("Request data parsed:", JSON.stringify(requestData));
     } catch (jsonError) {
-      console.error("Failed to parse request JSON:", jsonError);
+      console.error("Failed to parse request JSON:", jsonError, "Raw request body:", requestBody);
       return new Response(
-        JSON.stringify({ error: "Invalid JSON in request body" }),
+        JSON.stringify({ error: `Invalid JSON in request body: ${jsonError.message}`, rawBody: requestBody }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+
+    // Validate required fields
+    if (!requestData.action) {
+      console.error("Missing action in request");
+      return new Response(
+        JSON.stringify({ error: "Missing action in request" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+    
+    if (!requestData.userData || !requestData.userData.email) {
+      console.error("Missing email in request userData");
+      return new Response(
+        JSON.stringify({ error: "Missing email in request userData" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
       );
     }
@@ -121,12 +155,18 @@ const handler = async (req: Request): Promise<Response> => {
             { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
           );
         }
+        
+        console.log("Preparing sendTransactional request body");
+        
+        // For transactional emails, Loops requires dataVariables instead of dataFields
         endpoint = "https://app.loops.so/api/v1/transactional";
         body = {
           email: userData.email,
           transactionalId,
-          ...userData.customFields && { dataFields: userData.customFields }
+          dataVariables: userData.customFields || {}
         };
+        
+        console.log("Transactional email body:", JSON.stringify(body));
         break;
       
       default:
@@ -156,6 +196,7 @@ const handler = async (req: Request): Promise<Response> => {
     try {
       // First get the response as text
       responseText = await response.text();
+      console.log("Raw response text:", responseText);
       
       // Try to parse as JSON if not empty
       if (responseText.trim()) {
@@ -163,6 +204,8 @@ const handler = async (req: Request): Promise<Response> => {
       } else {
         responseData = { message: "Empty response received" };
       }
+      
+      console.log("Parsed response data:", JSON.stringify(responseData));
     } catch (parseError) {
       console.error(`Failed to parse response: ${responseText}`, parseError);
       responseData = { 
@@ -182,16 +225,16 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Loops API response:`, responseData);
+    console.log(`Loops API response success:`, JSON.stringify(responseData));
 
     return new Response(
       JSON.stringify({ success: true, data: responseData }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error(`Error in Loops integration:`, error.message);
+    console.error(`Error in Loops integration:`, error.message, error.stack);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message, stack: error.stack }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }

@@ -106,6 +106,11 @@ export const notifyLoopsPasswordReset = async (email: string, passwordResetLink:
       password_link: passwordResetLink
     };
     
+    console.log('Sending password reset to Loops with data:', {
+      email,
+      customFields
+    });
+    
     const { data, error } = await supabase.functions.invoke('loops-integration', {
       body: {
         action: 'sendTransactional',
