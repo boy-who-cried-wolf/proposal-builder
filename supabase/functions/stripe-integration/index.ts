@@ -27,6 +27,14 @@ const successResponse = (data) => {
 
 // Initialize clients
 const initializeClients = () => {
+  // Log environment variables availability
+  console.log('Environment variables check:');
+  console.log('STRIPE_SECRET_KEY available:', !!Deno.env.get('STRIPE_SECRET_KEY'));
+  console.log('SUPABASE_URL available:', !!Deno.env.get('SUPABASE_URL'));
+  console.log('SUPABASE_SERVICE_ROLE_KEY available:', !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
+  console.log('STRIPE_FREELANCER_PRICE_ID available:', !!Deno.env.get('STRIPE_FREELANCER_PRICE_ID'));
+  console.log('STRIPE_PRO_PRICE_ID available:', !!Deno.env.get('STRIPE_PRO_PRICE_ID'));
+  
   // Initialize Stripe
   const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
   if (!stripeKey) {
@@ -367,18 +375,14 @@ serve(async (req) => {
   // Health check endpoint
   const url = new URL(req.url);
   if (url.pathname.endsWith('/health')) {
-    return handleHealthCheck();
+    return successResponse({ status: 'ok', timestamp: new Date().toISOString() });
   }
 
   try {
-    // Log environment variables availability (not their values for security)
-    console.log('Environment variables check:');
-    console.log('STRIPE_SECRET_KEY available:', !!Deno.env.get('STRIPE_SECRET_KEY'));
-    console.log('SUPABASE_URL available:', !!Deno.env.get('SUPABASE_URL'));
-    console.log('SUPABASE_SERVICE_ROLE_KEY available:', !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
-    console.log('STRIPE_FREELANCER_PRICE_ID available:', !!Deno.env.get('STRIPE_FREELANCER_PRICE_ID'));
-    console.log('STRIPE_PRO_PRICE_ID available:', !!Deno.env.get('STRIPE_PRO_PRICE_ID'));
-    
+    // Log for debugging
+    console.log('Request URL:', req.url);
+    console.log('Request method:', req.method);
+
     // Initialize clients
     const { stripe, supabase } = initializeClients();
 
@@ -398,7 +402,7 @@ serve(async (req) => {
     const { action, userId, planId } = body;
     console.log(`Processing ${action || 'unknown'} request for user ${userId || 'unknown'}${planId ? ` and plan ${planId}` : ''}`);
 
-    const origin = req.headers.get('origin');
+    const origin = req.headers.get('origin') || 'https://app.example.com'; // Fallback origin if not provided
 
     // Route to the appropriate handler based on action
     switch (action) {

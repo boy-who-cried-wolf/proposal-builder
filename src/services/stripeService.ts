@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -5,10 +6,9 @@ export const createCheckoutSession = async (userId: string, planId: string) => {
   try {
     console.log(`Creating checkout session for user ${userId} and plan ${planId}`);
     
-    // Check connectivity to Supabase Functions
+    // Check connectivity to Supabase Functions - without using process.env
     try {
-      // Using proper way to access the Edge Function URL
-      const functionUrl = `${process.env.SUPABASE_URL || ''}/functions/v1/stripe-integration/health`;
+      const functionUrl = `${window.location.protocol}//${window.location.host}/functions/v1/stripe-integration/health`;
       const connectivityCheck = await fetch(functionUrl, {
         method: 'GET',
         headers: {
@@ -19,6 +19,7 @@ export const createCheckoutSession = async (userId: string, planId: string) => {
       console.log('Edge Function connectivity check:', connectivityCheck.status);
     } catch (error) {
       console.error('Edge Function connectivity check failed:', error);
+      // Continue anyway as this is just a diagnostic check
     }
     
     const { data, error } = await supabase.functions.invoke('stripe-integration', {
