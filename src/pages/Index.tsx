@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { MiddleSection } from "@/components/layout/MiddleSection";
 import { MainContent } from "@/components/layout/MainContent";
 import { ProposalSection } from "@/utils/openaiProposal";
+import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
   const [generatedProposalSections, setGeneratedProposalSections] = useState<ProposalSection[]>([]);
@@ -34,6 +35,7 @@ const Index = () => {
           hourlyRate={hourlyRate}
         />
       </div>
+      <Toaster />
     </>
   );
 };

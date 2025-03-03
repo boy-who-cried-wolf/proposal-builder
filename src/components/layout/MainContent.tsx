@@ -108,7 +108,7 @@ export const MainContent: React.FC<MainContentProps> = ({
         return;
       }
 
-      if (generatedProposalSections.length === 0) {
+      if (sections.length === 0) {
         toast({
           title: "No proposal to save",
           description: "Please generate a proposal first",
@@ -124,20 +124,22 @@ export const MainContent: React.FC<MainContentProps> = ({
         projectDescription: projectDescription,
         projectType: projectType,
         hourlyRate: hourlyRate,
-        sections: generatedProposalSections,
+        sections: sections,
       });
 
       if (result.success) {
         toast({
           title: "Success",
-          description: "Proposal saved successfully!",
+          description: `Proposal saved successfully! ID: ${result.id}`,
         });
+        console.log("Proposal saved with ID:", result.id);
       } else {
         toast({
           title: "Error",
           description: result.error || "Failed to save proposal",
           variant: "destructive",
         });
+        console.error("Error saving proposal:", result.error);
       }
     } catch (error) {
       console.error("Error saving proposal:", error);

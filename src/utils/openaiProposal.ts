@@ -97,8 +97,11 @@ export async function saveProposal(input: SaveProposalInput): Promise<{ success:
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
+      console.error('User not authenticated');
       return { success: false, error: 'User must be logged in to save proposals' };
     }
+    
+    console.log('Attempting to save proposal for user:', user.id);
     
     // Begin the transaction by inserting the proposal
     const { data: proposalData, error: proposalError } = await supabase
@@ -119,6 +122,7 @@ export async function saveProposal(input: SaveProposalInput): Promise<{ success:
     }
     
     const proposalId = proposalData.id;
+    console.log('Proposal saved with ID:', proposalId);
     
     // Save each section and its items
     for (const section of sections) {
@@ -138,6 +142,7 @@ export async function saveProposal(input: SaveProposalInput): Promise<{ success:
       }
       
       const sectionId = sectionData.id;
+      console.log('Section saved with ID:', sectionId);
       
       // Save each item in the section
       for (const item of section.items) {

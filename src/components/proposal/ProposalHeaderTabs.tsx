@@ -2,6 +2,7 @@
 import React from "react";
 import { ExpandableTabs, Tab } from "@/components/ui/expandable-tabs";
 import { DiamondPlus, Timer, Eye, Send, Copy, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ProposalHeaderTabsProps {
   activeHeaderTab: number | null;
@@ -70,19 +71,8 @@ export const ProposalHeaderTabs: React.FC<ProposalHeaderTabsProps> = ({
     { 
       title: "Save Proposal", 
       icon: Save,
-      content: (
-        <div className="p-4">
-          <h2 className="text-xl font-bold mb-4">Save Proposal</h2>
-          <p className="mb-4">Save your current proposal to your account.</p>
-          <button 
-            onClick={handleSaveProposal} 
-            disabled={isSaving}
-            className="bg-black text-white px-4 py-2 rounded flex items-center gap-2"
-          >
-            {isSaving ? 'Saving...' : 'Save Proposal'} <Save size={16} />
-          </button>
-        </div>
-      )
+      onClick: handleSaveProposal,
+      content: null
     },
   ];
 
