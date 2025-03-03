@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      organizations: {
+        Row: {
+          client_rate: number | null
+          created_at: string | null
+          hourly_rate: number | null
+          id: string
+          knowledge_base: string | null
+          name: string
+          services: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          client_rate?: number | null
+          created_at?: string | null
+          hourly_rate?: number | null
+          id?: string
+          knowledge_base?: string | null
+          name: string
+          services?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          client_rate?: number | null
+          created_at?: string | null
+          hourly_rate?: number | null
+          id?: string
+          knowledge_base?: string | null
+          name?: string
+          services?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           client_rate: number | null
@@ -19,6 +52,7 @@ export type Database = {
           id: string
           knowledge_base: string | null
           last_name: string | null
+          organization_id: string | null
           services: string[] | null
           updated_at: string | null
         }
@@ -31,6 +65,7 @@ export type Database = {
           id: string
           knowledge_base?: string | null
           last_name?: string | null
+          organization_id?: string | null
           services?: string[] | null
           updated_at?: string | null
         }
@@ -43,10 +78,19 @@ export type Database = {
           id?: string
           knowledge_base?: string | null
           last_name?: string | null
+          organization_id?: string | null
           services?: string[] | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       proposal_items: {
         Row: {
