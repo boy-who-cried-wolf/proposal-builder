@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavTab } from "@/components/ui/NavItem";
 import { SendIcon, UnfoldHorizontalIcon } from "@/components/icons";
 import { ProposalForm } from "@/components/ui/ProposalForm";
 import { ProposalSection } from "@/utils/openaiProposal";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 type Message = {
   id: string;
@@ -21,10 +24,13 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
   proposalSections = [],
   onUpdateProposal 
 }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isExpanded, setIsExpanded] = useState(true);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
@@ -35,6 +41,16 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
   };
 
   const processProposalRequest = async (userMessage: string) => {
+    // Check authentication before processing
+    if (!user) {
+      setShowAuthDialog(true);
+      return {
+        id: Date.now().toString(),
+        text: "Please sign in to use the assistant features.",
+        isUser: false,
+      };
+    }
+
     if (!proposalSections || proposalSections.length === 0) {
       return {
         id: Date.now().toString(),
@@ -198,6 +214,11 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
   };
 
   const handleSendClick = async () => {
+    if (!user) {
+      setShowAuthDialog(true);
+      return;
+    }
+
     if (inputValue.trim()) {
       const userMessage: Message = {
         id: Date.now().toString(),
@@ -233,6 +254,10 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
     if (onProposalGenerated) {
       onProposalGenerated(sections, description, type, rate, freelancerRate);
     }
+  };
+
+  const handleGoToAuth = () => {
+    navigate('/auth');
   };
 
   const renderTabContent = () => {
@@ -324,6 +349,29 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
       >
         <UnfoldHorizontalIcon className="w-4 h-4" />
       </div>
+
+      {/* Authentication Dialog */}
+      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Authentication Required</DialogTitle>
+            <DialogDescription>
+              You need to sign in or create an account to use this feature.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col space-y-3 mt-4">
+            <p className="text-sm text-gray-500">
+              This feature requires authentication. Please sign in or create an account to continue.
+            </p>
+            <button
+              onClick={handleGoToAuth}
+              className="bg-black text-white px-4 py-2 rounded"
+            >
+              Sign In or Create Account
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

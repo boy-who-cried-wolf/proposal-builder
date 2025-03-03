@@ -16,6 +16,7 @@ export const ProtectedRoute: React.FC = () => {
     );
   }
 
-  // Allow access to all routes, authentication state will be handled within components
+  // Allow access to the main routes - authentication checks will happen within components
+  // for specific actions like generating proposals
   return <Outlet />;
 };
