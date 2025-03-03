@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -29,8 +29,10 @@ export const NavItem: React.FC<NavItemProps> = ({
   onClick,
   isExpanded = true,
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
   const baseClasses = "flex rounded items-center cursor-pointer transition-all duration-300";
   const textClasses = "text-black text-[9px] font-semibold tracking-[1.389px] uppercase";
+  const shouldShowText = isExpanded || isHovered;
 
   return (
     <motion.div
@@ -46,6 +48,8 @@ export const NavItem: React.FC<NavItemProps> = ({
         active && isExpanded ? "bg-muted" : ""
       )}
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       role="button"
       tabIndex={0}
     >
@@ -61,7 +65,7 @@ export const NavItem: React.FC<NavItemProps> = ({
         </div>
       )}
       
-      {isExpanded && (
+      {shouldShowText && (
         <AnimatePresence>
           <motion.div 
             initial={{ width: 0, opacity: 0 }}

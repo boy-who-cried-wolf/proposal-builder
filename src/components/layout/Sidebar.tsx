@@ -9,7 +9,7 @@ import {
   DocumentIcon,
   LogoutIcon,
 } from "@/components/icons";
-import { Square, ChevronLeft, ChevronRight } from "lucide-react";
+import { Square, ChevronLeft, ChevronRight, Settings, Users, MessageSquare } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -49,40 +49,40 @@ export const Sidebar: React.FC = () => {
       ),
     },
     {
-      title: "Views",
-      icon: ViewIcon,
+      title: "Clients",
+      icon: Users,
       content: (
         <div className="p-3 bg-muted/20 rounded-sm mt-1">
           <ul className="space-y-2 text-xs">
-            <li className="cursor-pointer hover:text-primary">Grid View</li>
-            <li className="cursor-pointer hover:text-primary">List View</li>
-            <li className="cursor-pointer hover:text-primary">Calendar</li>
+            <li className="cursor-pointer hover:text-primary">All Clients</li>
+            <li className="cursor-pointer hover:text-primary">Add Client</li>
+            <li className="cursor-pointer hover:text-primary">Client Groups</li>
           </ul>
         </div>
       ),
     },
     {
-      title: "Premium",
-      icon: DiamondIcon,
+      title: "Assistant",
+      icon: MessageSquare,
       content: (
         <div className="p-3 bg-muted/20 rounded-sm mt-1">
           <ul className="space-y-2 text-xs">
-            <li className="cursor-pointer hover:text-primary">Features</li>
-            <li className="cursor-pointer hover:text-primary">Pricing</li>
-            <li className="cursor-pointer hover:text-primary">FAQ</li>
-          </ul>
-        </div>
-      ),
-    },
-    {
-      title: "Documents",
-      icon: DocumentIcon,
-      content: (
-        <div className="p-3 bg-muted/20 rounded-sm mt-1">
-          <ul className="space-y-2 text-xs">
-            <li className="cursor-pointer hover:text-primary">Recent</li>
-            <li className="cursor-pointer hover:text-primary">Shared</li>
+            <li className="cursor-pointer hover:text-primary">Chat</li>
             <li className="cursor-pointer hover:text-primary">Templates</li>
+            <li className="cursor-pointer hover:text-primary">History</li>
+          </ul>
+        </div>
+      ),
+    },
+    {
+      title: "Settings",
+      icon: Settings,
+      content: (
+        <div className="p-3 bg-muted/20 rounded-sm mt-1">
+          <ul className="space-y-2 text-xs">
+            <li className="cursor-pointer hover:text-primary">Account</li>
+            <li className="cursor-pointer hover:text-primary">Preferences</li>
+            <li className="cursor-pointer hover:text-primary">Team</li>
           </ul>
         </div>
       ),
