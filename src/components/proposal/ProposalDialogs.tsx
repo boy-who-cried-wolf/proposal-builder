@@ -19,7 +19,7 @@ interface ProposalDialogsProps {
   setIsSectionEditorOpen: (open: boolean) => void;
   editingSectionIndex: number | null;
   sections: ProposalSection[];
-  updateSection: (section: ProposalSection, index: number) => void;
+  updateSection: (sectionIndex: number, updatedSection: Partial<ProposalSection>) => void;
   deleteSection: (index: number) => void;
 }
 
@@ -59,7 +59,7 @@ export const ProposalDialogs: React.FC<ProposalDialogsProps> = ({
         onOpenChange={setIsSectionEditorOpen}
         section={editingSectionIndex !== null ? sections[editingSectionIndex] : null}
         sectionIndex={editingSectionIndex}
-        onSave={updateSection}
+        onSave={(sectionIndex, updatedSection) => updateSection(sectionIndex, updatedSection)}
         onDelete={deleteSection}
       />
     </>
