@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -5,13 +6,27 @@ export const createCheckoutSession = async (userId: string, planId: string) => {
   try {
     console.log(`Creating checkout session for user ${userId} and plan ${planId}`);
     
+    // Check connectivity to Supabase Functions
+    try {
+      const connectivityCheck = await fetch(`${supabase.functions.url}/stripe-integration/health`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabase.auth.getSession()}`
+        }
+      });
+      console.log('Edge Function connectivity check:', connectivityCheck.status);
+    } catch (error) {
+      console.error('Edge Function connectivity check failed:', error);
+    }
+    
     const { data, error } = await supabase.functions.invoke('stripe-integration', {
       body: { action: 'createCheckoutSession', userId, planId }
     });
 
     if (error) {
       console.error('Error creating checkout session:', error);
-      toast.error('Failed to create checkout session. Please try again later.');
+      toast.error('Failed to connect to payment service. Please try again later.');
       throw error;
     }
 
@@ -48,6 +63,7 @@ export const createCheckoutSession = async (userId: string, planId: string) => {
 
 export const getCurrentSubscription = async (userId: string) => {
   try {
+    console.log(`Fetching subscription for user ${userId}`);
     const { data, error } = await supabase.functions.invoke('stripe-integration', {
       body: { action: 'getCurrentSubscription', userId }
     });
@@ -57,6 +73,7 @@ export const getCurrentSubscription = async (userId: string) => {
       return { plan_id: 'free', status: 'active' }; // Default to free plan on error
     }
 
+    console.log('Subscription data retrieved:', data);
     return data;
   } catch (error) {
     console.error('Error:', error);
@@ -66,6 +83,7 @@ export const getCurrentSubscription = async (userId: string) => {
 
 export const cancelSubscription = async (userId: string) => {
   try {
+    console.log(`Cancelling subscription for user ${userId}`);
     const { data, error } = await supabase.functions.invoke('stripe-integration', {
       body: { action: 'cancelSubscription', userId }
     });

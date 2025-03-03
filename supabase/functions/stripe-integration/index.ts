@@ -14,7 +14,25 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
+  // Health check endpoint
+  const url = new URL(req.url);
+  if (url.pathname.endsWith('/health')) {
+    console.log('Health check requested');
+    return new Response(
+      JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
+    // Log environment variables availability (not their values for security)
+    console.log('Environment variables check:');
+    console.log('STRIPE_SECRET_KEY available:', !!Deno.env.get('STRIPE_SECRET_KEY'));
+    console.log('SUPABASE_URL available:', !!Deno.env.get('SUPABASE_URL'));
+    console.log('SUPABASE_SERVICE_ROLE_KEY available:', !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
+    console.log('STRIPE_FREELANCER_PRICE_ID available:', !!Deno.env.get('STRIPE_FREELANCER_PRICE_ID'));
+    console.log('STRIPE_PRO_PRICE_ID available:', !!Deno.env.get('STRIPE_PRO_PRICE_ID'));
+    
     // Initialize Stripe
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') || ''
     if (!stripeKey) {
@@ -43,9 +61,24 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Parse request body
-    const { action, userId, planId } = await req.json()
-    console.log(`Processing ${action} request for user ${userId}${planId ? ` and plan ${planId}` : ''}`)
+    // Parse request body for non-GET requests
+    let body = {};
+    if (req.method !== 'GET') {
+      try {
+        body = await req.json();
+        console.log('Request body:', JSON.stringify(body));
+      } catch (error) {
+        console.error('Error parsing request body:', error);
+        return new Response(
+          JSON.stringify({ error: 'Invalid request body' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // Extract action and params
+    const { action, userId, planId } = body;
+    console.log(`Processing ${action || 'unknown'} request for user ${userId || 'unknown'}${planId ? ` and plan ${planId}` : ''}`)
 
     // Create a customer if needed
     if (action === 'createCheckoutSession') {
@@ -364,7 +397,7 @@ serve(async (req) => {
 
     // Default response for unknown actions
     return new Response(
-      JSON.stringify({ error: 'Unknown action' }),
+      JSON.stringify({ error: 'Unknown action', receivedAction: action }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {

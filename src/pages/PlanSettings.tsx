@@ -1,25 +1,36 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Check, Loader2, AlertCircle } from "lucide-react";
+import { Check, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { NavTab } from "@/components/ui/NavItem";
 import { getCurrentSubscription, createCheckoutSession, cancelSubscription } from "@/services/stripeService";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const PlanSettings = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentPlan, setCurrentPlan] = React.useState("free");
-  const [loading, setLoading] = React.useState(true);
-  const [checkoutLoading, setCheckoutLoading] = React.useState("");
-  const [cancelLoading, setCancelLoading] = React.useState(false);
-  const [subscriptionInfo, setSubscriptionInfo] = React.useState<any>(null);
-  const [error, setError] = React.useState<string | null>(null);
+  const [currentPlan, setCurrentPlan] = useState("free");
+  const [loading, setLoading] = useState(true);
+  const [checkoutLoading, setCheckoutLoading] = useState("");
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [subscriptionInfo, setSubscriptionInfo] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorDetails, setErrorDetails] = useState<string>("");
   
   const searchParams = new URLSearchParams(location.search);
   const success = searchParams.get('success');
@@ -35,28 +46,38 @@ const PlanSettings = () => {
     }
   }, [success, canceled, navigate]);
 
-  useEffect(() => {
-    const fetchSubscription = async () => {
-      if (user?.id) {
-        try {
-          setLoading(true);
-          setError(null);
-          const subscription = await getCurrentSubscription(user.id);
-          if (subscription && subscription.plan_id) {
-            setCurrentPlan(subscription.plan_id);
-            setSubscriptionInfo(subscription);
-          }
-        } catch (error) {
-          console.error("Error fetching subscription:", error);
-          setError("Unable to load your subscription information. Please refresh the page.");
-        } finally {
-          setLoading(false);
+  const fetchSubscription = async () => {
+    if (user?.id) {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log(`Fetching subscription for user ${user.id}`);
+        const subscription = await getCurrentSubscription(user.id);
+        console.log("Received subscription data:", subscription);
+        
+        if (subscription && subscription.plan_id) {
+          setCurrentPlan(subscription.plan_id);
+          setSubscriptionInfo(subscription);
         }
+      } catch (error) {
+        console.error("Error fetching subscription:", error);
+        setError("Unable to load your subscription information. Please try again.");
+        setErrorDetails(JSON.stringify(error, null, 2));
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     fetchSubscription();
   }, [user]);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchSubscription();
+  };
 
   const handlePlanSelect = async (planId: string) => {
     if (planId === currentPlan) {
@@ -84,6 +105,8 @@ const PlanSettings = () => {
     } catch (error) {
       console.error("Error selecting plan:", error);
       setError("There was a problem connecting to our payment processor. Please try again later.");
+      setErrorDetails(JSON.stringify(error, null, 2));
+      setShowErrorDialog(true);
     } finally {
       setCheckoutLoading("");
     }
@@ -104,13 +127,13 @@ const PlanSettings = () => {
       setCancelLoading(true);
       setError(null);
       await cancelSubscription(user.id);
-      const subscription = await getCurrentSubscription(user.id);
-      setCurrentPlan(subscription.plan_id);
-      setSubscriptionInfo(subscription);
+      await fetchSubscription();
       toast.success("Your subscription has been cancelled");
     } catch (error) {
       console.error("Error cancelling subscription:", error);
       setError("Unable to cancel your subscription. Please try again later.");
+      setErrorDetails(JSON.stringify(error, null, 2));
+      setShowErrorDialog(true);
     } finally {
       setCancelLoading(false);
     }
@@ -198,15 +221,41 @@ const PlanSettings = () => {
           </div>
             
           <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-semibold">Subscription Plan</h2>
-              <p className="text-muted-foreground">Choose the plan that's right for you</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold">Subscription Plan</h2>
+                <p className="text-muted-foreground">Choose the plan that's right for you</p>
+              </div>
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleRefresh}
+                disabled={refreshing}
+              >
+                {refreshing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 mr-1" />
+                )}
+                Refresh
+              </Button>
             </div>
             
             {error && (
               <div className="bg-destructive/15 text-destructive p-4 rounded-lg flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                <p>{error}</p>
+                <div>
+                  <p className="font-medium">{error}</p>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-destructive hover:text-destructive/80 p-0 h-auto mt-1"
+                    onClick={() => setShowErrorDialog(true)}
+                  >
+                    View details
+                  </Button>
+                </div>
               </div>
             )}
             
@@ -306,6 +355,24 @@ const PlanSettings = () => {
             </div>
           </div>
         </div>
+        
+        {/* Error Details Dialog */}
+        <Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Error Details</DialogTitle>
+              <DialogDescription>
+                Technical information about the error.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="max-h-[300px] overflow-auto bg-muted p-4 rounded text-xs font-mono">
+              <pre>{errorDetails || "No details available"}</pre>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowErrorDialog(false)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </MainContent>
     </div>
   );
