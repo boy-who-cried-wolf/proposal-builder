@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Eye } from "lucide-react";
+import { Edit, Eye, GripVertical } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -20,11 +20,19 @@ interface Project {
 interface ProjectCardProps {
   project: Project;
   viewMode?: "grid" | "list";
+  onDragStart?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
+  onView?: () => void;
 }
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({ 
   project, 
-  viewMode = "grid" 
+  viewMode = "grid",
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onView
 }) => {
   // Format currency
   const formattedValue = new Intl.NumberFormat('en-US', {
@@ -112,8 +120,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
   if (viewMode === "list") {
     return (
-      <div className="section_wrapper mb-[34px]">
-        <div className="section_table_row grid grid-cols-6 gap-4 items-center text-sm px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
+      <div 
+        className="section_wrapper mb-[34px]"
+        draggable={true}
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+      >
+        <div className="section_table_row grid grid-cols-7 gap-4 items-center text-sm px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px] hover:bg-gray-50 transition-colors">
+          <div className="flex items-center">
+            <GripVertical size={16} className="mr-2 cursor-grab text-gray-400" />
+          </div>
           <div className="section_table_cell">
             <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{formattedValue}</p>
             <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">PROPOSAL AMOUNT</p>
@@ -136,17 +153,15 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             </p>
             <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">DAYS REMAINING</p>
           </div>
-          <div className="section_table_cell">
-            <div className="flex flex-wrap gap-1">
-              {["WEB DESIGN"].map((service, index) => (
-                <Badge 
-                  key={index} 
-                  className={cn("font-poppins text-xs", getServiceTagColor(service))}
-                >
-                  {service}
-                </Badge>
-              ))}
-            </div>
+          <div className="section_table_cell flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-7 px-2"
+              onClick={onView}
+            >
+              <Eye size={14} />
+            </Button>
           </div>
         </div>
       </div>
@@ -154,10 +169,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   }
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow">
+    <Card 
+      className="overflow-hidden hover:shadow-md transition-shadow"
+      draggable={true}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-bold font-poppins">{project.title}</CardTitle>
+          <div className="flex items-center">
+            <GripVertical size={16} className="mr-2 cursor-grab text-gray-400" />
+            <CardTitle className="text-lg font-bold font-poppins">{project.title}</CardTitle>
+          </div>
           <Badge className={getBadgeVariant(project.status)}>
             {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
           </Badge>
@@ -198,7 +222,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         </div>
         
         <div className="mt-4 flex justify-between gap-2">
-          <Button variant="outline" size="sm" className="flex-1">
+          <Button variant="outline" size="sm" className="flex-1" onClick={onView}>
             <Eye size={16} className="mr-2" />
             View
           </Button>

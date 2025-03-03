@@ -2,11 +2,18 @@
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, Clock, Grid, List } from "lucide-react";
+import { DollarSign, Clock, Grid, List, ArrowDown, ArrowUp, GripVertical, Eye } from "lucide-react";
 import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { DashboardFooter } from "@/components/dashboard/DashboardFooter";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 // Sample project data - in a real app, this would come from an API
 const sampleProjects = [
@@ -61,16 +68,79 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [sortField, setSortField] = useState<"value" | "date" | "hours">("value");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [projects, setProjects] = useState(sampleProjects);
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   
   // Filter projects based on selected status
   const filteredProjects = statusFilter === "all" 
-    ? sampleProjects 
-    : sampleProjects.filter(project => project.status === statusFilter);
+    ? projects 
+    : projects.filter(project => project.status === statusFilter);
+  
+  // Sort projects based on selected field and direction
+  const sortedProjects = [...filteredProjects].sort((a, b) => {
+    if (sortField === "date") {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+    } else {
+      return sortDirection === "asc" 
+        ? a[sortField] - b[sortField] 
+        : b[sortField] - a[sortField];
+    }
+  });
   
   // Calculate totals for the footer
   const totalValue = filteredProjects.reduce((sum, project) => sum + project.value, 0);
   const totalHours = filteredProjects.reduce((sum, project) => sum + project.hours, 0);
   const avgHourlyRate = totalHours > 0 ? totalValue / totalHours : 0;
+  
+  // Handle sort toggle
+  const handleSortToggle = (field: "value" | "date" | "hours") => {
+    if (sortField === field) {
+      // Toggle direction if same field
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new field and default to descending
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
+  
+  // Handle drag start
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData("text/plain", id);
+  };
+  
+  // Handle drag over
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+  
+  // Handle drop
+  const handleDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    const draggedId = e.dataTransfer.getData("text/plain");
+    
+    if (draggedId === targetId) return;
+    
+    const draggedIndex = projects.findIndex(p => p.id === draggedId);
+    const targetIndex = projects.findIndex(p => p.id === targetId);
+    
+    const newProjects = [...projects];
+    const [draggedProject] = newProjects.splice(draggedIndex, 1);
+    newProjects.splice(targetIndex, 0, draggedProject);
+    
+    setProjects(newProjects);
+  };
+  
+  // Handle view project
+  const handleViewProject = (project: any) => {
+    setSelectedProject(project);
+    setIsViewDialogOpen(true);
+  };
   
   return (
     <div className="flex h-screen">
@@ -85,6 +155,31 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="flex gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    {sortField === "value" ? <DollarSign size={16} className="mr-1" /> : 
+                     sortField === "date" ? <Clock size={16} className="mr-1" /> : 
+                     <Clock size={16} className="mr-1" />}
+                    Sort by {sortField}
+                    {sortDirection === "asc" ? <ArrowUp size={16} className="ml-1" /> : <ArrowDown size={16} className="ml-1" />}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => handleSortToggle("value")}>
+                    <DollarSign size={16} className="mr-2" />
+                    Sort by amount
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSortToggle("date")}>
+                    <Clock size={16} className="mr-2" />
+                    Sort by due date
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSortToggle("hours")}>
+                    <Clock size={16} className="mr-2" />
+                    Sort by hours
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -123,8 +218,16 @@ const Dashboard = () => {
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
                 : "flex flex-col"
               }>
-                {filteredProjects.map(project => (
-                  <ProjectCard key={project.id} project={project} viewMode={viewMode} />
+                {sortedProjects.map(project => (
+                  <ProjectCard 
+                    key={project.id} 
+                    project={project} 
+                    viewMode={viewMode} 
+                    onDragStart={(e) => handleDragStart(e, project.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, project.id)}
+                    onView={() => handleViewProject(project)}
+                  />
                 ))}
               </div>
             </TabsContent>
@@ -134,8 +237,16 @@ const Dashboard = () => {
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
                 : "flex flex-col"
               }>
-                {filteredProjects.map(project => (
-                  <ProjectCard key={project.id} project={project} viewMode={viewMode} />
+                {sortedProjects.map(project => (
+                  <ProjectCard 
+                    key={project.id} 
+                    project={project} 
+                    viewMode={viewMode} 
+                    onDragStart={(e) => handleDragStart(e, project.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, project.id)}
+                    onView={() => handleViewProject(project)}
+                  />
                 ))}
               </div>
             </TabsContent>
@@ -145,8 +256,16 @@ const Dashboard = () => {
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
                 : "flex flex-col"
               }>
-                {filteredProjects.map(project => (
-                  <ProjectCard key={project.id} project={project} viewMode={viewMode} />
+                {sortedProjects.map(project => (
+                  <ProjectCard 
+                    key={project.id} 
+                    project={project} 
+                    viewMode={viewMode} 
+                    onDragStart={(e) => handleDragStart(e, project.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, project.id)}
+                    onView={() => handleViewProject(project)}
+                  />
                 ))}
               </div>
             </TabsContent>
@@ -156,8 +275,16 @@ const Dashboard = () => {
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
                 : "flex flex-col"
               }>
-                {filteredProjects.map(project => (
-                  <ProjectCard key={project.id} project={project} viewMode={viewMode} />
+                {sortedProjects.map(project => (
+                  <ProjectCard 
+                    key={project.id} 
+                    project={project} 
+                    viewMode={viewMode} 
+                    onDragStart={(e) => handleDragStart(e, project.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, project.id)}
+                    onView={() => handleViewProject(project)}
+                  />
                 ))}
               </div>
             </TabsContent>
@@ -167,8 +294,16 @@ const Dashboard = () => {
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
                 : "flex flex-col"
               }>
-                {filteredProjects.map(project => (
-                  <ProjectCard key={project.id} project={project} viewMode={viewMode} />
+                {sortedProjects.map(project => (
+                  <ProjectCard 
+                    key={project.id} 
+                    project={project} 
+                    viewMode={viewMode} 
+                    onDragStart={(e) => handleDragStart(e, project.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, project.id)}
+                    onView={() => handleViewProject(project)}
+                  />
                 ))}
               </div>
             </TabsContent>
@@ -182,6 +317,62 @@ const Dashboard = () => {
           projectCount={filteredProjects.length}
         />
       </div>
+      
+      {/* View Project Dialog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{selectedProject?.title}</DialogTitle>
+            <DialogDescription>
+              Client: {selectedProject?.client}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 py-4">
+            <div>
+              <h3 className="font-medium mb-1">Project Details</h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Status:</p>
+                  <p className="capitalize">{selectedProject?.status}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Due Date:</p>
+                  <p>{selectedProject?.date}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Value:</p>
+                  <p>{selectedProject && new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                  }).format(selectedProject.value)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Hours:</p>
+                  <p>{selectedProject?.hours} hours</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 className="font-medium mb-1">Services</h3>
+              <div className="flex gap-1 flex-wrap">
+                <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">
+                  WEB DESIGN
+                </Badge>
+              </div>
+              <div className="mt-4">
+                <Button size="sm" variant="outline" className="mr-2">
+                  <Eye size={16} className="mr-2" />
+                  View Full Project
+                </Button>
+                <Button size="sm">
+                  <Edit size={16} className="mr-2" />
+                  Edit Project
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
