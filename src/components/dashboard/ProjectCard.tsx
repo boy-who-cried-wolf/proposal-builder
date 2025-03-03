@@ -1,30 +1,8 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Edit, Eye, GripVertical } from "lucide-react";
-import { Link } from "react-router-dom";
-import { cn } from "@/lib/utils";
-
-interface Project {
-  id: string;
-  title: string;
-  client: string;
-  date: string;
-  value: number;
-  hours: number;
-  status: string;
-}
-
-interface ProjectCardProps {
-  project: Project;
-  viewMode?: "grid" | "list";
-  onDragStart?: (e: React.DragEvent) => void;
-  onDragOver?: (e: React.DragEvent) => void;
-  onDrop?: (e: React.DragEvent) => void;
-  onView?: () => void;
-}
+import { ProjectCardProps } from "./types/projectTypes";
+import { ProjectCardGrid } from "./ProjectCardGrid";
+import { ProjectCardList } from "./ProjectCardList";
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({ 
   project, 
@@ -34,204 +12,26 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   onDrop,
   onView
 }) => {
-  // Format currency
-  const formattedValue = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(project.value);
-  
-  // Format date and calculate days remaining
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: '2-digit', 
-      day: '2-digit', 
-      year: '2-digit' 
-    });
-  };
-
-  const getDaysRemaining = (dateString: string) => {
-    const dueDate = new Date(dateString);
-    const today = new Date();
-    
-    // Reset time portion for accurate day calculation
-    today.setHours(0, 0, 0, 0);
-    dueDate.setHours(0, 0, 0, 0);
-    
-    const diffTime = dueDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    return diffDays;
-  };
-
-  const getDueDateColor = (dateString: string) => {
-    const daysRemaining = getDaysRemaining(dateString);
-    
-    if (daysRemaining < 0) return "text-red-600"; // Past due
-    if (daysRemaining <= 7) return "text-orange-500"; // Approaching (within 7 days)
-    return "text-green-600"; // Plenty of time
-  };
-
-  const getDaysRemainingColor = (dateString: string) => {
-    const daysRemaining = getDaysRemaining(dateString);
-    
-    if (daysRemaining < 0) return "text-red-600"; // Past due
-    if (daysRemaining <= 3) return "text-red-500"; // Very close
-    if (daysRemaining <= 7) return "text-orange-500"; // Approaching
-    return "text-green-600"; // Plenty of time
-  };
-
-  const dueDate = formatDate(project.date);
-  const daysRemaining = getDaysRemaining(project.date);
-  const dueDateColorClass = getDueDateColor(project.date);
-  const daysRemainingColorClass = getDaysRemainingColor(project.date);
-
-  // Get badge color based on status
-  const getBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800 hover:bg-green-200';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-      case 'draft':
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
-      default:
-        return '';
-    }
-  };
-
-  // Get service tag color
-  const getServiceTagColor = (service: string) => {
-    switch (service.trim().toLowerCase()) {
-      case 'web design':
-        return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
-      case 'services':
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-      case 'development':
-        return 'bg-green-100 text-green-800 hover:bg-green-200';
-      case 'marketing':
-        return 'bg-pink-100 text-pink-800 hover:bg-pink-200';
-      default:
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-    }
-  };
-
+  // Delegate to the appropriate view component
   if (viewMode === "list") {
     return (
-      <div 
-        className="section_wrapper mb-[34px]"
-        draggable={true}
+      <ProjectCardList
+        project={project}
         onDragStart={onDragStart}
         onDragOver={onDragOver}
         onDrop={onDrop}
-      >
-        <div className="section_table_row grid grid-cols-7 gap-4 items-center text-sm px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px] hover:bg-gray-50 transition-colors">
-          <div className="flex items-center">
-            <GripVertical size={16} className="mr-2 cursor-grab text-gray-400" />
-          </div>
-          <div className="section_table_cell">
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{formattedValue}</p>
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">PROPOSAL AMOUNT</p>
-          </div>
-          <div className="section_table_cell">
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{project.client}</p>
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">CLIENT NAME</p>
-          </div>
-          <div className="section_table_cell">
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{project.hours}</p>
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">HOURS</p>
-          </div>
-          <div className="section_table_cell">
-            <p className={cn("text-black text-[9px] font-semibold tracking-[1.389px] uppercase", dueDateColorClass)}>{dueDate}</p>
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">DUE DATE</p>
-          </div>
-          <div className="section_table_cell">
-            <p className={cn("text-black text-[9px] font-semibold tracking-[1.389px] uppercase", daysRemainingColorClass)}>
-              {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days` : `${daysRemaining} days`}
-            </p>
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">DAYS REMAINING</p>
-          </div>
-          <div className="section_table_cell flex gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-7 px-2"
-              onClick={onView}
-            >
-              <Eye size={14} />
-            </Button>
-          </div>
-        </div>
-      </div>
+        onView={onView}
+      />
     );
   }
 
   return (
-    <Card 
-      className="overflow-hidden hover:shadow-md transition-shadow"
-      draggable={true}
+    <ProjectCardGrid
+      project={project}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDrop={onDrop}
-    >
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center">
-            <GripVertical size={16} className="mr-2 cursor-grab text-gray-400" />
-            <CardTitle className="text-lg font-bold font-poppins">{project.title}</CardTitle>
-          </div>
-          <Badge className={getBadgeVariant(project.status)}>
-            {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-          </Badge>
-        </div>
-        <p className="text-sm text-muted-foreground">{project.client}</p>
-      </CardHeader>
-      <CardContent>
-        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-          <div>
-            <p className="font-semibold font-poppins">{formattedValue}</p>
-            <p className="text-muted-foreground">Value</p>
-          </div>
-          <div>
-            <p className={cn("font-semibold font-poppins", dueDateColorClass)}>{dueDate}</p>
-            <p className="text-muted-foreground">Due Date</p>
-          </div>
-          <div>
-            <p className="font-semibold font-poppins">{project.hours}</p>
-            <p className="text-muted-foreground">Hours</p>
-          </div>
-          <div>
-            <p className={cn("font-semibold font-poppins", daysRemainingColorClass)}>
-              {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days` : `${daysRemaining} days`}
-            </p>
-            <p className="text-muted-foreground">Remaining</p>
-          </div>
-        </div>
-        
-        <div className="mt-4 flex flex-wrap gap-1">
-          {["WEB DESIGN"].map((service, index) => (
-            <Badge 
-              key={index} 
-              className={cn("font-poppins text-xs", getServiceTagColor(service))}
-            >
-              {service}
-            </Badge>
-          ))}
-        </div>
-        
-        <div className="mt-4 flex justify-between gap-2">
-          <Button variant="outline" size="sm" className="flex-1" onClick={onView}>
-            <Eye size={16} className="mr-2" />
-            View
-          </Button>
-          <Button variant="outline" size="sm" className="flex-1">
-            <Edit size={16} className="mr-2" />
-            Edit
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      onView={onView}
+    />
   );
 };

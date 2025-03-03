@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,8 +13,9 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Edit } from "lucide-react";
 
-// Sample project data - in a real app, this would come from an API
 const sampleProjects = [
   {
     id: "1",
@@ -74,12 +74,10 @@ const Dashboard = () => {
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   
-  // Filter projects based on selected status
   const filteredProjects = statusFilter === "all" 
     ? projects 
     : projects.filter(project => project.status === statusFilter);
   
-  // Sort projects based on selected field and direction
   const sortedProjects = [...filteredProjects].sort((a, b) => {
     if (sortField === "date") {
       const dateA = new Date(a.date).getTime();
@@ -92,34 +90,27 @@ const Dashboard = () => {
     }
   });
   
-  // Calculate totals for the footer
   const totalValue = filteredProjects.reduce((sum, project) => sum + project.value, 0);
   const totalHours = filteredProjects.reduce((sum, project) => sum + project.hours, 0);
   const avgHourlyRate = totalHours > 0 ? totalValue / totalHours : 0;
   
-  // Handle sort toggle
   const handleSortToggle = (field: "value" | "date" | "hours") => {
     if (sortField === field) {
-      // Toggle direction if same field
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      // Set new field and default to descending
       setSortField(field);
       setSortDirection("desc");
     }
   };
   
-  // Handle drag start
   const handleDragStart = (e: React.DragEvent, id: string) => {
     e.dataTransfer.setData("text/plain", id);
   };
   
-  // Handle drag over
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
   
-  // Handle drop
   const handleDrop = (e: React.DragEvent, targetId: string) => {
     e.preventDefault();
     const draggedId = e.dataTransfer.getData("text/plain");
@@ -136,7 +127,6 @@ const Dashboard = () => {
     setProjects(newProjects);
   };
   
-  // Handle view project
   const handleViewProject = (project: any) => {
     setSelectedProject(project);
     setIsViewDialogOpen(true);
@@ -318,7 +308,6 @@ const Dashboard = () => {
         />
       </div>
       
-      {/* View Project Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
