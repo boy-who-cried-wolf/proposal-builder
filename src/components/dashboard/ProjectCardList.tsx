@@ -63,7 +63,7 @@ export const ProjectCardList: React.FC<ProjectCardListProps> = ({
         </div>
         <div className="section_table_cell">
           <p className={cn("text-black text-[9px] font-semibold tracking-[1.389px] uppercase", daysRemainingColorClass)}>
-            {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days` : `${daysRemaining} days`}
+            {Math.abs(daysRemaining)}
           </p>
           <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">DAYS REMAINING</p>
         </div>
