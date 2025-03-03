@@ -16,11 +16,6 @@ export const ProtectedRoute: React.FC = () => {
     );
   }
 
-  // Redirect to login if not authenticated
-  if (!user) {
-    return <Navigate to="/auth" state={{ from: location }} replace />;
-  }
-
-  // Render the protected content
+  // Allow access to all routes, authentication state will be handled within components
   return <Outlet />;
 };

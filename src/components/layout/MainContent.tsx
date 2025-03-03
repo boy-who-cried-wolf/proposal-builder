@@ -10,6 +10,8 @@ import { ProposalHeaderTabs } from "@/components/proposal/ProposalHeaderTabs";
 import { ProposalContent } from "@/components/proposal/ProposalContent";
 import { ProposalFooter } from "@/components/proposal/ProposalFooter";
 import { MainContentProps } from "@/types/mainContent";
+import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 export const MainContent: React.FC<MainContentProps> = ({
   generatedProposalSections,
@@ -22,6 +24,8 @@ export const MainContent: React.FC<MainContentProps> = ({
   proposalHistory,
   onRevertProposal,
 }) => {
+  const { user } = useAuth();
+  
   const {
     activeTab,
     activeHeaderTab,
@@ -68,14 +72,50 @@ export const MainContent: React.FC<MainContentProps> = ({
     switch (activeTab) {
       case 0:
         return (
-          <ProposalContent 
-            sections={sections} 
-            onEditItem={openEditDialog} 
-            onOpenSectionSettings={openSectionSettings}
-          />
+          <div className="relative">
+            <ProposalContent 
+              sections={sections} 
+              onEditItem={openEditDialog} 
+              onOpenSectionSettings={openSectionSettings}
+            />
+            
+            {/* Authentication overlay for non-authenticated users */}
+            {!user && sections.length > 0 && (
+              <div className="absolute inset-0 backdrop-blur-md flex flex-col items-center justify-center bg-black/30 z-10">
+                <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+                  <h3 className="text-xl font-bold mb-3">Sign Up to View Full Results</h3>
+                  <p className="mb-6">Create an account or sign in to see your complete proposal.</p>
+                  <div className="flex flex-col space-y-3">
+                    <Link to="/auth" className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded">
+                      Sign Up / Login
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         );
       case 1:
-        return <RevisionsTab revisions={revisions} />;
+        return (
+          <div className="relative">
+            <RevisionsTab revisions={revisions} />
+            
+            {/* Authentication overlay for non-authenticated users */}
+            {!user && revisions.length > 0 && (
+              <div className="absolute inset-0 backdrop-blur-md flex flex-col items-center justify-center bg-black/30 z-10">
+                <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+                  <h3 className="text-xl font-bold mb-3">Sign Up to View Revisions</h3>
+                  <p className="mb-6">Create an account or sign in to see your proposal revision history.</p>
+                  <div className="flex flex-col space-y-3">
+                    <Link to="/auth" className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded">
+                      Sign Up / Login
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
       case 2:
         return <MetricsTab />;
       default:

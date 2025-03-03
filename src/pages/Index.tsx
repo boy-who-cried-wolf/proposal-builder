@@ -1,13 +1,15 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MiddleSection } from "@/components/layout/MiddleSection";
 import { MainContent } from "@/components/layout/MainContent";
 import { ProposalSection } from "@/utils/openaiProposal";
 import { Toaster } from "@/components/ui/toaster";
 import { DateRange } from "react-day-picker";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { user } = useAuth();
   const [generatedProposalSections, setGeneratedProposalSections] = useState<ProposalSection[]>([]);
   const [proposalHistory, setProposalHistory] = useState<ProposalSection[][]>([]);
   const [projectDescription, setProjectDescription] = useState("");

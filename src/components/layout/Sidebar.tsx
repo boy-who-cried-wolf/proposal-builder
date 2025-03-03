@@ -12,6 +12,7 @@ import {
 import { Square, ChevronLeft, ChevronRight, Settings, Users, MessageSquare } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 export const Sidebar: React.FC = () => {
   const [activeNavItem, setActiveNavItem] = useState<number | null>(null);
@@ -102,8 +103,12 @@ export const Sidebar: React.FC = () => {
       )}>
         {isExpanded ? (
           <>
-            <div className="text-black text-[19px] font-bold">
-              proposal builder
+            <div className="text-orange-500 text-[19px] font-bold">
+              <img 
+                src="/lovable-uploads/044f32c4-fae7-492c-9ad5-18d2ac0a83f5.png" 
+                alt="Proposal Maker" 
+                className="h-8" 
+              />
             </div>
             <div 
               className="cursor-pointer" 
@@ -117,7 +122,11 @@ export const Sidebar: React.FC = () => {
         ) : (
           <>
             <div className="flex flex-col items-center">
-              <Square size={24} className="mb-1" />
+              <img 
+                src="/lovable-uploads/8e073d5c-cebc-4046-a3c6-7861dda72ee8.png" 
+                alt="PM" 
+                className="h-8 mb-1" 
+              />
               <div 
                 className="cursor-pointer" 
                 onClick={toggleExpand} 
@@ -169,28 +178,46 @@ export const Sidebar: React.FC = () => {
             <div className="text-black text-[10px] font-semibold tracking-[1.544px] uppercase mb-3">
               {user ? user.email : 'Guest User'}
             </div>
-            <div 
-              className="flex items-center justify-between cursor-pointer" 
-              onClick={handleLogout}
-              role="button"
-              tabIndex={0}
-            >
-              <div className="text-black text-[10px] font-semibold tracking-[1.544px] uppercase">
-                Logout
+            {user ? (
+              <div 
+                className="flex items-center justify-between cursor-pointer" 
+                onClick={handleLogout}
+                role="button"
+                tabIndex={0}
+              >
+                <div className="text-black text-[10px] font-semibold tracking-[1.544px] uppercase">
+                  Logout
+                </div>
+                <div className="text-black">
+                  <LogoutIcon />
+                </div>
               </div>
-              <div className="text-black">
-                <LogoutIcon />
-              </div>
-            </div>
+            ) : (
+              <Link 
+                to="/auth" 
+                className="flex items-center justify-between cursor-pointer"
+              >
+                <div className="text-black text-[10px] font-semibold tracking-[1.544px] uppercase">
+                  Sign In
+                </div>
+              </Link>
+            )}
           </>
         ) : (
-          <div 
-            className="cursor-pointer" 
-            onClick={handleLogout}
-            role="button"
-            tabIndex={0}
-          >
-            <LogoutIcon />
+          <div className="cursor-pointer">
+            {user ? (
+              <div 
+                onClick={handleLogout}
+                role="button"
+                tabIndex={0}
+              >
+                <LogoutIcon />
+              </div>
+            ) : (
+              <Link to="/auth">
+                <Users size={18} />
+              </Link>
+            )}
           </div>
         )}
       </div>
