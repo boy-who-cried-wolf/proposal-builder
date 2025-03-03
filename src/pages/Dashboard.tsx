@@ -140,7 +140,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-[9px] font-semibold tracking-[1.389px] uppercase text-muted-foreground">
                 Welcome back, {user?.email || 'User'}
               </p>
             </div>
@@ -312,14 +312,14 @@ const Dashboard = () => {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>{selectedProject?.title}</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-[9px] font-semibold tracking-[1.389px] uppercase text-muted-foreground">
               Client: {selectedProject?.client}
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-4">
             <div>
               <h3 className="font-medium mb-1">Project Details</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="grid grid-cols-2 gap-2 text-[9px] font-semibold tracking-[1.389px] uppercase">
                 <div>
                   <p className="text-muted-foreground">Status:</p>
                   <p className="capitalize">{selectedProject?.status}</p>
@@ -351,11 +351,11 @@ const Dashboard = () => {
               <div className="mt-4">
                 <Button size="sm" variant="outline" className="mr-2">
                   <Eye size={16} className="mr-2" />
-                  View Full Project
+                  <span className="text-[9px] font-semibold tracking-[1.389px] uppercase">View Full Project</span>
                 </Button>
                 <Button size="sm">
                   <Edit size={16} className="mr-2" />
-                  Edit Project
+                  <span className="text-[9px] font-semibold tracking-[1.389px] uppercase">Edit Project</span>
                 </Button>
               </div>
             </div>
