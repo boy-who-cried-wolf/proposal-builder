@@ -65,11 +65,27 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({ onProposalGenerate
     }
   };
 
+  const handleProposalGenerated = (sections: ProposalSection[], description: string, type: string, rate: number) => {
+    // Add message about proposal being generated
+    const proposalMessage: Message = {
+      id: Date.now().toString(),
+      text: `Generated proposal for ${type} project: ${description}`,
+      isUser: false,
+    };
+    
+    setMessages((prev) => [...prev, proposalMessage]);
+    
+    // Pass data to parent component
+    if (onProposalGenerated) {
+      onProposalGenerated(sections, description, type, rate);
+    }
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 0:
         return (
-          <div className="flex flex-col gap-3 overflow-y-auto max-h-full">
+          <div className="flex flex-col gap-3 overflow-y-auto max-h-full pb-4">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -82,10 +98,18 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({ onProposalGenerate
                 {message.text}
               </div>
             ))}
+            
+            <div className="mt-4">
+              <ProposalForm onProposalGenerated={handleProposalGenerated} />
+            </div>
           </div>
         );
       case 1:
-        return <ProposalForm onProposalGenerated={onProposalGenerated} />;
+        return (
+          <div className="text-center p-4 text-gray-500">
+            Project Settings Tab - Configuration options will appear here
+          </div>
+        );
       default:
         return null;
     }
