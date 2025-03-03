@@ -78,13 +78,15 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     {
       title: "Settings",
       icon: Settings,
-      path: "",
+      path: "/account-settings",
       content: (
         <div className="p-3 bg-muted/20 rounded-sm mt-1">
           <ul className="space-y-2 text-xs">
-            <li className="cursor-pointer hover:text-primary">Account</li>
-            <li className="cursor-pointer hover:text-primary">Preferences</li>
-            <li className="cursor-pointer hover:text-primary">Team</li>
+            <li className="cursor-pointer hover:text-primary">
+              <a href="/account-settings">Account</a>
+            </li>
+            <li className="cursor-pointer hover:text-primary">Organization</li>
+            <li className="cursor-pointer hover:text-primary">Plan</li>
           </ul>
         </div>
       ),

@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
+import AccountSettings from "./pages/AccountSettings";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/account-settings" element={<AccountSettings />} />
               {/* Add other protected routes here */}
             </Route>
             
