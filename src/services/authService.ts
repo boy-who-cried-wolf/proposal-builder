@@ -73,15 +73,18 @@ export const signOut = async () => {
  */
 export const requestPasswordReset = async (email: string) => {
   try {
+    // Generate the password reset link
+    const resetUrl = `${window.location.origin}/auth/reset-password`;
+    
     // First, request password reset from Supabase
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
+      redirectTo: resetUrl,
     });
     
     if (error) throw error;
     
-    // Then, send a transactional email via Loops.so
-    await notifyLoopsPasswordReset(email);
+    // Then, send a transactional email via Loops.so with the reset link
+    await notifyLoopsPasswordReset(email, resetUrl);
     
     toast.success('Password reset instructions sent to your email.');
     return { success: true };

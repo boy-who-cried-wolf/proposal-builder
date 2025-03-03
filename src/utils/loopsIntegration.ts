@@ -90,8 +90,9 @@ export const triggerLoopsEvent = async (email: string, eventName: string, custom
 /**
  * Notifies Loops.so that a user has requested a password reset
  * @param email User's email address
+ * @param passwordResetLink URL for password reset
  */
-export const notifyLoopsPasswordReset = async (email: string) => {
+export const notifyLoopsPasswordReset = async (email: string, passwordResetLink: string) => {
   try {
     // Get the user's name from the profiles table if available
     const { data: profileData } = await supabase
@@ -100,10 +101,10 @@ export const notifyLoopsPasswordReset = async (email: string) => {
       .eq('email', email)
       .single();
     
-    const customFields = profileData ? {
-      firstName: profileData.first_name,
-      lastName: profileData.last_name
-    } : undefined;
+    const customFields = {
+      firstName: profileData?.first_name || 'User',
+      password_link: passwordResetLink
+    };
     
     const { data, error } = await supabase.functions.invoke('loops-integration', {
       body: {
