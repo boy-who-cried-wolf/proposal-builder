@@ -1,15 +1,15 @@
 
 "use client";
 
-import * as React from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { useOnClickOutside } from "usehooks-ts";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
+import * as React from "react";
+import { useOnClickOutside } from "usehooks-ts";
 
 export interface Tab {
   title: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType;
   content?: React.ReactNode;
   type?: never;
 }
@@ -79,7 +79,7 @@ export function ExpandableTabs({
     // Only update if the tab is a real tab (not a separator)
     const tabItem = tabs[index];
     if (!tabItem || (tabItem as Separator).type === "separator") return;
-    
+
     setSelected(index);
     if (onTabChange) {
       onTabChange(index);
@@ -90,10 +90,12 @@ export function ExpandableTabs({
     <div className="mx-1 h-[24px] w-[1.2px] bg-border" aria-hidden="true" />
   );
 
+  const selectedTab: Tab = tabs[selected] as Tab
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col"
+      ref={outsideClickRef}>
       <div
-        ref={outsideClickRef}
         className={cn(
           "flex flex-wrap items-center gap-2 bg-background p-1",
           className
@@ -106,7 +108,7 @@ export function ExpandableTabs({
 
           const TabIcon = (tab as Tab).icon as LucideIcon;
           const isExpanded = selected === index || hovered === index;
-          
+
           return (
             <motion.button
               key={`tab-${index}-${(tab as Tab).title}`}
@@ -148,10 +150,10 @@ export function ExpandableTabs({
           );
         })}
       </div>
-      
+
       {showTabContent && selected !== null && (
-        <div className="mt-4 p-4 bg-muted/20 rounded-lg">
-          {tabs[selected] && !(tabs[selected] as any).type && (tabs[selected] as Tab).content}
+        <div className="top-3 bg-muted/20 rounded-lg relative">
+          {selectedTab?.content ?? null}
         </div>
       )}
     </div>

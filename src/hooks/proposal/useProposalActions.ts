@@ -20,6 +20,9 @@ export function useProposalActions(
   const [isCopying, setIsCopying] = useState(false);
 
   const handleSaveProposal = async () => {
+
+    console.log("Hit save proposal")
+
     try {
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
