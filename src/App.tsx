@@ -13,9 +13,9 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PlanProtectedRoute } from "./components/PlanProtectedRoute";
 import { AdminRoute } from "./components/AdminRoute";
-import OrganizationSettings from "./pages/OrganizationSettings";
-import PlanSettings from "./pages/PlanSettings";
 import AdminDashboard from "./pages/AdminDashboard";
+import AssistantPage from "./pages/AssistantPage";
+import SettingsPage from "./pages/SettingsPage";
 
 const queryClient = new QueryClient();
 
@@ -32,9 +32,7 @@ const App = () => (
             {/* Basic protected routes - just require authentication */}
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Index />} />
-              <Route path="/account-settings" element={<AccountSettings />} />
-              <Route path="/account-settings/organization" element={<OrganizationSettings />} />
-              <Route path="/account-settings/plan" element={<PlanSettings />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
             
             {/* Admin route - requires admin rights */}
@@ -60,8 +58,7 @@ const App = () => (
                 featureName="AI Assistant"
               />
             }>
-              {/* The assistant is embedded in the Index page, so we don't need to protect
-                  a specific route, but we'll need to add checks in the component itself */}
+              <Route path="/assistant" element={<AssistantPage />} />
             </Route>
             
             {/* Catch-all route */}

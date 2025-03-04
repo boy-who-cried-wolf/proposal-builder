@@ -5,9 +5,7 @@ import {
   Home,
   BarChart3,
   Settings,
-  Users,
-  FileText,
-  ShieldCheck
+  MessageSquare
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { checkIsAdmin } from "@/integrations/supabase/profileService";
@@ -62,37 +60,37 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       />
       <SidebarNavItem
         isExpanded={isExpanded}
-        isActive={activeNavItem === 1 || location.pathname.includes("proposals")}
-        onClick={() => handleNavigation(1, "/proposals")}
-        icon={FileText}
-        label="Proposals"
-        path="/proposals"
-      />
-      <SidebarNavItem
-        isExpanded={isExpanded}
-        isActive={activeNavItem === 2 || location.pathname === "/dashboard"}
-        onClick={() => handleNavigation(2, "/dashboard")}
+        isActive={activeNavItem === 1 || location.pathname === "/dashboard"}
+        onClick={() => handleNavigation(1, "/dashboard")}
         icon={BarChart3}
         label="Dashboard"
         path="/dashboard"
+      />
+      <SidebarNavItem
+        isExpanded={isExpanded}
+        isActive={activeNavItem === 2 || location.pathname === "/assistant"}
+        onClick={() => handleNavigation(2, "/assistant")}
+        icon={MessageSquare}
+        label="Assistant"
+        path="/assistant"
       />
       {isAdmin && (
         <SidebarNavItem
           isExpanded={isExpanded}
           isActive={activeNavItem === 3 || location.pathname === "/admin"}
           onClick={() => handleNavigation(3, "/admin")}
-          icon={ShieldCheck}
+          icon={Settings}
           label="Admin"
           path="/admin"
         />
       )}
       <SidebarNavItem
         isExpanded={isExpanded}
-        isActive={activeNavItem === 4 || location.pathname.includes("account-settings")}
-        onClick={() => handleNavigation(4, "/account-settings")}
+        isActive={activeNavItem === 4 || location.pathname === "/settings"}
+        onClick={() => handleNavigation(4, "/settings")}
         icon={Settings}
         label="Settings"
-        path="/account-settings"
+        path="/settings"
       />
     </div>
   );
