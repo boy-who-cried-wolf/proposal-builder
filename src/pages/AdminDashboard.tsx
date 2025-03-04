@@ -150,7 +150,7 @@ const AdminDashboard = () => {
       <Layout>
         <div className="flex items-center justify-center h-screen">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">Checking permissions...</span>
+          <span className="ml-2 font-poppins text-gray-700">Checking permissions...</span>
         </div>
       </Layout>
     );
@@ -162,11 +162,11 @@ const AdminDashboard = () => {
 
   return (
     <Layout>
-      <div className="container py-8">
+      <div className="container py-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold font-poppins text-gray-800">Admin Dashboard</h1>
           <div className="flex gap-2">
-            <Button onClick={fetchUsers} disabled={refreshing}>
+            <Button onClick={fetchUsers} disabled={refreshing} variant="outline" className="border-[#9b87f5] text-[#9b87f5] hover:bg-[#E5DEFF] hover:text-[#7E69AB]">
               {refreshing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -179,14 +179,15 @@ const AdminDashboard = () => {
                 </>
               )}
             </Button>
-            <Button onClick={() => setShowCreateUserDialog(true)}>
+            <Button onClick={() => setShowCreateUserDialog(true)} className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white">
               <UserPlus className="mr-2 h-4 w-4" />
               Add User
             </Button>
             <Button 
-              variant="outline" 
+              variant="secondary" 
               onClick={handleCheckExpiredSubscriptions}
               disabled={checkingExpired}
+              className="bg-[#F1F0FB] text-[#6E59A5] hover:bg-[#E5DEFF]"
             >
               {checkingExpired ? (
                 <>
@@ -201,37 +202,37 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs defaultValue="users" className="w-full">
-          <TabsList>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="stats">Statistics</TabsTrigger>
+          <TabsList className="bg-[#F1F0FB] mb-6">
+            <TabsTrigger value="users" className="data-[state=active]:bg-[#9b87f5] data-[state=active]:text-white">Users</TabsTrigger>
+            <TabsTrigger value="stats" className="data-[state=active]:bg-[#9b87f5] data-[state=active]:text-white">Statistics</TabsTrigger>
           </TabsList>
           
           <TabsContent value="users" className="pt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Manage Users</CardTitle>
-                <CardDescription>
+            <Card className="border-[#E5DEFF] shadow-md">
+              <CardHeader className="bg-[#F1F0FB] rounded-t-lg border-b border-[#E5DEFF]">
+                <CardTitle className="text-[#6E59A5] font-poppins">Manage Users</CardTitle>
+                <CardDescription className="text-[#8E9196] font-poppins">
                   View and manage all users in the system. You can edit their subscription plan, delete accounts, or add new users.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-3">Name</th>
-                        <th className="text-left p-3">Email</th>
-                        <th className="text-left p-3">Plan</th>
-                        <th className="text-left p-3">Status</th>
-                        <th className="text-left p-3">Expiration</th>
-                        <th className="text-left p-3">Admin</th>
-                        <th className="text-left p-3">Actions</th>
+                      <tr className="border-b border-[#E5DEFF]">
+                        <th className="text-left p-3 font-poppins text-[#6E59A5]">Name</th>
+                        <th className="text-left p-3 font-poppins text-[#6E59A5]">Email</th>
+                        <th className="text-left p-3 font-poppins text-[#6E59A5]">Plan</th>
+                        <th className="text-left p-3 font-poppins text-[#6E59A5]">Status</th>
+                        <th className="text-left p-3 font-poppins text-[#6E59A5]">Expiration</th>
+                        <th className="text-left p-3 font-poppins text-[#6E59A5]">Admin</th>
+                        <th className="text-left p-3 font-poppins text-[#6E59A5]">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {users.length === 0 ? (
                         <tr>
-                          <td colSpan={7} className="p-3 text-center text-gray-500">
+                          <td colSpan={7} className="p-3 text-center text-[#8E9196] font-poppins">
                             No users found
                           </td>
                         </tr>
@@ -242,18 +243,18 @@ const AdminDashboard = () => {
                           const status = subscription?.status || 'inactive';
                           
                           return (
-                            <tr key={user.id} className="border-b hover:bg-gray-50">
-                              <td className="p-3">
+                            <tr key={user.id} className="border-b border-[#E5DEFF] hover:bg-[#F1F0FB]">
+                              <td className="p-3 font-poppins">
                                 {user.first_name} {user.last_name}
                               </td>
-                              <td className="p-3">{user.email}</td>
+                              <td className="p-3 font-poppins">{user.email}</td>
                               <td className="p-3">
                                 <Select
                                   defaultValue={planId}
                                   onValueChange={(value) => handleUpdatePlan(user.id, value)}
                                   disabled={processingUser === user.id}
                                 >
-                                  <SelectTrigger className="w-[130px]">
+                                  <SelectTrigger className="w-[130px] border-[#E5DEFF] text-[#6E59A5] font-poppins">
                                     <SelectValue placeholder="Select Plan" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -264,11 +265,11 @@ const AdminDashboard = () => {
                                 </Select>
                               </td>
                               <td className="p-3">
-                                <Badge variant={status === 'active' ? 'default' : 'secondary'}>
+                                <Badge variant={status === 'active' ? 'default' : 'secondary'} className={status === 'active' ? 'bg-[#F2FCE2] text-green-700' : 'bg-[#F1F0FB] text-[#8E9196]'}>
                                   {status === 'active' ? 'Active' : 'Inactive'}
                                 </Badge>
                               </td>
-                              <td className="p-3">
+                              <td className="p-3 font-poppins text-[#8E9196]">
                                 {subscription?.current_period_end ? (
                                   new Date(subscription.current_period_end).toLocaleDateString()
                                 ) : (
@@ -277,9 +278,9 @@ const AdminDashboard = () => {
                               </td>
                               <td className="p-3">
                                 {user.is_admin ? (
-                                  <Badge variant="outline">Admin</Badge>
+                                  <Badge variant="outline" className="border-[#9b87f5] text-[#6E59A5]">Admin</Badge>
                                 ) : (
-                                  'No'
+                                  <span className="text-[#8E9196] font-poppins">No</span>
                                 )}
                               </td>
                               <td className="p-3">
@@ -288,6 +289,7 @@ const AdminDashboard = () => {
                                   size="sm"
                                   onClick={() => handleDeleteUser(user.id)}
                                   disabled={processingUser === user.id}
+                                  className="bg-red-100 text-red-600 hover:bg-red-200"
                                 >
                                   {processingUser === user.id ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -308,15 +310,15 @@ const AdminDashboard = () => {
           </TabsContent>
           
           <TabsContent value="stats" className="pt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>User Statistics</CardTitle>
-                <CardDescription>
+            <Card className="border-[#E5DEFF] shadow-md">
+              <CardHeader className="bg-[#F1F0FB] rounded-t-lg border-b border-[#E5DEFF]">
+                <CardTitle className="text-[#6E59A5] font-poppins">User Statistics</CardTitle>
+                <CardDescription className="text-[#8E9196] font-poppins">
                   Overview of user accounts and subscription statistics.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <StatCard 
                     title="Total Users" 
                     value={users.length} 
@@ -346,10 +348,10 @@ const AdminDashboard = () => {
 
       {/* Create User Dialog */}
       <Dialog open={showCreateUserDialog} onOpenChange={setShowCreateUserDialog}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] border-[#E5DEFF]">
           <DialogHeader>
-            <DialogTitle>Create New User</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-[#6E59A5] font-poppins">Create New User</DialogTitle>
+            <DialogDescription className="text-[#8E9196] font-poppins">
               Add a new user account to the system.
             </DialogDescription>
           </DialogHeader>
@@ -358,38 +360,41 @@ const AdminDashboard = () => {
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName" className="text-[#6E59A5] font-poppins">First Name</Label>
                   <Input
                     id="firstName"
                     value={newUser.firstName}
                     onChange={(e) => setNewUser({...newUser, firstName: e.target.value})}
                     required
+                    className="border-[#E5DEFF] focus-visible:ring-[#9b87f5]"
                   />
                 </div>
                 <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName" className="text-[#6E59A5] font-poppins">Last Name</Label>
                   <Input
                     id="lastName"
                     value={newUser.lastName}
                     onChange={(e) => setNewUser({...newUser, lastName: e.target.value})}
                     required
+                    className="border-[#E5DEFF] focus-visible:ring-[#9b87f5]"
                   />
                 </div>
               </div>
               
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-[#6E59A5] font-poppins">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={newUser.email}
                   onChange={(e) => setNewUser({...newUser, email: e.target.value})}
                   required
+                  className="border-[#E5DEFF] focus-visible:ring-[#9b87f5]"
                 />
               </div>
               
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-[#6E59A5] font-poppins">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -397,6 +402,7 @@ const AdminDashboard = () => {
                   onChange={(e) => setNewUser({...newUser, password: e.target.value})}
                   required
                   minLength={6}
+                  className="border-[#E5DEFF] focus-visible:ring-[#9b87f5]"
                 />
               </div>
               
@@ -406,9 +412,9 @@ const AdminDashboard = () => {
                   id="isAdmin"
                   checked={newUser.isAdmin}
                   onChange={(e) => setNewUser({...newUser, isAdmin: e.target.checked})}
-                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  className="h-4 w-4 rounded border-[#9b87f5] text-[#9b87f5] focus:ring-[#9b87f5]"
                 />
-                <Label htmlFor="isAdmin">Make this user an admin</Label>
+                <Label htmlFor="isAdmin" className="text-[#6E59A5] font-poppins">Make this user an admin</Label>
               </div>
             </div>
             
@@ -417,10 +423,15 @@ const AdminDashboard = () => {
                 type="button" 
                 variant="outline" 
                 onClick={() => setShowCreateUserDialog(false)}
+                className="border-[#E5DEFF] text-[#8E9196] hover:bg-[#F1F0FB]"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={processingUser === 'new'}>
+              <Button 
+                type="submit" 
+                disabled={processingUser === 'new'}
+                className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white"
+              >
                 {processingUser === 'new' ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -440,10 +451,10 @@ const AdminDashboard = () => {
 
 // Simple stat card component
 const StatCard = ({ title, value, description }: { title: string, value: number, description: string }) => (
-  <div className="bg-white rounded-lg border p-4">
-    <h3 className="text-lg font-medium text-gray-600">{title}</h3>
-    <p className="text-3xl font-bold mt-2">{value}</p>
-    <p className="text-sm text-gray-500 mt-1">{description}</p>
+  <div className="bg-white rounded-lg border border-[#E5DEFF] p-6 shadow-sm hover:shadow-md transition-shadow">
+    <h3 className="text-lg font-medium text-[#6E59A5] font-poppins">{title}</h3>
+    <p className="text-3xl font-bold mt-2 text-[#1A1F2C] font-poppins">{value}</p>
+    <p className="text-sm text-[#8E9196] mt-1 font-poppins">{description}</p>
   </div>
 );
 
