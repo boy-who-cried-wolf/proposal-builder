@@ -125,11 +125,11 @@ export function ExpandableTabs({
               className={cn(
                 "relative flex items-center rounded-md text-sm font-medium transition-colors duration-300 whitespace-nowrap",
                 isExpanded
-                  ? cn("bg-muted", activeColor)
+                  ? cn("bg-muted hover:bg-muted/80", activeColor)
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              <TabIcon size={20} />
+              <TabIcon size={20} className={isExpanded ? "text-primary" : ""} />
               <AnimatePresence initial={false}>
                 {isExpanded && (
                   <motion.span
@@ -138,7 +138,7 @@ export function ExpandableTabs({
                     animate="animate"
                     exit="exit"
                     transition={transition}
-                    className="overflow-hidden whitespace-nowrap"
+                    className="overflow-hidden whitespace-nowrap text-primary"
                   >
                     {(tab as Tab).title}
                   </motion.span>
