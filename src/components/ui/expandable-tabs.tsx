@@ -12,6 +12,7 @@ export interface Tab {
   icon: React.ComponentType;
   content?: React.ReactNode;
   type?: never;
+  onClick?: () => void;
 }
 
 interface Separator {
@@ -109,6 +110,8 @@ export function ExpandableTabs({
           const TabIcon = (tab as Tab).icon as LucideIcon;
           const isExpanded = selected === index || hovered === index;
 
+          const tabOnClick = (tab as Tab).onClick ?? (() => null)
+
           return (
             <motion.button
               key={`tab-${index}-${(tab as Tab).title}`}
@@ -119,6 +122,11 @@ export function ExpandableTabs({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+
+                if (typeof tabOnClick === "function") {
+                  tabOnClick()
+                }
+
                 handleSelect(index);
               }}
               onMouseEnter={() => setHovered(index)}
@@ -150,12 +158,6 @@ export function ExpandableTabs({
           );
         })}
       </div>
-
-      {showTabContent && selected !== null && (
-        <div className="top-3 bg-muted/20 rounded-lg relative">
-          {selectedTab?.content ?? null}
-        </div>
-      )}
     </div>
   );
 }
