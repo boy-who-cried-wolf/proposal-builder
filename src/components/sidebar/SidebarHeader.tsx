@@ -18,14 +18,14 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
           <div className="text-orange-500 text-[19px] font-bold">
             <img src="/lovable-uploads/044f32c4-fae7-492c-9ad5-18d2ac0a83f5.png" alt="Proposal Maker" className="h-8" />
           </div>
-          <div className="cursor-pointer" onClick={toggleExpand} role="button" tabIndex={0}>
+          <div className="cursor-pointer" onClick={toggleExpand} role="button">
             <ChevronLeft size={20} />
           </div>
         </> : 
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="cursor-pointer" onClick={toggleExpand} role="button" tabIndex={0}>
+              <div className="cursor-pointer" onClick={toggleExpand} role="button">
                 <img src="/lovable-uploads/8e073d5c-cebc-4046-a3c6-7861dda72ee8.png" alt="PM" className="h-8 mb-1" />
               </div>
             </TooltipTrigger>

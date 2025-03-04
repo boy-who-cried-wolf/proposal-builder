@@ -25,13 +25,13 @@ export function useItemEditing(
       hours: item.hours.toString(),
       price: item.price.toString()
     };
-    
+
     setEditingItem({
       sectionIndex,
       itemIndex,
       item: formattedItem as any,
     });
-    
+
     setIsEditDialogOpen(true);
   };
 
@@ -60,7 +60,7 @@ export function useItemEditing(
 
     const { sectionIndex, itemIndex, item } = editingItem;
     const oldItem = sections[sectionIndex].items[itemIndex];
-    
+
     if (item.hours) {
       const hours = parseInt(item.hours.toString(), 10);
       if (!isNaN(hours)) {
@@ -71,7 +71,8 @@ export function useItemEditing(
         }
       }
     }
-    
+    console.log(item)
+
     const newSections = [...sections];
     newSections[sectionIndex] = {
       ...newSections[sectionIndex],
@@ -87,7 +88,7 @@ export function useItemEditing(
     if (projectBudget > 0) {
       const currentTotal = calculateTotalFromSections(newSections);
       if (currentTotal !== projectBudget) {
-        adjustSectionsToMatchBudget(newSections, projectBudget, hourlyRate, isHoursPriceLocked);
+        // adjustSectionsToMatchBudget(newSections, projectBudget, hourlyRate, isHoursPriceLocked);
       }
     }
 
@@ -107,7 +108,7 @@ export function useItemEditing(
 
     setSections(newSections);
     setIsEditDialogOpen(false);
-    
+
     toast({
       title: "Changes saved",
       description: `Updated ${item.item} in ${sections[sectionIndex].title}`,
@@ -118,10 +119,10 @@ export function useItemEditing(
     if (!editingItem) return;
 
     const { sectionIndex, itemIndex, item } = editingItem;
-    
+
     const newSections = [...sections];
     const oldItems = [...newSections[sectionIndex].items];
-    
+
     newSections[sectionIndex] = {
       ...newSections[sectionIndex],
       items: [
@@ -141,7 +142,7 @@ export function useItemEditing(
 
     setSections(newSections);
     setIsEditDialogOpen(false);
-    
+
     toast({
       title: "Item deleted",
       description: `Removed ${item.item} from ${sections[sectionIndex].title}`,

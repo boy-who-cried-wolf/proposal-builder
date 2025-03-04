@@ -31,7 +31,6 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
               className="flex items-center justify-between cursor-pointer" 
               onClick={onLogout}
               role="button"
-              tabIndex={0}
             >
               <div className="text-black text-[10px] font-semibold tracking-[1.544px] uppercase">
                 Logout
@@ -57,7 +56,6 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
             <div 
               onClick={onLogout}
               role="button"
-              tabIndex={0}
             >
               <LogoutIcon />
             </div>

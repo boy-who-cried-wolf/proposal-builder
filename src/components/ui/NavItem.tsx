@@ -39,7 +39,6 @@ export const NavItem: React.FC<NavItemProps> = ({
         )}
         onClick={onClick}
         role="button"
-        tabIndex={0}
       >
         {icon && (
           <div className={iconClasses}>
@@ -67,7 +66,6 @@ export const NavItem: React.FC<NavItemProps> = ({
             )}
             onClick={onClick}
             role="button"
-            tabIndex={0}
           >
             {icon && (
               <div className={iconClasses}>
@@ -101,7 +99,6 @@ export const NavTab: React.FC<Omit<NavItemProps, "icon">> = ({
       )}
       onClick={onClick}
       role="button"
-      tabIndex={0}
     >
       {children}
     </div>
