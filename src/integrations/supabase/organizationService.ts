@@ -10,7 +10,7 @@ export const createOrganization = async (name: string, userId: string) => {
       .from('organizations')
       .insert([{ 
         name, 
-        owner_id: userId  // Using owner_id for RLS policy
+        user_id: userId  // Using owner_id for RLS policy
       }])
       .select()
       .single();

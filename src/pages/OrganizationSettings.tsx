@@ -21,6 +21,7 @@ const OrganizationSettings = () => {
     setClientRate,
     knowledgeBase,
     setKnowledgeBase,
+    loadingServices,
     services,
     newService,
     setNewService,
@@ -40,7 +41,7 @@ const OrganizationSettings = () => {
             <h1 className="text-3xl font-bold py-4">Account Settings</h1>
           </div>
         </div>
-        
+
         <div className="container px-4 py-[25px]">
           <div className="flex gap-[34px] px-[23px] py-[15px] mb-4">
             <NavTab active={location.pathname === "/account-settings"} onClick={() => navigate("/account-settings")}>
@@ -53,8 +54,8 @@ const OrganizationSettings = () => {
               Plan
             </NavTab>
           </div>
-          
-          <OrganizationSettingsForm loading={loading} saving={saving} companyName={companyName} setCompanyName={setCompanyName} hourlyRate={hourlyRate} setHourlyRate={setHourlyRate} clientRate={clientRate} setClientRate={setClientRate} knowledgeBase={knowledgeBase} setKnowledgeBase={setKnowledgeBase} services={services} newService={newService} setNewService={setNewService} handleSave={handleSave} handleAddService={handleAddService} handleRemoveService={handleRemoveService} handleNumberChange={handleNumberChange} handleNumberFocus={handleNumberFocus} />
+
+          <OrganizationSettingsForm loading={loading} saving={saving} companyName={companyName} setCompanyName={setCompanyName} hourlyRate={hourlyRate} setHourlyRate={setHourlyRate} clientRate={clientRate} setClientRate={setClientRate} knowledgeBase={knowledgeBase} setKnowledgeBase={setKnowledgeBase} loadingServices={loadingServices} services={services} newService={newService} setNewService={setNewService} handleSave={handleSave} handleAddService={handleAddService} handleRemoveService={handleRemoveService} handleNumberChange={handleNumberChange} handleNumberFocus={handleNumberFocus} />
         </div>
       </MainContent>
     </div>

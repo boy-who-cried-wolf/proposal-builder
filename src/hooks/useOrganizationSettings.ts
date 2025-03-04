@@ -1,19 +1,19 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { 
-  getUserProfile
-} from "@/integrations/supabase/profileService"; 
 import {
-  updateOrganization, 
+  getUserProfile
+} from "@/integrations/supabase/profileService";
+import {
+  updateOrganization,
   createOrganization
 } from "@/integrations/supabase/organizationService";
 import {
   linkUserToOrganization
 } from "@/integrations/supabase/profileService";
 import {
-  addServiceToProfile, 
-  removeServiceFromProfile 
+  addServiceToProfile,
+  removeServiceFromProfile
 } from "@/integrations/supabase/serviceManagement";
 import { toast } from "sonner";
 
@@ -28,6 +28,7 @@ export const useOrganizationSettings = () => {
   const [services, setServices] = useState<string[]>([]);
   const [newService, setNewService] = useState("");
   const [organizationId, setOrganizationId] = useState<string | null>(null);
+  const [loadingServices, setLoadingServices] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -37,11 +38,11 @@ export const useOrganizationSettings = () => {
 
   const loadUserProfile = async () => {
     if (!user?.id) return;
-    
+
     try {
       setLoading(true);
       const profile = await getUserProfile(user.id);
-      
+
       if (profile) {
         // Check if user has an organization
         if (profile.organizations) {
@@ -71,19 +72,19 @@ export const useOrganizationSettings = () => {
 
   const handleSave = async () => {
     if (!user?.id) return;
-    
+
     try {
       setSaving(true);
-      
+
       // If user doesn't have an organization yet, create one
       if (!organizationId) {
         toast.info("Creating new organization...");
         const newOrg = await createOrganization(companyName, user.id);
         setOrganizationId(newOrg.id);
-        
+
         // Link user to the new organization
         await linkUserToOrganization(user.id, newOrg.id);
-        
+
         // Update the organization with all settings
         await updateOrganization(newOrg.id, {
           name: companyName,
@@ -92,7 +93,7 @@ export const useOrganizationSettings = () => {
           knowledge_base: knowledgeBase,
           services: services
         });
-        
+
         toast.success("Organization created and settings saved successfully");
       } else {
         // Update existing organization
@@ -103,7 +104,7 @@ export const useOrganizationSettings = () => {
           knowledge_base: knowledgeBase,
           services: services
         });
-        
+
         toast.success("Organization settings saved successfully");
       }
     } catch (error) {
@@ -116,11 +117,14 @@ export const useOrganizationSettings = () => {
 
   const handleAddService = async () => {
     if (!newService.trim() || !user?.id) return;
-    
+
     try {
       // Only use the service management API if we have an organization
       if (organizationId) {
-        await addServiceToProfile(user.id, newService.trim());
+        setLoadingServices(true);
+        const newServices = await addServiceToProfile(user.id, newService.trim());
+        setServices(newServices?.[0]?.services ?? []);
+        setLoadingServices(false);
       } else {
         // Just update the local state if no organization exists yet
         setServices([...services, newService.trim()]);
@@ -135,11 +139,14 @@ export const useOrganizationSettings = () => {
 
   const handleRemoveService = async (service: string) => {
     if (!user?.id) return;
-    
+
     try {
       // Only use the service management API if we have an organization
       if (organizationId) {
-        await removeServiceFromProfile(user.id, service);
+        setLoadingServices(true);
+        const newServices = await removeServiceFromProfile(user.id, service);
+        setServices(newServices?.[0]?.services ?? []);
+        setLoadingServices(false);
       } else {
         // Just update the local state if no organization exists yet
         setServices(services.filter(s => s !== service));
@@ -154,19 +161,19 @@ export const useOrganizationSettings = () => {
   // Handle input change for number fields to prevent starting with 0
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<number | null>>) => {
     const value = e.target.value;
-    
+
     // If the input is empty, set to null
     if (!value) {
       setter(null);
       return;
     }
-    
+
     // Remove leading zeros
     if (value.startsWith('0') && value.length > 1) {
       setter(parseInt(value.replace(/^0+/, ''), 10));
       return;
     }
-    
+
     setter(parseInt(value, 10));
   };
 
@@ -188,6 +195,7 @@ export const useOrganizationSettings = () => {
     setClientRate,
     knowledgeBase,
     setKnowledgeBase,
+    loadingServices,
     services,
     newService,
     setNewService,

@@ -18,6 +18,7 @@ interface OrganizationSettingsFormProps {
   setClientRate: React.Dispatch<React.SetStateAction<number | null>>;
   knowledgeBase: string;
   setKnowledgeBase: (value: string) => void;
+  loadingServices: boolean;
   services: string[];
   newService: string;
   setNewService: (value: string) => void;
@@ -39,6 +40,7 @@ export const OrganizationSettingsForm: React.FC<OrganizationSettingsFormProps> =
   setClientRate,
   knowledgeBase,
   setKnowledgeBase,
+  loadingServices,
   services,
   newService,
   setNewService,
@@ -61,22 +63,23 @@ export const OrganizationSettingsForm: React.FC<OrganizationSettingsFormProps> =
     <div className="grid gap-4 max-w-2xl">
       <div>
         <label className="block text-sm font-medium mb-1">Company Name</label>
-        <Input 
-          value={companyName} 
+        <Input
+          value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
-          placeholder="Your company name" 
+          placeholder="Your company name"
         />
       </div>
-      
-      <ServicesSection 
+
+      <ServicesSection
+        loadingServices={loadingServices}
         services={services}
         newService={newService}
         setNewService={setNewService}
         handleAddService={handleAddService}
         handleRemoveService={handleRemoveService}
       />
-      
-      <RatesSection 
+
+      <RatesSection
         hourlyRate={hourlyRate}
         clientRate={clientRate}
         handleNumberChange={handleNumberChange}
@@ -84,12 +87,12 @@ export const OrganizationSettingsForm: React.FC<OrganizationSettingsFormProps> =
         setHourlyRate={setHourlyRate}
         setClientRate={setClientRate}
       />
-      
-      <KnowledgeBaseSection 
+
+      <KnowledgeBaseSection
         knowledgeBase={knowledgeBase}
         setKnowledgeBase={setKnowledgeBase}
       />
-      
+
       <div className="pt-2">
         <Button onClick={handleSave} disabled={saving}>
           {saving ? (
