@@ -15,17 +15,6 @@ export function useProposalFormState(
   propsDateRange?: { from: Date; to?: Date },
   propsServices?: Array<string>,
 ) {
-
-  console.log(
-    propsProjectDescription,
-    propsProjectType,
-    propsHourlyRate,
-    propsFreelancerRate,
-    propsProjectBudget,
-    propsDateRange,
-    propsServices,
-  )
-
   const { user } = useAuth();
 
   const [organization, setOrganization] = useState<Organization>()
