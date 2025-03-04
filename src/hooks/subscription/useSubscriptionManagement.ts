@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { cancelSubscription, createCustomerPortalSession } from "@/services/stripeService";
-import { updateUserInLoops } from "@/utils/loopsIntegration";
+import { updateUserInLoops } from "@/services/loopsIntegration";
 
 export function useSubscriptionManagement(userId: string | undefined, currentPlan: string, userEmail: string | null) {
   const [cancelLoading, setCancelLoading] = useState(false);

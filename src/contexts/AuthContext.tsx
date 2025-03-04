@@ -5,7 +5,7 @@ import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { getSavedProposalFormData } from '@/utils/localStorage';
 import { signUp, signIn, signOut, requestPasswordReset } from '@/services/authService';
-import { checkForExpiredSubscriptions } from '@/utils/subscriptionUtils';
+import { checkForExpiredSubscriptions } from '@/services/subscriptionUtils';
 
 interface AuthContextType {
   session: Session | null;

@@ -1,7 +1,7 @@
 
-import { generateProposal } from './proposal/generateProposal';
-import { saveProposal } from './proposal/saveProposal';
-import { getSectionTemplates } from './proposal/sectionTemplates';
+import { generateProposal } from './generateProposal';
+import { saveProposal } from './saveProposal';
+import { getSectionTemplates } from './sectionTemplates';
 import type { 
   ProposalSection, 
   ProposalItem, 

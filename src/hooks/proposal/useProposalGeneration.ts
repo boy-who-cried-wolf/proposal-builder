@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { ProposalSection, ProposalInput } from "@/types/proposal";
-import { generateProposal } from "@/utils/proposal/generateProposal";
+import { generateProposal } from "@/services/generateProposal";
 import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
 

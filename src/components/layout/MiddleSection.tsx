@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ProposalForm } from "@/components/ui/ProposalForm";
-import { ProposalSection } from "@/utils/openaiProposal";
+import { ProposalSection } from "@/services/openaiProposal";
 import { MiddleSectionTabs } from "./MiddleSectionTabs";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { ResizablePanel } from "./ResizablePanel";

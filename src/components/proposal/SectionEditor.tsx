@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Check, Save, Trash } from "lucide-react";
-import { ProposalSection } from "@/utils/openaiProposal";
+import { ProposalSection } from "@/services/openaiProposal";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 

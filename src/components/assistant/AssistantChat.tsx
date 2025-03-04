@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { SendIcon } from "@/components/icons";
-import { ProposalSection } from "@/utils/openaiProposal";
+import { ProposalSection } from "@/services/openaiProposal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";

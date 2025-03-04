@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { ProposalSection } from "@/utils/openaiProposal";
+import { ProposalSection } from "@/services/openaiProposal";
 import { Revision } from "@/components/proposal/RevisionsTab";
 import { useProposalEditing } from "@/hooks/proposal/useProposalEditing";
 import { useProposalMetrics } from "@/hooks/proposal/useProposalMetrics";

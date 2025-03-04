@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ProposalSection } from "@/types/proposal";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { saveProposal } from "@/utils/openaiProposal";
+import { saveProposal } from "@/services/openaiProposal";
 import { formatProposalForFigma } from "@/utils/proposal/formatProposalForFigma";
 import { Revision } from "@/components/proposal/RevisionsTab";
 

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ProposalSection } from "@/utils/openaiProposal";
+import { ProposalSection } from "@/services/openaiProposal";
 import { Pencil, Settings } from "lucide-react";
 
 interface ProposalTableProps {
