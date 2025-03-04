@@ -12,7 +12,8 @@ export function useProposalGeneration(
   projectBudget: number,
   dateRange: DateRange | undefined,
   freelancerRate: number,
-  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number) => void
+  services?: Array<string>,
+  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number, services?: Array<string>) => void
 ) {
   const { toast } = useToast();
   const [proposalSections, setProposalSections] = useState<ProposalSection[]>([]);
@@ -22,13 +23,13 @@ export function useProposalGeneration(
   const handleStreamUpdate = (sections: ProposalSection[]) => {
     // Update the local state with the latest sections
     setProposalSections(sections);
-    
+
     // Calculate a progress indicator (this is just an estimate)
     setStreamProgress(Math.min(95, streamProgress + 5)); // Cap at 95% until fully complete
-    
+
     // Send the current state up to parent component
     if (onProposalGenerated) {
-      onProposalGenerated(sections, projectDescription, projectType, hourlyRate, freelancerRate);
+      onProposalGenerated(sections, projectDescription, projectType, hourlyRate, freelancerRate, services);
     }
   };
 
@@ -55,7 +56,7 @@ export function useProposalGeneration(
     setIsGenerating(true);
     setStreamProgress(0);
     setProposalSections([]);
-    
+
     try {
       const input: ProposalInput = {
         projectDescription,
@@ -65,18 +66,18 @@ export function useProposalGeneration(
         dateRange,
         freelancerRate
       };
-      
+
       const sections = await generateProposal(input, handleStreamUpdate);
-      
+
       // Final update with complete result
       setProposalSections(sections);
       setStreamProgress(100);
-      
+
       // Pass the generated proposal data to the parent component
       if (onProposalGenerated) {
         onProposalGenerated(sections, projectDescription, projectType, hourlyRate, freelancerRate);
       }
-      
+
       toast({
         title: "Success",
         description: "Proposal generated successfully!",

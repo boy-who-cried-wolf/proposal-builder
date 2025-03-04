@@ -7,15 +7,31 @@ import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { ResizablePanel } from "./ResizablePanel";
 
 interface MiddleSectionProps {
-  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number) => void;
+  projectDescription?: string;
+  projectType?: string;
+  hourlyRate?: number;
+  freelancerRate?: number;
+  projectBudget?: number;
+  dateRange?: { from: Date; to?: Date };
+  services?: Array<string>;
+
+  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number, services?: Array<string>) => void;
   proposalSections?: ProposalSection[];
   onUpdateProposal?: (sections: ProposalSection[]) => void;
 }
 
-export const MiddleSection: React.FC<MiddleSectionProps> = ({ 
-  onProposalGenerated, 
+export const MiddleSection: React.FC<MiddleSectionProps> = ({
+  projectDescription,
+  projectType,
+  hourlyRate,
+  freelancerRate,
+  projectBudget,
+  dateRange,
+  services,
+
+  onProposalGenerated,
   proposalSections = [],
-  onUpdateProposal 
+  onUpdateProposal
 }) => {
   const [activeTab, setActiveTab] = useState(0);
 
@@ -23,13 +39,13 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
     setActiveTab(index);
   };
 
-  const handleProposalGenerated = (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number) => {
+  const handleProposalGenerated = (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number, services?: Array<string>) => {
     // Update the active tab to switch to Assistant view after generating a proposal
     setActiveTab(1);
-    
+
     // Pass the generated proposal data to the parent component
     if (onProposalGenerated) {
-      onProposalGenerated(sections, description, type, rate, freelancerRate);
+      onProposalGenerated(sections, description, type, rate, freelancerRate, services);
     }
   };
 
@@ -39,15 +55,25 @@ export const MiddleSection: React.FC<MiddleSectionProps> = ({
         return (
           <div className="flex flex-col gap-3 overflow-y-auto max-h-full pb-4">
             <div className="mt-4">
-              <ProposalForm onProposalGenerated={handleProposalGenerated} />
+              <ProposalForm
+                projectDescription={projectDescription}
+                projectType={projectType}
+                hourlyRate={hourlyRate}
+                freelancerRate={freelancerRate}
+                projectBudget={projectBudget}
+                dateRange={dateRange}
+                services={services}
+
+                onProposalGenerated={handleProposalGenerated}
+              />
             </div>
           </div>
         );
       case 1:
         return (
-          <AssistantChat 
-            proposalSections={proposalSections} 
-            onUpdateProposal={onUpdateProposal} 
+          <AssistantChat
+            proposalSections={proposalSections}
+            onUpdateProposal={onUpdateProposal}
           />
         );
       default:

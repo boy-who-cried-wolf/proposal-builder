@@ -11,6 +11,7 @@ export interface SavedProposalFormData {
     from: string;
     to: string;
   };
+  services?: Array<string>;
 }
 
 export const saveProposalFormData = (data: SavedProposalFormData): void => {
@@ -20,7 +21,7 @@ export const saveProposalFormData = (data: SavedProposalFormData): void => {
 export const getSavedProposalFormData = (): SavedProposalFormData | null => {
   const savedData = localStorage.getItem('savedProposalData');
   if (!savedData) return null;
-  
+
   try {
     return JSON.parse(savedData);
   } catch (error) {

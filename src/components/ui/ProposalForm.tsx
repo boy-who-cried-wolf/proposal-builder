@@ -11,10 +11,26 @@ import { saveProposalFormData, getSavedProposalFormData, clearSavedProposalFormD
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ProposalFormProps {
-  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number) => void;
+  projectDescription?: string;
+  projectType?: string;
+  hourlyRate?: number;
+  freelancerRate?: number;
+  projectBudget?: number;
+  dateRange?: { from: Date; to?: Date };
+  services?: Array<string>;
+  onProposalGenerated?: (sections: ProposalSection[], description: string, type: string, rate: number, freelancerRate: number, services?: Array<string>) => void;
 }
 
-export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated }) => {
+export const ProposalForm: React.FC<ProposalFormProps> = ({
+  projectDescription: propsProjectDescription,
+  projectType: propsProjectType,
+  hourlyRate: propsHourlyRate,
+  freelancerRate: propsFreelancerRate,
+  projectBudget: propsProjectBudget,
+  dateRange: propsDateRange,
+  services: propsServices,
+  onProposalGenerated
+}) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -28,7 +44,15 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
     dateRange, setDateRange,
     services, setServices,
     loadingServices, servicesOptions
-  } = useProposalFormState();
+  } = useProposalFormState(
+    propsProjectDescription,
+    propsProjectType,
+    propsHourlyRate,
+    propsFreelancerRate,
+    propsProjectBudget,
+    propsDateRange,
+    propsServices
+  );
 
   const {
     proposalSections,
@@ -42,8 +66,11 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
     projectBudget,
     dateRange,
     freelancerRate,
+    services,
     onProposalGenerated
   );
+
+  console.log(projectDescription)
 
   useEffect(() => {
     const savedData = getSavedProposalFormData();
@@ -65,7 +92,7 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
         clearSavedProposalFormData();
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {

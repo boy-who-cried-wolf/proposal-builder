@@ -15,13 +15,11 @@ export const MainContent: React.FC<MainContentProps> = ({
   freelancerRate = 0,
   projectBudget = 0,
   dateRange,
+  services = [],
   proposalHistory,
   onRevertProposal,
   children
 }) => {
-  if (children) {
-    return <main className="grow flex flex-col max-md:h-screen">{children}</main>;
-  }
 
   const {
     activeTab,
@@ -65,6 +63,10 @@ export const MainContent: React.FC<MainContentProps> = ({
     dateRange
   );
 
+  if (children) {
+    return <main className="grow flex flex-col max-md:h-screen">{children}</main>;
+  }
+
   return (
     <main className="grow flex flex-col max-md:h-screen">
       <ProposalHeader
@@ -93,7 +95,7 @@ export const MainContent: React.FC<MainContentProps> = ({
         />
       </div>
 
-      <ProposalFooter 
+      <ProposalFooter
         totalHours={getTotalHoursDisplay()}
         hoursPerDay={getHoursPerDayDisplay()}
         hoursPerDayValue={getHoursPerDayValue()}

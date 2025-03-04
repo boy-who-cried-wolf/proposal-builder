@@ -6,19 +6,38 @@ import { addDays } from "date-fns";
 import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 
-export function useProposalFormState() {
+export function useProposalFormState(
+  propsProjectDescription?: string,
+  propsProjectType?: string,
+  propsHourlyRate?: number,
+  propsFreelancerRate?: number,
+  propsProjectBudget?: number,
+  propsDateRange?: { from: Date; to?: Date },
+  propsServices?: Array<string>,
+) {
+
+  console.log(
+    propsProjectDescription,
+    propsProjectType,
+    propsHourlyRate,
+    propsFreelancerRate,
+    propsProjectBudget,
+    propsDateRange,
+    propsServices,
+  )
+
   const { user } = useAuth();
 
   const [organization, setOrganization] = useState<Organization>()
-  const [projectDescription, setProjectDescription] = useState("");
-  const [hourlyRate, setHourlyRate] = useState(100);
-  const [freelancerRate, setFreelancerRate] = useState(60);
-  const [projectBudget, setProjectBudget] = useState(5000);
-  const [projectType, setProjectType] = useState("Website");
+  const [projectDescription, setProjectDescription] = useState(propsProjectDescription ?? "");
+  const [hourlyRate, setHourlyRate] = useState(propsHourlyRate ?? 100);
+  const [freelancerRate, setFreelancerRate] = useState(propsFreelancerRate ?? 60);
+  const [projectBudget, setProjectBudget] = useState(propsProjectBudget ?? 5000);
+  const [projectType, setProjectType] = useState(propsProjectType ?? "Website");
+  const [services, setServices] = useState<Array<string>>(propsServices ?? []);
   const [loadingServices, setLoadingServices] = useState(false);
-  const [services, setServices] = useState<Array<string>>([]);
   const [servicesOptions, setServicesOptions] = useState<Array<string>>([]);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(propsDateRange ?? {
     from: new Date(),
     to: addDays(new Date(), 14),
   });
@@ -29,10 +48,11 @@ export function useProposalFormState() {
 
     setOrganization(resOrg);
 
-    setServices(resOrg.services);
-    setServicesOptions(resOrg.services);
-    setHourlyRate(resOrg.hourly_rate);
+    setServices(propsServices ?? resOrg.services);
+    setHourlyRate(propsHourlyRate ?? resOrg.hourly_rate);
     // setFreelancerRate(resOrg.client_rate);
+
+    setServicesOptions(resOrg.services);
 
     setLoadingServices(false);
   }

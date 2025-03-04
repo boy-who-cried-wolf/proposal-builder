@@ -13,7 +13,7 @@ export function useProposalContent(
   hourlyRate: number,
   freelancerRate: number = 0,
   projectBudget: number = 0,
-  dateRange?: { from: Date; to?: Date }
+  dateRange?: { from: Date; to?: Date },
 ) {
   const [activeTab, setActiveTab] = useState(0);
   const [activeHeaderTab, setActiveHeaderTab] = useState<number | null>(null);
@@ -73,22 +73,22 @@ export function useProposalContent(
     activeHeaderTab,
     handleTabClick,
     handleHeaderTabChange,
-    
+
     // Data
     sections,
     revisions,
-    
+
     // Action states
     isSaving,
     isCopying,
-    
+
     // Editing states
     isEditDialogOpen,
     editingItem,
     isHoursPriceLocked,
     isSectionEditorOpen,
     editingSectionIndex,
-    
+
     // Metrics
     getTotalHoursDisplay,
     getHoursPerDayDisplay,
@@ -96,11 +96,11 @@ export function useProposalContent(
     getTotalValueDisplay,
     calculateMonthlyRevenue: getMonthlyRevenueDisplay,
     calculateProfitMargin: getProfitMargin,
-    
+
     // Actions
     handleSaveProposal,
     handleCopyToFigma,
-    
+
     // Editing functions
     openEditDialog,
     openSectionSettings,

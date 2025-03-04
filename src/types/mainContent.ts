@@ -9,6 +9,7 @@ export interface MainContentProps {
   freelancerRate?: number;
   projectBudget?: number;
   dateRange?: { from: Date; to?: Date };
+  services?: Array<string>;
   proposalHistory?: ProposalSection[][];
   onRevertProposal?: (index: number) => void;
   children?: React.ReactNode;

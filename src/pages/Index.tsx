@@ -13,12 +13,13 @@ const Index = () => {
   const { user } = useAuth();
   const [generatedProposalSections, setGeneratedProposalSections] = useState<ProposalSection[]>([]);
   const [proposalHistory, setProposalHistory] = useState<ProposalSection[][]>([]);
-  const [projectDescription, setProjectDescription] = useState("");
-  const [projectType, setProjectType] = useState("");
-  const [hourlyRate, setHourlyRate] = useState(0);
-  const [freelancerRate, setFreelancerRate] = useState(0);
-  const [projectBudget, setProjectBudget] = useState(0);
+  const [projectDescription, setProjectDescription] = useState<string>();
+  const [projectType, setProjectType] = useState<string>();
+  const [hourlyRate, setHourlyRate] = useState<number>();
+  const [freelancerRate, setFreelancerRate] = useState<number>();
+  const [projectBudget, setProjectBudget] = useState<number>();
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [services, setServices] = useState<Array<string>>();
 
   // Check if there's saved form data after login
   useEffect(() => {
@@ -30,14 +31,15 @@ const Index = () => {
         setHourlyRate(savedData.hourlyRate);
         setFreelancerRate(savedData.freelancerRate);
         setProjectBudget(savedData.projectBudget);
-        
+
         if (savedData.dateRange) {
           setDateRange({
             from: new Date(savedData.dateRange.from),
             to: new Date(savedData.dateRange.to),
           });
         }
-        
+        setServices(savedData?.services ?? []);
+
         // Clear saved data since we've restored it
         clearSavedProposalFormData();
       }
@@ -45,23 +47,25 @@ const Index = () => {
   }, [user]);
 
   const handleProposalGenerated = (
-    sections: ProposalSection[], 
-    description: string, 
-    type: string, 
+    sections: ProposalSection[],
+    description: string,
+    type: string,
     rate: number,
-    freelancerRate: number
+    freelancerRate: number,
+    services?: Array<string>
   ) => {
     // Save the current proposal to history if it exists
     if (generatedProposalSections.length > 0) {
       setProposalHistory(prev => [...prev, [...generatedProposalSections]]);
     }
-    
+
     setGeneratedProposalSections(sections);
     setProjectDescription(description);
     setProjectType(type);
     setHourlyRate(rate);
     setFreelancerRate(freelancerRate);
-    
+    setServices(services);
+
     // Get the project budget and date range from the form
     const form = document.querySelector('form');
     if (form) {
@@ -69,7 +73,7 @@ const Index = () => {
       if (budgetInput) {
         setProjectBudget(Number(budgetInput.value));
       }
-      
+
       // Get the date range from the button text
       const dateRangeButton = form.querySelector('button[class*="justify-start"]');
       if (dateRangeButton && dateRangeButton.textContent) {
@@ -96,7 +100,7 @@ const Index = () => {
   const handleRevertProposal = (index: number) => {
     if (proposalHistory[index]) {
       setGeneratedProposalSections([...proposalHistory[index]]);
-      
+
       // Remove all history up to the reverted point
       setProposalHistory(prev => prev.slice(0, index));
     }
@@ -110,12 +114,20 @@ const Index = () => {
       />
       <div className="flex w-full h-screen bg-white max-md:flex-col">
         <Sidebar />
-        <MiddleSection 
-          onProposalGenerated={handleProposalGenerated} 
+        <MiddleSection
+          projectDescription={projectDescription}
+          projectType={projectType}
+          hourlyRate={hourlyRate}
+          freelancerRate={freelancerRate}
+          projectBudget={projectBudget}
+          dateRange={dateRange}
+          services={services}
+
+          onProposalGenerated={handleProposalGenerated}
           proposalSections={generatedProposalSections}
           onUpdateProposal={handleUpdateProposal}
         />
-        <MainContent 
+        <MainContent
           generatedProposalSections={generatedProposalSections}
           projectDescription={projectDescription}
           projectType={projectType}
@@ -123,6 +135,7 @@ const Index = () => {
           freelancerRate={freelancerRate}
           projectBudget={projectBudget}
           dateRange={dateRange}
+          services={services}
           proposalHistory={proposalHistory}
           onRevertProposal={handleRevertProposal}
         />
