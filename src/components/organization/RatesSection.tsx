@@ -30,6 +30,13 @@ export const RatesSection: React.FC<RatesSectionProps> = ({
     return null;
   }, [hourlyRate, clientRate]);
 
+  // Determine color based on profit margin percentage
+  const getProfitMarginColor = (margin: number): string => {
+    if (margin >= 60) return "text-green-600";  // Green for >= 60%
+    if (margin >= 30) return "text-amber-500";  // Yellow/Amber for 30-59%
+    return "text-red-600";                     // Red for < 30%
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-medium">Rates</h3>
@@ -87,7 +94,7 @@ export const RatesSection: React.FC<RatesSectionProps> = ({
       {profitMargin && (
         <div className="bg-muted/50 p-3 rounded-md text-sm">
           <p>
-            With these rates, your profit margin is approximately <span className="font-medium">{profitMargin}%</span>
+            With these rates, your profit margin is approximately <span className={`font-medium ${getProfitMarginColor(parseFloat(profitMargin))}`}>{profitMargin}%</span>
           </p>
         </div>
       )}
