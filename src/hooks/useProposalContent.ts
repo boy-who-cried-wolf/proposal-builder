@@ -20,9 +20,12 @@ export function useProposalContent(
   const [sections, setSections] = useState<ProposalSection[]>(generatedProposalSections);
   const [revisions, setRevisions] = useState<Revision[]>([]);
 
+  const jsonGeneratedProposalSections = JSON.stringify(generatedProposalSections)
+
   useEffect(() => {
     setSections(generatedProposalSections);
-  }, [generatedProposalSections]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jsonGeneratedProposalSections]);
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
