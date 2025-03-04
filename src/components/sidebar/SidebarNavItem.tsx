@@ -3,11 +3,10 @@ import React from "react";
 import { NavItem } from "@/components/ui/NavItem";
 import { AnimatePresence, motion } from "framer-motion";
 import { LucideProps } from "lucide-react";
-import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 
 interface SidebarNavItemProps {
   title?: string;
-  icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
+  icon: React.ComponentType<{ className?: string }>;
   content?: React.ReactNode;
   isActive: boolean;
   isExpanded: boolean;
@@ -38,7 +37,7 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
     <div>
       <NavItem
         active={isActive}
-        icon={<Icon />}
+        icon={<Icon className="text-black" />}
         onClick={handleClick}
         isExpanded={isExpanded}
       >

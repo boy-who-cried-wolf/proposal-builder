@@ -3,10 +3,9 @@ import React, { useEffect, useState } from "react";
 import { SidebarNavItem } from "./SidebarNavItem";
 import { 
   Home,
-  BarChart3,
+  LayoutDashboard,
   Settings,
-  Users,
-  FileText,
+  MessageSquare,
   ShieldCheck
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,6 +27,9 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Standard size for all icons to maintain consistency
+  const ICON_SIZE = 20;
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -56,43 +58,43 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         isExpanded={isExpanded}
         isActive={activeNavItem === 0 || location.pathname === "/"}
         onClick={() => handleNavigation(0, "/")}
-        icon={Home}
+        icon={({className}) => <Home size={ICON_SIZE} className={className} />}
         label="Home"
         path="/"
       />
       <SidebarNavItem
         isExpanded={isExpanded}
-        isActive={activeNavItem === 1 || location.pathname.includes("proposals")}
-        onClick={() => handleNavigation(1, "/proposals")}
-        icon={FileText}
-        label="Proposals"
-        path="/proposals"
+        isActive={activeNavItem === 1 || location.pathname.includes("dashboard")}
+        onClick={() => handleNavigation(1, "/dashboard")}
+        icon={({className}) => <LayoutDashboard size={ICON_SIZE} className={className} />}
+        label="Dashboard"
+        path="/dashboard"
       />
       <SidebarNavItem
         isExpanded={isExpanded}
-        isActive={activeNavItem === 2 || location.pathname === "/dashboard"}
-        onClick={() => handleNavigation(2, "/dashboard")}
-        icon={BarChart3}
-        label="Dashboard"
-        path="/dashboard"
+        isActive={activeNavItem === 2 || location.pathname.includes("assistant")}
+        onClick={() => handleNavigation(2, "/assistant")}
+        icon={({className}) => <MessageSquare size={ICON_SIZE} className={className} />}
+        label="Assistant"
+        path="/assistant"
       />
       {isAdmin && (
         <SidebarNavItem
           isExpanded={isExpanded}
-          isActive={activeNavItem === 3 || location.pathname === "/admin"}
+          isActive={activeNavItem === 3 || location.pathname.includes("admin")}
           onClick={() => handleNavigation(3, "/admin")}
-          icon={ShieldCheck}
+          icon={({className}) => <ShieldCheck size={ICON_SIZE} className={className} />}
           label="Admin"
           path="/admin"
         />
       )}
       <SidebarNavItem
         isExpanded={isExpanded}
-        isActive={activeNavItem === 4 || location.pathname.includes("account-settings")}
-        onClick={() => handleNavigation(4, "/account-settings")}
-        icon={Settings}
+        isActive={activeNavItem === 4 || location.pathname.includes("settings")}
+        onClick={() => handleNavigation(4, "/settings")}
+        icon={({className}) => <Settings size={ICON_SIZE} className={className} />}
         label="Settings"
-        path="/account-settings"
+        path="/settings"
       />
     </div>
   );

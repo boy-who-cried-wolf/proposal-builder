@@ -27,3 +27,17 @@ export const isTestEnvironment = (): boolean => {
 export const getEnvironmentMode = (): 'test' | 'live' => {
   return isTestEnvironment() ? 'test' : 'live';
 };
+
+/**
+ * Validate application routes to ensure they exist
+ */
+export const getValidRoutes = (): string[] => {
+  return [
+    '/',                // Home
+    '/dashboard',       // Dashboard
+    '/assistant',       // Assistant
+    '/admin',           // Admin (requires admin permission)
+    '/settings',        // Settings
+    '/account-settings' // Legacy settings route
+  ];
+};

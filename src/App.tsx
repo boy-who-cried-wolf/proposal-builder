@@ -32,9 +32,17 @@ const App = () => (
             {/* Basic protected routes - just require authentication */}
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Index />} />
+              
+              {/* Account settings routes - maintain backwards compatibility */}
               <Route path="/account-settings" element={<AccountSettings />} />
               <Route path="/account-settings/organization" element={<OrganizationSettings />} />
               <Route path="/account-settings/plan" element={<PlanSettings />} />
+              
+              {/* New settings route */}
+              <Route path="/settings" element={<AccountSettings />} />
+              
+              {/* Assistant route */}
+              <Route path="/assistant" element={<Index />} />
             </Route>
             
             {/* Admin route - requires admin rights */}
