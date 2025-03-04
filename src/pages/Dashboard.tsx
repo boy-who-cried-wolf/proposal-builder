@@ -111,7 +111,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center h-[42px]">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-[9px] font-semibold tracking-[1.389px] uppercase text-muted-foreground">
+              <p className="text-[9px] font-semibold tracking-[1px] uppercase text-muted-foreground">
                 Welcome back, {user?.email || 'User'}
               </p>
             </div>
@@ -129,10 +129,10 @@ const Dashboard = () => {
         <div className="grow p-6 overflow-y-auto">
           <Tabs defaultValue="all" className="mb-6" onValueChange={setStatusFilter}>
             <TabsList className="rounded-none border-b border-solid border-[#F6F6F7] bg-transparent text-[#8E9196] w-full justify-start gap-[34px] p-0">
-              <TabsTrigger value="all" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1.389px]">ALL PROPOSALS</TabsTrigger>
-              <TabsTrigger value="draft" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1.389px]">DRAFTS</TabsTrigger>
-              <TabsTrigger value="completed" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1.389px]">COMPLETED</TabsTrigger>
-              <TabsTrigger value="pending" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1.389px]">PENDING</TabsTrigger>
+              <TabsTrigger value="all" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">ALL PROPOSALS</TabsTrigger>
+              <TabsTrigger value="draft" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">DRAFTS</TabsTrigger>
+              <TabsTrigger value="completed" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">COMPLETED</TabsTrigger>
+              <TabsTrigger value="pending" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">PENDING</TabsTrigger>
             </TabsList>
             
             <div className="bg-[#F1F1F1] px-4 py-3 mt-4 mb-2 flex justify-between items-center">
@@ -201,14 +201,14 @@ const Dashboard = () => {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>{selectedProject?.title}</DialogTitle>
-            <DialogDescription className="text-[9px] font-semibold tracking-[1.389px] uppercase text-muted-foreground">
+            <DialogDescription className="text-[9px] font-semibold tracking-[1px] uppercase text-muted-foreground">
               Client: {selectedProject?.client}
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-4">
             <div>
               <h3 className="font-medium mb-1">Project Details</h3>
-              <div className="grid grid-cols-2 gap-2 text-[9px] font-semibold tracking-[1.389px] uppercase">
+              <div className="grid grid-cols-2 gap-2 text-[9px] font-semibold tracking-[1px] uppercase">
                 <div>
                   <p className="text-muted-foreground">Status:</p>
                   <p className="capitalize">{selectedProject?.status}</p>
@@ -240,11 +240,11 @@ const Dashboard = () => {
               <div className="mt-4">
                 <Button size="sm" variant="outline" className="mr-2">
                   <Eye size={16} className="mr-2" />
-                  <span className="text-[9px] font-semibold tracking-[1.389px] uppercase">View Full Project</span>
+                  <span className="text-[9px] font-semibold tracking-[1px] uppercase">View Full Project</span>
                 </Button>
                 <Button size="sm">
                   <Edit size={16} className="mr-2" />
-                  <span className="text-[9px] font-semibold tracking-[1.389px] uppercase">Edit Project</span>
+                  <span className="text-[9px] font-semibold tracking-[1px] uppercase">Edit Project</span>
                 </Button>
               </div>
             </div>

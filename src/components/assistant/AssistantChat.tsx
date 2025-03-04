@@ -305,7 +305,7 @@ export const AssistantChat: React.FC<AssistantChatProps> = ({
           <input
             type="text"
             placeholder="Refine your proposal..."
-            className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
+            className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}

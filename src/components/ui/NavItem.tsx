@@ -45,7 +45,7 @@ export const NavItem: React.FC<NavItemProps> = ({
             <div className="text-black">{icon}</div>
           </div>
         )}
-        <div className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase ml-2">
+        <div className="text-black text-[9px] font-semibold tracking-[1px] uppercase ml-2">
           {children}
         </div>
       </div>
@@ -74,7 +74,7 @@ export const NavItem: React.FC<NavItemProps> = ({
             )}
           </div>
         </TooltipTrigger>
-        <TooltipContent className="text-[9px] font-semibold tracking-[1.389px] uppercase bg-white border border-gray-200">
+        <TooltipContent className="text-[9px] font-semibold tracking-[1px] uppercase bg-white border border-gray-200">
           {children}
         </TooltipContent>
       </Tooltip>
@@ -91,7 +91,7 @@ export const NavTab: React.FC<Omit<NavItemProps, "icon">> = ({
   return (
     <div
       className={cn(
-        "rounded-none gap-[11px] text-[9px] font-semibold tracking-[1.389px] uppercase px-0 py-1.5",
+        "rounded-none gap-[11px] text-[9px] font-semibold tracking-[1px] uppercase px-0 py-1.5",
         active
           ? "text-black border-b-black border-b border-solid"
           : "text-[rgba(0,0,0,0.5)]",

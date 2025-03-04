@@ -23,7 +23,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
 }) => {
   return (
     <div>
-      <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
+      <label className="text-black text-[11px] font-semibold tracking-[1px] uppercase block mb-2">
         Project Timeline
       </label>
       <Popover>
@@ -31,7 +31,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
           <Button
             variant="outline"
             className={cn(
-              "w-full h-[39px] justify-start text-left font-normal border border-[#E1E1DC] bg-[#F7F6F2] text-[9px] font-semibold tracking-[1.389px] uppercase p-[11px]",
+              "w-full h-[39px] justify-start text-left font-normal border border-[#E1E1DC] bg-[#F7F6F2] text-[9px] font-semibold tracking-[1px] uppercase p-[11px]",
               !dateRange && "text-muted-foreground"
             )}
           >

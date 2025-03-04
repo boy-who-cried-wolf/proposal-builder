@@ -42,22 +42,22 @@ export const ProjectCardGrid: React.FC<ProjectCardGridProps> = ({
       <CardContent className="pt-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col">
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{formattedValue}</p>
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">PROPOSAL AMOUNT</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1px] uppercase">{formattedValue}</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1px] uppercase text-gray-500">PROPOSAL AMOUNT</p>
           </div>
           <div className="flex flex-col">
-            <p className={cn("text-black text-[9px] font-semibold tracking-[1.389px] uppercase", dueDateColorClass)}>{dueDate}</p>
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">DUE DATE</p>
+            <p className={cn("text-black text-[9px] font-semibold tracking-[1px] uppercase", dueDateColorClass)}>{dueDate}</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1px] uppercase text-gray-500">DUE DATE</p>
           </div>
           <div className="flex flex-col">
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase">{project.hours}</p>
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">HOURS</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1px] uppercase">{project.hours}</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1px] uppercase text-gray-500">HOURS</p>
           </div>
           <div className="flex flex-col">
-            <p className={cn("text-black text-[9px] font-semibold tracking-[1.389px] uppercase", daysRemainingColorClass)}>
+            <p className={cn("text-black text-[9px] font-semibold tracking-[1px] uppercase", daysRemainingColorClass)}>
               {Math.abs(daysRemaining)}
             </p>
-            <p className="text-black text-[9px] font-semibold tracking-[1.389px] uppercase text-gray-500">DAYS REMAINING</p>
+            <p className="text-black text-[9px] font-semibold tracking-[1px] uppercase text-gray-500">DAYS REMAINING</p>
           </div>
         </div>
         

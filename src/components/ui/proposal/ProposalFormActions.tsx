@@ -20,7 +20,7 @@ export const ProposalFormActions: React.FC<ProposalFormActionsProps> = ({
       >
         {isGenerating ? (
           <div className="flex items-center">
-            <span>Generating</span>
+            <span>Loading</span>
             <span className="ml-1 animate-pulse">...</span>
             {streamProgress > 0 && (
               <span className="ml-2 text-xs">{streamProgress}%</span>

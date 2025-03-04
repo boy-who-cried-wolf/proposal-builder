@@ -13,7 +13,7 @@ export const ProjectDescriptionTextarea: React.FC<ProjectDescriptionTextareaProp
 }) => {
   return (
     <div className="flex flex-col h-full">
-      <label htmlFor="project-description" className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
+      <label htmlFor="project-description" className="text-black text-[11px] font-semibold tracking-[1px] uppercase block mb-2">
         Project Description
       </label>
       <Textarea

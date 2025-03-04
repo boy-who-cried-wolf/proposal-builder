@@ -29,7 +29,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
                 <img src="/lovable-uploads/8e073d5c-cebc-4046-a3c6-7861dda72ee8.png" alt="PM" className="h-8 mb-1" />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="text-[9px] font-semibold tracking-[1.389px] uppercase bg-white border border-gray-200">
+            <TooltipContent className="text-[9px] font-semibold tracking-[1px] uppercase bg-white border border-gray-200">
               Expand Sidebar
             </TooltipContent>
           </Tooltip>

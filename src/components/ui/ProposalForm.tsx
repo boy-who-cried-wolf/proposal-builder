@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ProposalSection, ProposalInput } from "@/types/proposal"; 
+import { ProposalSection, ProposalInput } from "@/types/proposal";
 import { useProposalGeneration } from "@/hooks/proposal/useProposalGeneration";
 import { useProposalFormState } from "@/hooks/proposal/useProposalFormState";
 import { ProposalFormInputs } from "./proposal/ProposalFormInputs";
@@ -18,16 +18,18 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  
+
   const {
     projectDescription, setProjectDescription,
     hourlyRate, setHourlyRate,
     freelancerRate, setFreelancerRate,
     projectBudget, setProjectBudget,
     projectType, setProjectType,
-    dateRange, setDateRange
+    dateRange, setDateRange,
+    services, setServices,
+    loadingServices, servicesOptions
   } = useProposalFormState();
-  
+
   const {
     proposalSections,
     isGenerating,
@@ -51,23 +53,24 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
       setHourlyRate(savedData.hourlyRate);
       setFreelancerRate(savedData.freelancerRate);
       setProjectBudget(savedData.projectBudget);
-      
+
       if (savedData.dateRange) {
         setDateRange({
           from: new Date(savedData.dateRange.from),
           to: new Date(savedData.dateRange.to),
         });
       }
-      
+
       if (user) {
         clearSavedProposalFormData();
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!projectDescription) {
       return;
     }
@@ -88,9 +91,9 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
           to: dateRange.to.toISOString()
         } : undefined
       });
-      
+
       await generateProposalContent();
-      
+
       return;
     }
 
@@ -109,7 +112,7 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
         to: dateRange.to.toISOString()
       } : undefined
     });
-    
+
     navigate('/auth');
   };
 
@@ -117,7 +120,7 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
     <div className="h-full mb-4 flex flex-col">
       <div className="p-4 bg-white flex-grow flex flex-col h-full">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
-          <ProposalFormInputs 
+          <ProposalFormInputs
             projectType={projectType}
             setProjectType={setProjectType}
             hourlyRate={hourlyRate}
@@ -130,18 +133,22 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({ onProposalGenerated 
             setDateRange={setDateRange}
             projectDescription={projectDescription}
             setProjectDescription={setProjectDescription}
+            services={services}
+            setServices={setServices}
+            loadingServices={loadingServices}
+            servicesOptions={servicesOptions}
           />
-          
-          <ProposalFormActions isGenerating={isGenerating} streamProgress={streamProgress} />
-          
-          {isGenerating && streamProgress > 0 && (
+
+          <ProposalFormActions isGenerating={isGenerating || loadingServices} streamProgress={streamProgress} />
+
+          {(isGenerating || loadingServices) && streamProgress > 0 && (
             <ProposalProgressBar streamProgress={streamProgress} />
           )}
         </form>
       </div>
 
-      <AuthenticationDialog 
-        open={showAuthDialog} 
+      <AuthenticationDialog
+        open={showAuthDialog}
         onOpenChange={setShowAuthDialog}
         onGoToAuth={handleGoToAuth}
       />

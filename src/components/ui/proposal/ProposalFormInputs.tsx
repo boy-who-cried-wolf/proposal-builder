@@ -6,6 +6,7 @@ import { DateRangePicker } from "../DateRangePicker";
 import { ProjectDescriptionTextarea } from "../ProjectDescriptionTextarea";
 import { DateRange } from "react-day-picker";
 import { Textarea } from "../textarea";
+import { ServicesSelect } from "../ServicesSelect";
 
 interface ProposalFormInputsProps {
   projectType: string;
@@ -20,6 +21,10 @@ interface ProposalFormInputsProps {
   setDateRange: (range: DateRange | undefined) => void;
   projectDescription: string;
   setProjectDescription: (description: string) => void;
+  services: Array<string>;
+  setServices: (v: Array<string>) => void;
+  loadingServices: boolean;
+  servicesOptions: Array<string>;
 }
 
 export const ProposalFormInputs: React.FC<ProposalFormInputsProps> = ({
@@ -34,16 +39,27 @@ export const ProposalFormInputs: React.FC<ProposalFormInputsProps> = ({
   dateRange,
   setDateRange,
   projectDescription,
-  setProjectDescription
+  setProjectDescription,
+  services,
+  setServices,
+  loadingServices,
+  servicesOptions,
 }) => {
   return (
     <div className="flex flex-col h-full">
       <div className="space-y-4 mb-4">
-        <ProjectTypeSelect 
+        <ServicesSelect
+          services={services}
+          setServices={setServices}
+          loadingServices={loadingServices}
+          servicesOptions={servicesOptions}
+        />
+
+        <ProjectTypeSelect
           projectType={projectType}
           setProjectType={setProjectType}
         />
-        
+
         <NumericInput
           label="Hourly Rate ($)"
           value={hourlyRate}
@@ -62,13 +78,13 @@ export const ProposalFormInputs: React.FC<ProposalFormInputsProps> = ({
           onChange={setProjectBudget}
           min={100}
         />
-        
+
         <DateRangePicker
           dateRange={dateRange}
           setDateRange={setDateRange}
         />
       </div>
-      
+
       <div className="flex-grow mb-4">
         <ProjectDescriptionTextarea
           projectDescription={projectDescription}

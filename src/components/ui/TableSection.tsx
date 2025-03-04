@@ -28,17 +28,17 @@ export const TableSection: React.FC<TableSectionProps> = ({
       <SectionHeader title={title} />
 
       {/* Table Header */}
-      <div className="section_table_header grid grid-cols-[2fr_4fr_1fr_1fr] text-black text-[9px] font-semibold tracking-[1.389px] uppercase px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
-        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+      <div className="section_table_header grid grid-cols-[2fr_4fr_1fr_1fr] text-black text-[9px] font-semibold tracking-[1px] uppercase px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
+        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
           Item
         </div>
-        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
           Description
         </div>
-        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
           Hours
         </div>
-        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
           Price
         </div>
       </div>
@@ -49,16 +49,16 @@ export const TableSection: React.FC<TableSectionProps> = ({
           key={index}
           className="section_table_row grid grid-cols-[2fr_4fr_1fr_1fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]"
         >
-          <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+          <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
             {item.item}
           </div>
-          <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+          <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
             {item.description}
           </div>
-          <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+          <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
             {item.hours}
           </div>
-          <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+          <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
             {item.price}
           </div>
         </div>
@@ -66,10 +66,10 @@ export const TableSection: React.FC<TableSectionProps> = ({
 
       {/* Table Footer */}
       <div className="section_table_footer grid grid-cols-[2fr_4fr_1fr_1fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
-        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
           Subtotal
         </div>
-        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1.389px] uppercase">
+        <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
           {subtotal}
         </div>
       </div>

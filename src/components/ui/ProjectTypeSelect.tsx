@@ -27,13 +27,13 @@ export const ProjectTypeSelect: React.FC<ProjectTypeSelectProps> = ({
 }) => {
   return (
     <div>
-      <label className="text-black text-[11px] font-semibold tracking-[1.389px] uppercase block mb-2">
+      <label className="text-black text-[11px] font-semibold tracking-[1px] uppercase block mb-2">
         Project Type
       </label>
       <select
         value={projectType}
         onChange={(e) => setProjectType(e.target.value)}
-        className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1.389px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
+        className="w-full h-[39px] rounded border text-black text-[9px] font-semibold tracking-[1px] uppercase bg-[#F7F6F2] p-[11px] border-solid border-[#E1E1DC]"
       >
         {projectTypes.map((type) => (
           <option key={type} value={type}>
