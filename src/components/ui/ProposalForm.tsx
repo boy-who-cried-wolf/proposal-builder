@@ -70,8 +70,6 @@ export const ProposalForm: React.FC<ProposalFormProps> = ({
     onProposalGenerated
   );
 
-  console.log(projectDescription)
-
   useEffect(() => {
     const savedData = getSavedProposalFormData();
     if (savedData) {
