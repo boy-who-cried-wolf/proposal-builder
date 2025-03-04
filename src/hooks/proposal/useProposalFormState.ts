@@ -32,7 +32,7 @@ export function useProposalFormState() {
     setServices(resOrg.services);
     setServicesOptions(resOrg.services);
     setHourlyRate(resOrg.hourly_rate);
-    setFreelancerRate(resOrg.client_rate);
+    // setFreelancerRate(resOrg.client_rate);
 
     setLoadingServices(false);
   }

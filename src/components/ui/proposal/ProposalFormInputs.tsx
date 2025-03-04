@@ -1,11 +1,9 @@
 
 import React from "react";
-import { ProjectTypeSelect } from "../ProjectTypeSelect";
-import { NumericInput } from "../NumericInput";
-import { DateRangePicker } from "../DateRangePicker";
-import { ProjectDescriptionTextarea } from "../ProjectDescriptionTextarea";
 import { DateRange } from "react-day-picker";
-import { Textarea } from "../textarea";
+import { DateRangePicker } from "../DateRangePicker";
+import { NumericInput } from "../NumericInput";
+import { ProjectDescriptionTextarea } from "../ProjectDescriptionTextarea";
 import { ServicesSelect } from "../ServicesSelect";
 
 interface ProposalFormInputsProps {
@@ -55,10 +53,10 @@ export const ProposalFormInputs: React.FC<ProposalFormInputsProps> = ({
           servicesOptions={servicesOptions}
         />
 
-        <ProjectTypeSelect
+        {/* <ProjectTypeSelect
           projectType={projectType}
           setProjectType={setProjectType}
-        />
+        /> */}
 
         <NumericInput
           label="Hourly Rate ($)"
@@ -66,11 +64,12 @@ export const ProposalFormInputs: React.FC<ProposalFormInputsProps> = ({
           onChange={setHourlyRate}
         />
 
+        {/* 
         <NumericInput
           label="Freelancer Rate ($)"
           value={freelancerRate}
           onChange={setFreelancerRate}
-        />
+        /> */}
 
         <NumericInput
           label="Project Budget ($)"
