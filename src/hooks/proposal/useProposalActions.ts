@@ -20,9 +20,6 @@ export function useProposalActions(
   const [isCopying, setIsCopying] = useState(false);
 
   const handleSaveProposal = async () => {
-
-    console.log("Hit save proposal")
-
     try {
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
@@ -45,6 +42,10 @@ export function useProposalActions(
 
       setIsSaving(true);
 
+      toast({
+        title: "Info",
+        description: "Saving proposal ...",
+      });
       const result = await saveProposal({
         title: `Proposal for ${projectType} project`,
         projectDescription: projectDescription,
