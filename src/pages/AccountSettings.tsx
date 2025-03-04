@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { MainContent } from "@/components/layout/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -9,20 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { NavTab } from "@/components/ui/NavItem";
-
 const AccountSettings = () => {
-  const { user, signOut, requestPasswordReset } = useAuth();
+  const {
+    user,
+    signOut,
+    requestPasswordReset
+  } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
@@ -30,20 +23,16 @@ const AccountSettings = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
   useEffect(() => {
     if (user) {
       loadUserProfile();
     }
   }, [user]);
-
   const loadUserProfile = async () => {
     if (!user?.id) return;
-    
     try {
       setLoading(true);
       const profile = await getUserProfile(user.id);
-      
       if (profile) {
         setFirstName(profile.first_name || "");
         setLastName(profile.last_name || "");
@@ -55,17 +44,14 @@ const AccountSettings = () => {
       setLoading(false);
     }
   };
-
   const handleSave = async () => {
     if (!user?.id) return;
-    
     try {
       setSaving(true);
       await updateUserProfile(user.id, {
         first_name: firstName,
-        last_name: lastName,
+        last_name: lastName
       });
-      
       toast.success("Account settings saved successfully");
     } catch (error) {
       console.error("Error saving account settings:", error);
@@ -74,10 +60,8 @@ const AccountSettings = () => {
       setSaving(false);
     }
   };
-
   const handleRequestPasswordReset = async () => {
     if (!user?.email) return;
-    
     try {
       await requestPasswordReset(user.email);
       toast.success("Password reset instructions sent to your email");
@@ -86,14 +70,11 @@ const AccountSettings = () => {
       toast.error("Failed to send password reset email");
     }
   };
-
   const handleDeleteAccount = async () => {
     toast.info("Account deletion is not implemented in this demo");
     setShowDeleteDialog(false);
   };
-
-  return (
-    <div className="flex h-screen">
+  return <div className="flex h-screen">
       <Sidebar />
       <MainContent>
         <div className="border-b border-border pb-4">
@@ -102,61 +83,37 @@ const AccountSettings = () => {
           </div>
         </div>
         
-        <div className="container px-4">
+        <div className="container px-4 py-[25px]">
           <div className="flex gap-[34px] px-[23px] py-[15px] mb-4">
-            <NavTab 
-              active={location.pathname === "/account-settings"} 
-              onClick={() => navigate("/account-settings")}
-            >
+            <NavTab active={location.pathname === "/account-settings"} onClick={() => navigate("/account-settings")}>
               Account
             </NavTab>
-            <NavTab 
-              active={location.pathname === "/account-settings/organization"} 
-              onClick={() => navigate("/account-settings/organization")}
-            >
+            <NavTab active={location.pathname === "/account-settings/organization"} onClick={() => navigate("/account-settings/organization")}>
               Organization
             </NavTab>
-            <NavTab 
-              active={location.pathname === "/account-settings/plan"} 
-              onClick={() => navigate("/account-settings/plan")}
-            >
+            <NavTab active={location.pathname === "/account-settings/plan"} onClick={() => navigate("/account-settings/plan")}>
               Plan
             </NavTab>
           </div>
           
-          {loading ? (
-            <div className="text-center py-8">Loading account settings...</div>
-          ) : (
-            <>
+          {loading ? <div className="text-center py-8">Loading account settings...</div> : <>
               <div className="grid gap-4 max-w-xl">
                 <h2 className="text-xl font-semibold">Personal Information</h2>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">First Name</label>
-                    <Input 
-                      value={firstName} 
-                      onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="Your first name" 
-                    />
+                    <Input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Your first name" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Last Name</label>
-                    <Input 
-                      value={lastName} 
-                      onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Your last name" 
-                    />
+                    <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Your last name" />
                   </div>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium mb-1">Email Address</label>
-                  <Input 
-                    value={user?.email || ""} 
-                    disabled 
-                    className="bg-muted/30" 
-                  />
+                  <Input value={user?.email || ""} disabled className="bg-muted/30" />
                   <p className="text-xs text-muted-foreground mt-1">
                     Email address cannot be changed.
                   </p>
@@ -192,8 +149,7 @@ const AccountSettings = () => {
                   </div>
                 </div>
               </div>
-            </>
-          )}
+            </>}
         </div>
 
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -214,8 +170,6 @@ const AccountSettings = () => {
           </AlertDialogContent>
         </AlertDialog>
       </MainContent>
-    </div>
-  );
+    </div>;
 };
-
 export default AccountSettings;
