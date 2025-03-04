@@ -10,7 +10,7 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserProfile } from "@/integrations/supabase/profileService";
+import { checkIsAdmin } from "@/integrations/supabase/profileService";
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface SidebarNavigationProps {
@@ -34,8 +34,9 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       if (!user) return;
       
       try {
-        const profile = await getUserProfile(user.id);
-        setIsAdmin(profile?.is_admin || false);
+        // Use the dedicated admin check function to avoid RLS issues
+        const adminStatus = await checkIsAdmin(user.id);
+        setIsAdmin(adminStatus);
       } catch (error) {
         console.error("Error checking admin status:", error);
       }

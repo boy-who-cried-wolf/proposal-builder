@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getUserProfile } from '@/integrations/supabase/profileService';
+import { checkIsAdmin } from '@/integrations/supabase/profileService';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 
@@ -20,8 +20,9 @@ export const AdminRoute: React.FC = () => {
       }
 
       try {
-        const profile = await getUserProfile(user.id);
-        setIsAdmin(profile?.is_admin || false);
+        // Use the dedicated admin check function to avoid RLS issues
+        const adminStatus = await checkIsAdmin(user.id);
+        setIsAdmin(adminStatus);
       } catch (error) {
         console.error("Error checking admin status:", error);
         toast.error("Error checking permissions");

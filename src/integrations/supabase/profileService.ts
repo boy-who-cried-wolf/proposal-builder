@@ -43,6 +43,27 @@ export const getUserProfile = async (userId: string) => {
   }
 };
 
+// Function to check if a user is an admin - directly check admin status
+export const checkIsAdmin = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', userId)
+      .single();
+    
+    if (error) {
+      console.error('Error checking admin status:', error);
+      return false;
+    }
+    
+    return data?.is_admin || false;
+  } catch (error) {
+    console.error('Error in checkIsAdmin:', error);
+    return false;
+  }
+};
+
 // Helper function to update user profile including organization settings
 export const updateUserProfile = async (userId: string, updates: any) => {
   console.log('Updating profile for user:', userId, 'with data:', updates);
