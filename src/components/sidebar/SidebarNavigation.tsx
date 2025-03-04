@@ -3,9 +3,10 @@ import React, { useEffect, useState } from "react";
 import { SidebarNavItem } from "./SidebarNavItem";
 import { 
   Home,
-  BarChart3,
+  LayoutDashboard,
   Settings,
-  MessageSquare
+  MessageSquare,
+  Shield
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { checkIsAdmin } from "@/integrations/supabase/profileService";
@@ -26,6 +27,9 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Consistent icon size for all navigation items
+  const iconSize = 20;
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -54,7 +58,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         isExpanded={isExpanded}
         isActive={activeNavItem === 0 || location.pathname === "/"}
         onClick={() => handleNavigation(0, "/")}
-        icon={Home}
+        icon={(props) => <Home size={iconSize} {...props} />}
         label="Home"
         path="/"
       />
@@ -62,7 +66,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         isExpanded={isExpanded}
         isActive={activeNavItem === 1 || location.pathname === "/dashboard"}
         onClick={() => handleNavigation(1, "/dashboard")}
-        icon={BarChart3}
+        icon={(props) => <LayoutDashboard size={iconSize} {...props} />}
         label="Dashboard"
         path="/dashboard"
       />
@@ -70,7 +74,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         isExpanded={isExpanded}
         isActive={activeNavItem === 2 || location.pathname === "/assistant"}
         onClick={() => handleNavigation(2, "/assistant")}
-        icon={MessageSquare}
+        icon={(props) => <MessageSquare size={iconSize} {...props} />}
         label="Assistant"
         path="/assistant"
       />
@@ -79,7 +83,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           isExpanded={isExpanded}
           isActive={activeNavItem === 3 || location.pathname === "/admin"}
           onClick={() => handleNavigation(3, "/admin")}
-          icon={Settings}
+          icon={(props) => <Shield size={iconSize} {...props} />}
           label="Admin"
           path="/admin"
         />
@@ -88,7 +92,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         isExpanded={isExpanded}
         isActive={activeNavItem === 4 || location.pathname === "/settings"}
         onClick={() => handleNavigation(4, "/settings")}
-        icon={Settings}
+        icon={(props) => <Settings size={iconSize} {...props} />}
         label="Settings"
         path="/settings"
       />

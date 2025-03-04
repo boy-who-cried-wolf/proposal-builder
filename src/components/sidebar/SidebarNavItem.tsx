@@ -3,11 +3,10 @@ import React from "react";
 import { NavItem } from "@/components/ui/NavItem";
 import { AnimatePresence, motion } from "framer-motion";
 import { LucideProps } from "lucide-react";
-import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 
 interface SidebarNavItemProps {
   title?: string;
-  icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
+  icon: React.ComponentType<LucideProps> | ((props: LucideProps) => JSX.Element);
   content?: React.ReactNode;
   isActive: boolean;
   isExpanded: boolean;
@@ -19,7 +18,7 @@ interface SidebarNavItemProps {
 
 export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   title,
-  icon: Icon,
+  icon: IconComponent,
   content,
   isActive,
   isExpanded,
@@ -34,11 +33,19 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   // Use label or title for displaying the text
   const displayText = label || title;
   
+  // Render the icon component
+  const renderIcon = () => {
+    if (typeof IconComponent === 'function') {
+      return <IconComponent />;
+    }
+    return null;
+  };
+  
   return (
     <div>
       <NavItem
         active={isActive}
-        icon={<Icon />}
+        icon={renderIcon()}
         onClick={handleClick}
         isExpanded={isExpanded}
       >

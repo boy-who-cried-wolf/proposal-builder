@@ -5,6 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { AssistantChat } from '@/components/assistant/AssistantChat';
 
 const AssistantPage = () => {
+  // Create an empty array for proposalSections to satisfy the component requirements
+  const proposalSections = [];
+
   return (
     <Layout>
       <div className="container py-8 max-w-7xl mx-auto">
@@ -20,7 +23,7 @@ const AssistantPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
-            <AssistantChat />
+            <AssistantChat proposalSections={proposalSections} />
           </CardContent>
         </Card>
       </div>
