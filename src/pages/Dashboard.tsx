@@ -52,9 +52,8 @@ const sampleProjects = [{
   status: "pending"
 }];
 const Dashboard = () => {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
+
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [sortField, setSortField] = useState<"value" | "date" | "hours">("value");
@@ -62,6 +61,7 @@ const Dashboard = () => {
   const [projects, setProjects] = useState(sampleProjects);
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+
   const filteredProjects = statusFilter === "all" ? projects : projects.filter(project => project.status === statusFilter);
   const sortedProjects = [...filteredProjects].sort((a, b) => {
     if (sortField === "date") {
@@ -105,152 +105,152 @@ const Dashboard = () => {
     setIsViewDialogOpen(true);
   };
   return <div className="flex h-screen">
-      <Sidebar />
-      <div className="flex flex-col flex-grow">
-        <header className="border-b border-black px-6 py-[13px]">
-          <div className="flex justify-between items-center h-[42px]">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-[9px] font-semibold tracking-[1px] uppercase text-muted-foreground">
-                Welcome back, {user?.email || 'User'}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="icon" className={viewMode === "grid" ? "bg-muted" : ""} onClick={() => setViewMode("grid")} title="Grid View">
-                <Grid size={16} />
-              </Button>
-              <Button variant="outline" size="icon" className={viewMode === "list" ? "bg-muted" : ""} onClick={() => setViewMode("list")} title="List View">
-                <List size={16} />
-              </Button>
-            </div>
+    <Sidebar />
+    <div className="flex flex-col flex-grow">
+      <header className="border-b border-black px-6 py-[13px]">
+        <div className="flex justify-between items-center h-[42px]">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-[9px] font-semibold tracking-[1px] uppercase text-muted-foreground">
+              Welcome back, {user?.email || 'User'}
+            </p>
           </div>
-        </header>
-        
-        <div className="grow p-6 overflow-y-auto">
-          <Tabs defaultValue="all" className="mb-6" onValueChange={setStatusFilter}>
-            <TabsList className="rounded-none border-b border-solid border-[#F6F6F7] bg-transparent text-[#8E9196] w-full justify-start gap-[34px] p-0">
-              <TabsTrigger value="all" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">ALL PROPOSALS</TabsTrigger>
-              <TabsTrigger value="draft" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">DRAFTS</TabsTrigger>
-              <TabsTrigger value="completed" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">COMPLETED</TabsTrigger>
-              <TabsTrigger value="pending" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">PENDING</TabsTrigger>
-            </TabsList>
-            
-            <div className="bg-[#F1F1F1] px-4 py-3 mt-4 mb-2 flex justify-between items-center">
-              <h2 className="text-[#403E43] text-lg font-medium">proposals & contracts</h2>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    {sortField === "value" ? <DollarSign size={16} className="mr-1" /> : sortField === "date" ? <Clock size={16} className="mr-1" /> : <Clock size={16} className="mr-1" />}
-                    Sort by {sortField}
-                    {sortDirection === "asc" ? <ArrowUp size={16} className="ml-1" /> : <ArrowDown size={16} className="ml-1" />}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => handleSortToggle("value")}>
-                    <DollarSign size={16} className="mr-2" />
-                    Sort by amount
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSortToggle("date")}>
-                    <Clock size={16} className="mr-2" />
-                    Sort by due date
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSortToggle("hours")}>
-                    <Clock size={16} className="mr-2" />
-                    Sort by hours
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            
-            <TabsContent value="all" className="mt-0">
-              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
-                {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="active" className="mt-0">
-              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
-                {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="completed" className="mt-0">
-              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
-                {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="draft" className="mt-0">
-              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
-                {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="pending" className="mt-0">
-              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
-                {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
-              </div>
-            </TabsContent>
-          </Tabs>
+          <div className="flex gap-2">
+            <Button variant="outline" size="icon" className={viewMode === "grid" ? "bg-muted" : ""} onClick={() => setViewMode("grid")} title="Grid View">
+              <Grid size={16} />
+            </Button>
+            <Button variant="outline" size="icon" className={viewMode === "list" ? "bg-muted" : ""} onClick={() => setViewMode("list")} title="List View">
+              <List size={16} />
+            </Button>
+          </div>
         </div>
+      </header>
 
-        <DashboardFooter totalValue={totalValue} totalHours={totalHours} avgHourlyRate={avgHourlyRate} projectCount={filteredProjects.length} />
-      </div>
-      
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>{selectedProject?.title}</DialogTitle>
-            <DialogDescription className="text-[9px] font-semibold tracking-[1px] uppercase text-muted-foreground">
-              Client: {selectedProject?.client}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <div>
-              <h3 className="font-medium mb-1">Project Details</h3>
-              <div className="grid grid-cols-2 gap-2 text-[9px] font-semibold tracking-[1px] uppercase">
-                <div>
-                  <p className="text-muted-foreground">Status:</p>
-                  <p className="capitalize">{selectedProject?.status}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Due Date:</p>
-                  <p>{selectedProject?.date}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Value:</p>
-                  <p>{selectedProject && new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD'
-                  }).format(selectedProject.value)}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Hours:</p>
-                  <p>{selectedProject?.hours} hours</p>
-                </div>
-              </div>
+      <div className="grow p-6 overflow-y-auto">
+        <Tabs defaultValue="all" className="mb-6" onValueChange={setStatusFilter}>
+          <TabsList className="rounded-none border-b border-solid border-[#F6F6F7] bg-transparent text-[#8E9196] w-full justify-start gap-[34px] p-0">
+            <TabsTrigger value="all" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">ALL PROPOSALS</TabsTrigger>
+            <TabsTrigger value="draft" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">DRAFTS</TabsTrigger>
+            <TabsTrigger value="completed" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">COMPLETED</TabsTrigger>
+            <TabsTrigger value="pending" className="rounded-none px-0 py-1.5 data-[state=active]:border-b-black data-[state=active]:border-b data-[state=active]:border-solid data-[state=active]:bg-transparent data-[state=active]:text-black font-semibold text-[9px] tracking-[1px]">PENDING</TabsTrigger>
+          </TabsList>
+
+          <div className="bg-[#F1F1F1] px-4 py-3 mt-4 mb-2 flex justify-between items-center">
+            <h2 className="text-[#403E43] text-lg font-medium">proposals & contracts</h2>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  {sortField === "value" ? <DollarSign size={16} className="mr-1" /> : sortField === "date" ? <Clock size={16} className="mr-1" /> : <Clock size={16} className="mr-1" />}
+                  Sort by {sortField}
+                  {sortDirection === "asc" ? <ArrowUp size={16} className="ml-1" /> : <ArrowDown size={16} className="ml-1" />}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleSortToggle("value")}>
+                  <DollarSign size={16} className="mr-2" />
+                  Sort by amount
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortToggle("date")}>
+                  <Clock size={16} className="mr-2" />
+                  Sort by due date
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortToggle("hours")}>
+                  <Clock size={16} className="mr-2" />
+                  Sort by hours
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <TabsContent value="all" className="mt-0">
+            <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
+              {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
             </div>
-            <div>
-              <h3 className="font-medium mb-1">Services</h3>
-              <div className="flex gap-1 flex-wrap">
-                <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">
-                  WEB DESIGN
-                </Badge>
+          </TabsContent>
+
+          <TabsContent value="active" className="mt-0">
+            <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
+              {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="completed" className="mt-0">
+            <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
+              {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="draft" className="mt-0">
+            <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
+              {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="pending" className="mt-0">
+            <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col"}>
+              {sortedProjects.map(project => <ProjectCard key={project.id} project={project} viewMode={viewMode} onDragStart={e => handleDragStart(e, project.id)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, project.id)} onView={() => handleViewProject(project)} />)}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <DashboardFooter totalValue={totalValue} totalHours={totalHours} avgHourlyRate={avgHourlyRate} projectCount={filteredProjects.length} />
+    </div>
+
+    <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+      <DialogContent className="max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>{selectedProject?.title}</DialogTitle>
+          <DialogDescription className="text-[9px] font-semibold tracking-[1px] uppercase text-muted-foreground">
+            Client: {selectedProject?.client}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-4 py-4">
+          <div>
+            <h3 className="font-medium mb-1">Project Details</h3>
+            <div className="grid grid-cols-2 gap-2 text-[9px] font-semibold tracking-[1px] uppercase">
+              <div>
+                <p className="text-muted-foreground">Status:</p>
+                <p className="capitalize">{selectedProject?.status}</p>
               </div>
-              <div className="mt-4">
-                <Button size="sm" variant="outline" className="mr-2">
-                  <Eye size={16} className="mr-2" />
-                  <span className="text-[9px] font-semibold tracking-[1px] uppercase">View Full Project</span>
-                </Button>
-                <Button size="sm">
-                  <Edit size={16} className="mr-2" />
-                  <span className="text-[9px] font-semibold tracking-[1px] uppercase">Edit Project</span>
-                </Button>
+              <div>
+                <p className="text-muted-foreground">Due Date:</p>
+                <p>{selectedProject?.date}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Value:</p>
+                <p>{selectedProject && new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD'
+                }).format(selectedProject.value)}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Hours:</p>
+                <p>{selectedProject?.hours} hours</p>
               </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
-    </div>;
+          <div>
+            <h3 className="font-medium mb-1">Services</h3>
+            <div className="flex gap-1 flex-wrap">
+              <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">
+                WEB DESIGN
+              </Badge>
+            </div>
+            <div className="mt-4">
+              <Button size="sm" variant="outline" className="mr-2">
+                <Eye size={16} className="mr-2" />
+                <span className="text-[9px] font-semibold tracking-[1px] uppercase">View Full Project</span>
+              </Button>
+              <Button size="sm">
+                <Edit size={16} className="mr-2" />
+                <span className="text-[9px] font-semibold tracking-[1px] uppercase">Edit Project</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  </div>;
 };
 export default Dashboard;

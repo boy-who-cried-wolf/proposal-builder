@@ -57,8 +57,8 @@ export const TabContent: React.FC<TabContentProps> = ({
   );
 
   const renderPlanUpgradeOverlay = (feature: string) => (
-    <div className="absolute top-1/2 inset-0 flex flex-col items-center justify-center z-10 w-full h-full">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/70 to-white pointer-events-none"></div>
+    <div className="absolute top-20 inset-0 flex flex-col items-center justify-start z-10 w-full h-full">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/100 to-white pointer-events-none"></div>
       <div className="z-20 bg-white border-2 border-amber-500 py-3 px-6 text-center max-w-md">
         <h3 className="text-xl font-bold text-amber-800 mb-2">Upgrade Required</h3>
         <p className="mb-4 text-amber-700">
