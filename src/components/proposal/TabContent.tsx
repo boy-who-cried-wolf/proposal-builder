@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ProposalContent } from "@/components/proposal/ProposalContent";
 import { RevisionsTab } from "@/components/proposal/RevisionsTab";
@@ -14,6 +15,7 @@ interface TabContentProps {
   revisions: any[];
   openEditDialog: (sectionIndex: number, itemIndex: number) => void;
   openSectionSettings: (sectionIndex: number) => void;
+  addItem?: (sectionIndex: number) => void;
 }
 
 export const TabContent: React.FC<TabContentProps> = ({ 
@@ -21,7 +23,8 @@ export const TabContent: React.FC<TabContentProps> = ({
   sections, 
   revisions,
   openEditDialog,
-  openSectionSettings
+  openSectionSettings,
+  addItem
 }) => {
   const { user } = useAuth();
   const { currentPlan } = usePlanSubscription(user?.id);
@@ -78,6 +81,7 @@ export const TabContent: React.FC<TabContentProps> = ({
             sections={sections} 
             onEditItem={openEditDialog} 
             onOpenSectionSettings={openSectionSettings}
+            onAddItem={addItem}
           />
           
           {!user && sections.length > 0 && renderAuthOverlay()}

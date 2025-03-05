@@ -35,6 +35,49 @@ export function useItemEditing(
     setIsEditDialogOpen(true);
   };
 
+  const addItem = (sectionIndex: number) => {
+    // Create a new empty item
+    const newItem = {
+      item: "New Task",
+      description: "Description of the new task",
+      hours: "1",
+      price: `$${hourlyRate}`
+    };
+
+    const newSections = [...sections];
+    newSections[sectionIndex] = {
+      ...newSections[sectionIndex],
+      items: [
+        ...newSections[sectionIndex].items,
+        newItem,
+      ],
+    };
+
+    // Update sections state
+    setSections(newSections);
+    
+    // Recalculate subtotals
+    recalculateSubtotals(newSections);
+
+    // Create revision record
+    const newRevision = createRevisionRecord(
+      sections[sectionIndex].title,
+      newItem.item,
+      'item',
+      'None',
+      'Added'
+    );
+    setRevisions(prev => [newRevision, ...prev]);
+
+    // Open the edit dialog for the new item
+    openEditDialog(sectionIndex, newSections[sectionIndex].items.length - 1);
+
+    toast({
+      title: "Item added",
+      description: `Added new task to ${sections[sectionIndex].title}`,
+    });
+  };
+
   const handleItemChange = (field: keyof EditingItem["item"], value: string) => {
     if (!editingItem) return;
 
@@ -158,7 +201,8 @@ export function useItemEditing(
     handleItemChange,
     setIsHoursPriceLocked,
     saveItemChanges,
-    deleteItem
+    deleteItem,
+    addItem
   };
 }
 

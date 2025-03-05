@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useProposalContent } from "@/hooks/useProposalContent";
 import { ProposalHeader } from "@/components/proposal/ProposalHeader";
@@ -52,7 +53,8 @@ export const MainContent: React.FC<MainContentProps> = ({
     deleteItem,
     updateSection,
     deleteSection,
-    setIsSectionEditorOpen
+    setIsSectionEditorOpen,
+    addItem
   } = useProposalContent(
     generatedProposalSections || [],
     projectDescription || "",
@@ -92,6 +94,7 @@ export const MainContent: React.FC<MainContentProps> = ({
           revisions={revisions}
           openEditDialog={openEditDialog}
           openSectionSettings={openSectionSettings}
+          addItem={addItem}
         />
       </div>
 

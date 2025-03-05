@@ -7,12 +7,14 @@ interface ProposalContentProps {
   sections: ProposalSection[];
   onEditItem: (sectionIndex: number, itemIndex: number) => void;
   onOpenSectionSettings: (sectionIndex: number) => void;
+  onAddItem?: (sectionIndex: number) => void;
 }
 
 export const ProposalContent: React.FC<ProposalContentProps> = ({
   sections,
   onEditItem,
-  onOpenSectionSettings
+  onOpenSectionSettings,
+  onAddItem
 }) => {
   if (sections.length === 0) {
     return (
@@ -27,6 +29,7 @@ export const ProposalContent: React.FC<ProposalContentProps> = ({
       sections={sections} 
       onEditItem={onEditItem} 
       onOpenSectionSettings={onOpenSectionSettings}
+      onAddItem={onAddItem}
     />
   );
 };

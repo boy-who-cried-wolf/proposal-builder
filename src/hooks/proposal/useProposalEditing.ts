@@ -21,7 +21,8 @@ export function useProposalEditing(
     handleItemChange,
     setIsHoursPriceLocked,
     saveItemChanges,
-    deleteItem
+    deleteItem,
+    addItem
   } = useItemEditing(sections, setSections, setRevisions, hourlyRate, projectBudget);
 
   const {
@@ -49,7 +50,8 @@ export function useProposalEditing(
     deleteItem,
     updateSection,
     deleteSection,
-    setIsSectionEditorOpen
+    setIsSectionEditorOpen,
+    addItem
   };
 }
 

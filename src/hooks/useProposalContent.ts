@@ -51,7 +51,8 @@ export function useProposalContent(
     deleteItem,
     updateSection,
     deleteSection,
-    setIsSectionEditorOpen
+    setIsSectionEditorOpen,
+    addItem
   } = useProposalEditing(sections, setSections, setRevisions, hourlyRate, projectBudget);
 
   const {
@@ -114,6 +115,7 @@ export function useProposalContent(
     deleteItem,
     updateSection,
     deleteSection,
-    setIsSectionEditorOpen
+    setIsSectionEditorOpen,
+    addItem
   };
 }

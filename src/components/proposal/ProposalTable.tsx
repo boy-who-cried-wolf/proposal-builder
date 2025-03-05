@@ -1,18 +1,20 @@
 
 import React from "react";
 import { ProposalSection } from "@/services/openaiProposal";
-import { Pencil, Settings } from "lucide-react";
+import { Pencil, Settings, Plus } from "lucide-react";
 
 interface ProposalTableProps {
   sections: ProposalSection[];
   onEditItem: (sectionIndex: number, itemIndex: number) => void;
   onOpenSectionSettings: (sectionIndex: number) => void;
+  onAddItem?: (sectionIndex: number) => void;
 }
 
 export const ProposalTable: React.FC<ProposalTableProps> = ({ 
   sections, 
   onEditItem,
-  onOpenSectionSettings 
+  onOpenSectionSettings,
+  onAddItem
 }) => {
   return (
     <div className="space-y-6">
@@ -82,6 +84,19 @@ export const ProposalTable: React.FC<ProposalTableProps> = ({
             </div>
             <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
               {section.subtotal}
+            </div>
+            <div className="section_table_cell"></div>
+            <div className="section_table_cell"></div>
+            <div className="section_table_cell">
+              {onAddItem && (
+                <button 
+                  onClick={() => onAddItem(index)} 
+                  className="p-1 rounded bg-gray-100 hover:bg-gray-200"
+                  aria-label="Add item"
+                >
+                  <Plus size={14} />
+                </button>
+              )}
             </div>
           </div>
         </div>

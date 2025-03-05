@@ -1,3 +1,4 @@
+
 import { ProposalSection } from "@/types/proposal";
 
 export function formatProposalForFigma(
@@ -90,7 +91,7 @@ export function formatProposalForFigma(
         item.item,
         item.description,
         item.hours.toString(),
-        `$${item.price}`,
+        `$${item.price.toString().replace(/^\$/, '')}`,
       ]);
     });
 
@@ -98,7 +99,7 @@ export function formatProposalForFigma(
       `${section.title} Subtotal`,
       "",
       "",
-      `$${section.subtotal}`,
+      `$${section.subtotal.toString().replace(/^\$/, '')}`,
     ]);
   });
 

@@ -19,6 +19,7 @@ export type Database = {
           name: string
           services: string[] | null
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           client_rate?: number | null
@@ -29,6 +30,7 @@ export type Database = {
           name: string
           services?: string[] | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           client_rate?: number | null
@@ -39,6 +41,7 @@ export type Database = {
           name?: string
           services?: string[] | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
