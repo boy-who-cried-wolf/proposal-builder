@@ -1,6 +1,7 @@
+
 import { ExpandableTabs, Tab } from "@/components/ui/expandable-tabs";
 import { ProposalSection } from "@/types/proposal";
-import { DiamondPlus, Eye, Figma, History, Save, Send, Timer, Plus } from "lucide-react";
+import { Figma, History, Save, Send, Timer, Plus } from "lucide-react";
 import React from "react";
 
 interface ProposalHeaderTabsProps {
@@ -33,14 +34,9 @@ export const ProposalHeaderTabs: React.FC<ProposalHeaderTabsProps> = ({
       onClick: () => onAddSection?.()
     },
     {
-      title: "Time Tracking",
+      title: "Toggle Hours",
       icon: Timer,
-      // content: <div className="p-4">Enable time tracking</div>
-    },
-    {
-      title: "Preview",
-      icon: Eye,
-      // content: <div className="p-4">Preview the proposal</div>
+      // content: <div className="p-4">Toggle hours visibility</div>
     },
     {
       title: "Send",
@@ -88,11 +84,14 @@ export const ProposalHeaderTabs: React.FC<ProposalHeaderTabsProps> = ({
   ];
 
   return (
-    <ExpandableTabs
-      tabs={tabs}
-      activeTab={activeHeaderTab}
-      onTabChange={handleHeaderTabChange}
-      showTabContent={activeHeaderTab !== null}
-    />
+    <div className="flex items-center justify-between w-full">
+      <div className="text-lg font-bold">Proposal</div>
+      <ExpandableTabs
+        tabs={tabs}
+        activeTab={activeHeaderTab}
+        onTabChange={handleHeaderTabChange}
+        showTabContent={activeHeaderTab !== null}
+      />
+    </div>
   );
 };

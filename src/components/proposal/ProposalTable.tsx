@@ -111,13 +111,13 @@ export const ProposalTable: React.FC<ProposalTableProps> = ({
       {sections.map((section, index) => (
         <div 
           key={index} 
-          className={`section_wrapper mb-[34px] ${draggingSection === index ? 'opacity-50' : ''}`}
+          className={`section_wrapper mb-[34px] transition-all duration-200 ${draggingSection === index ? 'opacity-50 scale-[1.01]' : ''}`}
           data-section-index={index}
         >
           <div className="text-black text-lg font-bold bg-[#E1E1DC] px-[17px] py-[11px] rounded-[4px_4px_0_0] flex justify-between items-center">
             <div className="flex items-center">
               <div 
-                className="mr-3 cursor-move p-1" 
+                className="mr-3 cursor-move p-1 hover:bg-gray-300 rounded transition-all"
                 onMouseDown={(e) => handleSectionMouseDown(e, index)}
               >
                 <GripVertical size={16} className="text-gray-500" />
@@ -157,8 +157,8 @@ export const ProposalTable: React.FC<ProposalTableProps> = ({
           {section.items.map((item, itemIndex) => (
             <div
               key={itemIndex}
-              className={`section_table_row grid grid-cols-[2fr_4fr_1fr_1fr_0.5fr_0.5fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px] ${
-                draggingItem?.sectionIndex === index && draggingItem?.itemIndex === itemIndex ? 'opacity-50' : ''
+              className={`section_table_row grid grid-cols-[2fr_4fr_1fr_1fr_0.5fr_0.5fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px] transition-all duration-200 ${
+                draggingItem?.sectionIndex === index && draggingItem?.itemIndex === itemIndex ? 'opacity-50 bg-gray-100 scale-[1.005]' : ''
               }`}
               data-item-index={itemIndex}
             >
@@ -176,7 +176,7 @@ export const ProposalTable: React.FC<ProposalTableProps> = ({
               </div>
               <div className="section_table_cell text-black text-[9px] font-semibold tracking-[1px] uppercase">
                 <div 
-                  className="cursor-move p-1"
+                  className="cursor-move p-1 hover:bg-gray-200 rounded transition-colors"
                   onMouseDown={(e) => handleItemMouseDown(e, index, itemIndex)}
                 >
                   <GripVertical size={14} className="text-gray-500" />
