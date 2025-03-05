@@ -1,15 +1,13 @@
 
-import React from "react";
+import { MetricsTab } from "@/components/proposal/MetricsTab";
 import { ProposalContent } from "@/components/proposal/ProposalContent";
 import { RevisionsTab } from "@/components/proposal/RevisionsTab";
-import { MetricsTab } from "@/components/proposal/MetricsTab";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
-import { ProposalSection } from "@/types/proposal";
 import { usePlanSubscription } from "@/hooks/usePlanSubscription";
-import { Button } from "@/components/ui/button";
-import { UpgradeOverlay } from "../UpgradeOverlay";
+import { ProposalSection } from "@/types/proposal";
+import React from "react";
 import { AuthOverlay } from "../AuthOverlay";
+import { UpgradeOverlay } from "../UpgradeOverlay";
 
 interface TabContentProps {
   activeTab: number;
