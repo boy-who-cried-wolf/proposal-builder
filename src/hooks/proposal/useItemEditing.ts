@@ -22,8 +22,8 @@ export function useItemEditing(
     const item = { ...sections[sectionIndex].items[itemIndex] };
     const formattedItem = {
       ...item,
-      hours: item.hours.toString(),
-      price: item.price.toString()
+      hours: (item.hours ?? 0).toString(),
+      price: (item.price ?? 0).toString()
     };
 
     setEditingItem({

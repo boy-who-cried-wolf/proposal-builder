@@ -5,6 +5,7 @@ import { Revision } from "@/components/proposal/RevisionsTab";
 import { useProposalEditing } from "@/hooks/proposal/useProposalEditing";
 import { useProposalMetrics } from "@/hooks/proposal/useProposalMetrics";
 import { useProposalActions } from "@/hooks/proposal/useProposalActions";
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
 export function useProposalContent(
   generatedProposalSections: ProposalSection[],
@@ -20,12 +21,13 @@ export function useProposalContent(
   const [sections, setSections] = useState<ProposalSection[]>(generatedProposalSections);
   const [revisions, setRevisions] = useState<Revision[]>([]);
 
-  const jsonGeneratedProposalSections = JSON.stringify(generatedProposalSections)
+  // const jsonGeneratedProposalSections = JSON.stringify(generatedProposalSections)
 
-  useEffect(() => {
+
+  useDeepCompareEffect(() => {
+    console.log('Sections updated:', generatedProposalSections);
     setSections(generatedProposalSections);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jsonGeneratedProposalSections]);
+  }, [generatedProposalSections]); // Deep comparison of dependencies
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
@@ -120,7 +122,7 @@ export function useProposalContent(
     deleteSection,
     setIsSectionEditorOpen,
     addItem,
-    
+
     // New section functions
     addSection,
     reorderSections,
