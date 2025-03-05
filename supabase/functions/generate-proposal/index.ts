@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
@@ -10,16 +9,17 @@ const corsHeaders = {
 };
 
 const systemPrompt = `
-You are a creative freelancer proposal assistant. Generate a structured, professional proposal based on the project description.
+You are a creative freelancer proposal assistant. Generate a structured, professional proposal based on the project description and ensure the total cost stays within the provided budget.
 
 Follow these rules:
 1. Do NOT include introduction or terms sections as billable items. Keep these in a separate notes section if needed.
 2. Only billable tasks should be included in the main sections.
 3. Break down the project into logical sections based on offerings (Design, Development, Content, etc.)
-4. Itemize tasks within each section - each item must be a concrete, billable deliverable
-5. Estimate the hours required per task based on industry best practices
-6. Calculate the cost by multiplying hours by the provided hourly rate
-7. Return the proposal in JSON format exactly as specified below
+4. Itemize tasks within each section - each item must be a concrete, billable deliverable.
+5. Estimate the hours required per task based on industry best practices.
+6. Calculate the cost by multiplying hours by the provided hourly rate.
+7. Ensure the total cost of the proposal does not exceed the provided budget if possible. If necessary, adjust the scope or prioritize tasks to stay within budget.
+8. Return the proposal in JSON format exactly as specified below.
 
 Format your response as a JSON object with this structure:
 {
@@ -36,7 +36,9 @@ Format your response as a JSON object with this structure:
       ],
       "subtotal": "Subtotal price as formatted string with $ sign"
     }
-  ]
+  ],
+  "total": "Total price as formatted string with $ sign",
+  "withinBudget": true/false // Indicates whether the proposal is within the provided budget
 }
 
 IMPORTANT: General information like introductions or terms and conditions should NOT be included as billable items with hours and prices. Focus only on concrete, billable deliverables for the main section items.
@@ -103,6 +105,9 @@ serve(async (req) => {
       enhancedSystemPrompt += `\n\nThe service provider specializes in: ${userServices.join(', ')}. Consider these services when creating the proposal structure if applicable to the project.`;
     }
     
+    // Add budget information to the user prompt
+    const userPrompt = `${prompt}\n\nBudget: $${projectBudget}\nHourly Rate: $${hourlyRate}`;
+
     // Start the OpenAI request
     fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -113,9 +118,10 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
+        // model: 'gpt-4', // Use the correct model name
         messages: [
           { role: 'system', content: enhancedSystemPrompt },
-          { role: 'user', content: prompt }
+          { role: 'user', content: userPrompt } // Use the updated user prompt
         ],
         temperature: 0.7,
         stream: true,
@@ -129,7 +135,7 @@ serve(async (req) => {
       const reader = aiResponse.body?.getReader();
       if (!reader) throw new Error('Failed to get reader from response');
       
-      let jsonData = { sections: [] };
+      let jsonData = { sections: [], total: "$0", withinBudget: true };
       
       // Process the stream
       while (true) {
@@ -167,7 +173,7 @@ serve(async (req) => {
                   jsonData = partialData;
                   
                   // Send the update to the client
-                  await writer.write(encoder.encode(`data: ${JSON.stringify({ sections: jsonData.sections })}\n\n`));
+                  await writer.write(encoder.encode(`data: ${JSON.stringify({ sections: jsonData.sections, total: jsonData.total, withinBudget: jsonData.withinBudget })}\n\n`));
                   
                   // Clear the buffer after successful parse
                   buffer = buffer.replace(jsonStr, '');
