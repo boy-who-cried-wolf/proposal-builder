@@ -54,7 +54,10 @@ export const MainContent: React.FC<MainContentProps> = ({
     updateSection,
     deleteSection,
     setIsSectionEditorOpen,
-    addItem
+    addItem,
+    addSection,
+    reorderSections,
+    reorderItems
   } = useProposalContent(
     generatedProposalSections || [],
     projectDescription || "",
@@ -80,6 +83,7 @@ export const MainContent: React.FC<MainContentProps> = ({
         onRevertProposal={onRevertProposal}
         isSaving={isSaving}
         isCopying={isCopying}
+        onAddSection={addSection}
       />
 
       <ProposalNavigation
@@ -95,6 +99,8 @@ export const MainContent: React.FC<MainContentProps> = ({
           openEditDialog={openEditDialog}
           openSectionSettings={openSectionSettings}
           addItem={addItem}
+          reorderSections={reorderSections}
+          reorderItems={reorderItems}
         />
       </div>
 

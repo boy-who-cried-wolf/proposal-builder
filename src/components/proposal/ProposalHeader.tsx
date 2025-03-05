@@ -4,14 +4,15 @@ import { ProposalHeaderTabs } from "@/components/proposal/ProposalHeaderTabs";
 import { ProposalSection } from "@/types/proposal";
 
 interface ProposalHeaderProps {
-  activeHeaderTab: number;
-  handleHeaderTabChange: (index: number) => void;
+  activeHeaderTab: number | null;
+  handleHeaderTabChange: (index: number | null) => void;
   handleSaveProposal: () => void;
   handleCopyToFigma: () => void;
   proposalHistory?: ProposalSection[][];
   onRevertProposal?: (index: number) => void;
   isSaving: boolean;
   isCopying: boolean;
+  onAddSection?: () => void;
 }
 
 export const ProposalHeader: React.FC<ProposalHeaderProps> = ({
@@ -22,26 +23,22 @@ export const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalHistory,
   onRevertProposal,
   isSaving,
-  isCopying
+  isCopying,
+  onAddSection
 }) => {
   return (
-    <header className="h-[69px] flex justify-between items-center px-[23px] py-[15px] border-b-black border-b border-solid">
-      <h1 className="text-black text-[26px] font-bold max-sm:text-xl">
-        proposal 1.0
-      </h1>
-
-      <div className="flex items-center">
-        <ProposalHeaderTabs
-          activeHeaderTab={activeHeaderTab}
-          handleHeaderTabChange={handleHeaderTabChange}
-          handleSaveProposal={handleSaveProposal}
-          handleCopyToFigma={handleCopyToFigma}
-          proposalHistory={proposalHistory}
-          onRevertProposal={onRevertProposal}
-          isSaving={isSaving}
-          isCopying={isCopying}
-        />
-      </div>
-    </header>
+    <div className="px-[23px] py-[15px] border-b border-solid border-gray-300">
+      <ProposalHeaderTabs
+        activeHeaderTab={activeHeaderTab}
+        handleHeaderTabChange={handleHeaderTabChange}
+        handleSaveProposal={handleSaveProposal}
+        handleCopyToFigma={handleCopyToFigma}
+        proposalHistory={proposalHistory}
+        onRevertProposal={onRevertProposal}
+        isSaving={isSaving}
+        isCopying={isCopying}
+        onAddSection={onAddSection}
+      />
+    </div>
   );
 };

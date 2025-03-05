@@ -8,13 +8,17 @@ interface ProposalContentProps {
   onEditItem: (sectionIndex: number, itemIndex: number) => void;
   onOpenSectionSettings: (sectionIndex: number) => void;
   onAddItem?: (sectionIndex: number) => void;
+  onReorderSections?: (startIndex: number, endIndex: number) => void;
+  onReorderItems?: (sectionIndex: number, startIndex: number, endIndex: number) => void;
 }
 
 export const ProposalContent: React.FC<ProposalContentProps> = ({
   sections,
   onEditItem,
   onOpenSectionSettings,
-  onAddItem
+  onAddItem,
+  onReorderSections,
+  onReorderItems
 }) => {
   if (sections.length === 0) {
     return (
@@ -30,6 +34,8 @@ export const ProposalContent: React.FC<ProposalContentProps> = ({
       onEditItem={onEditItem} 
       onOpenSectionSettings={onOpenSectionSettings}
       onAddItem={onAddItem}
+      onReorderSections={onReorderSections}
+      onReorderItems={onReorderItems}
     />
   );
 };

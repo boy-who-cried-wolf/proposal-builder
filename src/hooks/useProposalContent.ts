@@ -52,7 +52,10 @@ export function useProposalContent(
     updateSection,
     deleteSection,
     setIsSectionEditorOpen,
-    addItem
+    addItem,
+    addSection,
+    reorderSections,
+    reorderItems
   } = useProposalEditing(sections, setSections, setRevisions, hourlyRate, projectBudget);
 
   const {
@@ -116,6 +119,11 @@ export function useProposalContent(
     updateSection,
     deleteSection,
     setIsSectionEditorOpen,
-    addItem
+    addItem,
+    
+    // New section functions
+    addSection,
+    reorderSections,
+    reorderItems
   };
 }

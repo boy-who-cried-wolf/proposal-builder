@@ -1,6 +1,6 @@
 import { ExpandableTabs, Tab } from "@/components/ui/expandable-tabs";
 import { ProposalSection } from "@/types/proposal";
-import { DiamondPlus, Eye, Figma, History, Save, Send, Timer } from "lucide-react";
+import { DiamondPlus, Eye, Figma, History, Save, Send, Timer, Plus } from "lucide-react";
 import React from "react";
 
 interface ProposalHeaderTabsProps {
@@ -12,6 +12,7 @@ interface ProposalHeaderTabsProps {
   onRevertProposal?: (index: number) => void;
   isSaving: boolean;
   isCopying: boolean;
+  onAddSection?: () => void;
 }
 
 export const ProposalHeaderTabs: React.FC<ProposalHeaderTabsProps> = ({
@@ -23,12 +24,13 @@ export const ProposalHeaderTabs: React.FC<ProposalHeaderTabsProps> = ({
   onRevertProposal,
   isSaving,
   isCopying,
+  onAddSection,
 }) => {
   const tabs: Tab[] = [
     {
-      title: "Add Premium",
-      icon: DiamondPlus,
-      // content: <div className="p-4">Add premium features here</div> 
+      title: "Add Section",
+      icon: Plus,
+      onClick: () => onAddSection?.()
     },
     {
       title: "Time Tracking",
@@ -48,37 +50,11 @@ export const ProposalHeaderTabs: React.FC<ProposalHeaderTabsProps> = ({
     {
       title: "Copy to Figma",
       icon: Figma,
-      // content: (
-      //   <div className="p-4">
-      //     <h2 className="text-xl font-bold mb-4">Copy Proposal to Figma</h2>
-      //     <p className="mb-4">Copy your proposal in a format optimized for pasting into Figma or other design tools.</p>
-      //     <Button
-      //       onClick={handleCopyToFigma}
-      //       disabled={isCopying}
-      //       className="bg-black text-white px-4 py-2 rounded flex items-center gap-2"
-      //     >
-      //       {isCopying ? 'Copying...' : 'Copy to Figma'} <Copy size={16} />
-      //     </Button>
-      //   </div>
-      // )
       onClick: () => handleCopyToFigma()
     },
     {
       title: "Save Proposal",
       icon: Save,
-      // content: (
-      //   <div className="p-4">
-      //     <h2 className="text-xl font-bold mb-4">Save Proposal</h2>
-      //     <p className="mb-4">Save your current proposal to your account.</p>
-      //     <Button
-      //       onClick={handleSaveProposal}
-      //       disabled={isSaving}
-      //       className="bg-black text-white px-4 py-2 rounded flex items-center gap-2"
-      //     >
-      //       {isSaving ? 'Saving...' : 'Save Proposal'} <Save size={16} />
-      //     </Button>
-      //   </div>
-      // )
       onClick: () => handleSaveProposal()
     },
     {

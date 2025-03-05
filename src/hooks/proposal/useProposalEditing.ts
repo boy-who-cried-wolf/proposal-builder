@@ -3,6 +3,7 @@ import { useItemEditing } from "@/hooks/proposal/useItemEditing";
 import { useSectionEditing } from "@/hooks/proposal/useSectionEditing";
 import { ProposalSection } from "@/types/proposal";
 import { Revision } from "@/components/proposal/RevisionsTab";
+import { createRevisionRecord } from "@/utils/proposal/sectionManagement";
 
 export function useProposalEditing(
   sections: ProposalSection[],
@@ -34,6 +35,70 @@ export function useProposalEditing(
     setIsSectionEditorOpen
   } = useSectionEditing(sections, setSections, setRevisions);
 
+  const addSection = () => {
+    const newSection: ProposalSection = {
+      title: "New Section",
+      items: [],
+      subtotal: "$0"
+    };
+
+    const newSections = [...sections, newSection];
+    setSections(newSections);
+
+    // Record the change in revisions
+    const newRevision = createRevisionRecord(
+      "Proposal",
+      "Section",
+      "add",
+      "",
+      "New Section"
+    );
+    setRevisions(prev => [newRevision, ...prev]);
+  };
+
+  const reorderSections = (startIndex: number, endIndex: number) => {
+    const result = Array.from(sections);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    setSections(result);
+
+    // Record the change in revisions
+    const newRevision = createRevisionRecord(
+      sections[startIndex].title,
+      "Section",
+      "order",
+      `Position ${startIndex + 1}`,
+      `Position ${endIndex + 1}`
+    );
+    setRevisions(prev => [newRevision, ...prev]);
+  };
+
+  const reorderItems = (sectionIndex: number, startIndex: number, endIndex: number) => {
+    const section = sections[sectionIndex];
+    const newItems = Array.from(section.items);
+    const [removed] = newItems.splice(startIndex, 1);
+    newItems.splice(endIndex, 0, removed);
+
+    const newSections = [...sections];
+    newSections[sectionIndex] = {
+      ...section,
+      items: newItems
+    };
+
+    setSections(newSections);
+
+    // Record the change in revisions
+    const newRevision = createRevisionRecord(
+      sections[sectionIndex].title,
+      section.items[startIndex].item,
+      "order",
+      `Position ${startIndex + 1}`,
+      `Position ${endIndex + 1}`
+    );
+    setRevisions(prev => [newRevision, ...prev]);
+  };
+
   // Combine and return all functionality
   return {
     isEditDialogOpen,
@@ -51,7 +116,10 @@ export function useProposalEditing(
     updateSection,
     deleteSection,
     setIsSectionEditorOpen,
-    addItem
+    addItem,
+    addSection,
+    reorderSections,
+    reorderItems
   };
 }
 

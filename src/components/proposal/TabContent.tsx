@@ -16,6 +16,8 @@ interface TabContentProps {
   openEditDialog: (sectionIndex: number, itemIndex: number) => void;
   openSectionSettings: (sectionIndex: number) => void;
   addItem?: (sectionIndex: number) => void;
+  reorderSections?: (startIndex: number, endIndex: number) => void;
+  reorderItems?: (sectionIndex: number, startIndex: number, endIndex: number) => void;
 }
 
 export const TabContent: React.FC<TabContentProps> = ({ 
@@ -24,7 +26,9 @@ export const TabContent: React.FC<TabContentProps> = ({
   revisions,
   openEditDialog,
   openSectionSettings,
-  addItem
+  addItem,
+  reorderSections,
+  reorderItems
 }) => {
   const { user } = useAuth();
   const { currentPlan } = usePlanSubscription(user?.id);
@@ -82,6 +86,8 @@ export const TabContent: React.FC<TabContentProps> = ({
             onEditItem={openEditDialog} 
             onOpenSectionSettings={openSectionSettings}
             onAddItem={addItem}
+            onReorderSections={reorderSections}
+            onReorderItems={reorderItems}
           />
           
           {!user && sections.length > 0 && renderAuthOverlay()}
