@@ -32,16 +32,16 @@ const initClients = (mode = 'live') => {
   console.log('STRIPE_TEST_SECRET_KEY available:', !!Deno.env.get('STRIPE_TEST_SECRET_KEY'));
   console.log('SUPABASE_URL available:', !!Deno.env.get('SUPABASE_URL'));
   console.log('SUPABASE_SERVICE_ROLE_KEY available:', !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
-  
+
   // Test mode check
   const isTestMode = mode === 'test';
   console.log(`Using ${isTestMode ? 'TEST' : 'LIVE'} mode for Stripe`);
-  
+
   // Initialize Stripe with appropriate key based on mode
-  const stripeKey = isTestMode 
-    ? Deno.env.get('STRIPE_TEST_SECRET_KEY') 
+  const stripeKey = isTestMode
+    ? Deno.env.get('STRIPE_TEST_SECRET_KEY')
     : Deno.env.get('STRIPE_SECRET_KEY');
-  
+
   if (!stripeKey) {
     throw new Error(`Missing ${isTestMode ? 'STRIPE_TEST_SECRET_KEY' : 'STRIPE_SECRET_KEY'} environment variable`);
   }
@@ -50,11 +50,11 @@ const initClients = (mode = 'live') => {
   const freelancerPriceId = isTestMode
     ? Deno.env.get('STRIPE_TEST_FREELANCER_PRICE_ID')
     : Deno.env.get('STRIPE_FREELANCER_PRICE_ID');
-    
+
   const proPriceId = isTestMode
     ? Deno.env.get('STRIPE_TEST_PRO_PRICE_ID')
     : Deno.env.get('STRIPE_PRO_PRICE_ID');
-  
+
   // Log price IDs
   console.log('Using price IDs:');
   console.log('Freelancer:', freelancerPriceId);
@@ -67,15 +67,15 @@ const initClients = (mode = 'live') => {
   // Initialize Supabase client
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
   const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-  
+
   if (!supabaseUrl || !supabaseKey) {
     throw new Error('Missing Supabase environment variables');
   }
-  
+
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  return { 
-    stripe, 
+  return {
+    stripe,
     supabase,
     priceIds: {
       freelancer: freelancerPriceId,
@@ -98,7 +98,7 @@ const updateLoopsContact = async (supabase, email, userGroup) => {
         }
       }
     });
-    
+
     // Also trigger an event for analytics
     await supabase.functions.invoke('loops-integration', {
       body: {
@@ -113,7 +113,7 @@ const updateLoopsContact = async (supabase, email, userGroup) => {
         eventName: userGroup === 'free' ? 'plan_downgraded' : 'plan_upgraded'
       }
     });
-    
+
     console.log(`Successfully updated Loops for ${email}`);
     return true;
   } catch (error) {
@@ -138,27 +138,27 @@ const pricingService = {
   getPlansWithPricing: async (stripe, priceIds, mode) => {
     try {
       console.log(`Fetching plans with pricing from Stripe in ${mode} mode`);
-      
+
       // Get price information from Stripe
       const freelancerPriceId = priceIds.freelancer;
       const proPriceId = priceIds.pro;
-      
+
       if (!freelancerPriceId || !proPriceId) {
         console.error('Missing price IDs in environment variables');
-        return errorResponse('Missing Stripe price configuration');
+        return errorResponse(`Missing Stripe price configuration: ${JSON.stringify({ stripe, priceIds, mode })}`);
       }
-      
+
       // Fetch prices from Stripe
       const [freelancerPrice, proPrice] = await Promise.all([
         stripe.prices.retrieve(freelancerPriceId),
         stripe.prices.retrieve(proPriceId)
       ]);
-      
-      console.log('Fetched Stripe prices:', { 
-        freelancer: `${freelancerPrice.id} - ${freelancerPrice.unit_amount}`, 
-        pro: `${proPrice.id} - ${proPrice.unit_amount}` 
+
+      console.log('Fetched Stripe prices:', {
+        freelancer: `${freelancerPrice.id} - ${freelancerPrice.unit_amount}`,
+        pro: `${proPrice.id} - ${proPrice.unit_amount}`
       });
-      
+
       // Format prices for display
       const formatPrice = (price) => {
         const amount = price.unit_amount / 100; // Convert from cents to dollars
@@ -168,10 +168,10 @@ const pricingService = {
           currency: currency,
           minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
         }).format(amount);
-        
+
         return formatted;
       };
-      
+
       const getPeriod = (price) => {
         if (price.type === 'recurring') {
           switch (price.recurring.interval) {
@@ -185,7 +185,7 @@ const pricingService = {
         }
         return '';
       };
-      
+
       // Construct plans data with pricing
       const plans = [
         {
@@ -204,7 +204,7 @@ const pricingService = {
           period: getPeriod(proPrice)
         }
       ];
-      
+
       console.log('Returning formatted plans data:', plans);
       return successResponse({ plans, mode });
     } catch (error) {
@@ -242,7 +242,7 @@ const subscriptionService = {
 
     return successResponse({ ...data, mode });
   },
-  
+
   // Cancel subscription
   cancelSubscription: async (stripe, supabase, userId, mode) => {
     if (!userId) {
@@ -303,7 +303,7 @@ const subscriptionService = {
 
     return successResponse({ success: true, mode });
   },
-  
+
   // Create checkout session
   createCheckoutSession: async (stripe, supabase, userId, planId, origin, priceIds, mode) => {
     if (!userId) {
@@ -423,7 +423,7 @@ const subscriptionService = {
       return errorResponse(`Error creating checkout session: ${error.message}`);
     }
   },
-  
+
   // Create customer portal session
   createCustomerPortalSession: async (stripe, supabase, userId, origin, mode) => {
     if (!userId) {
@@ -471,16 +471,16 @@ const webhookService = {
   // Handle webhook events
   handleWebhook: async (stripe, supabase, req, mode) => {
     const signature = req.headers.get('stripe-signature');
-    const webhookSecret = mode === 'test' 
+    const webhookSecret = mode === 'test'
       ? Deno.env.get('STRIPE_TEST_WEBHOOK_SECRET')
       : Deno.env.get('STRIPE_WEBHOOK_SECRET');
-    
+
     if (!signature || !webhookSecret) {
       return errorResponse('Missing signature or webhook secret', 400);
     }
 
     const body = await req.text();
-    
+
     let event;
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
@@ -491,7 +491,7 @@ const webhookService = {
     // Handle the event
     try {
       console.log(`Processing webhook event: ${event.type} in ${mode} mode`);
-      
+
       switch (event.type) {
         case 'checkout.session.completed': {
           const session = event.data.object;
@@ -516,7 +516,7 @@ const webhookService = {
                 status: 'active',
                 current_period_end: new Date(subscription.current_period_end * 1000).toISOString()
               });
-              
+
             // Update user in Loops if email is available
             if (userEmail) {
               try {
@@ -534,7 +534,7 @@ const webhookService = {
           const userId = subscription.metadata.userId;
           const userEmail = subscription.metadata.userEmail;
           const planId = subscription.metadata.planId;
-          
+
           if (userId) {
             await supabase
               .from('subscriptions')
@@ -543,7 +543,7 @@ const webhookService = {
                 current_period_end: new Date(subscription.current_period_end * 1000).toISOString()
               })
               .eq('stripe_subscription_id', subscription.id);
-              
+
             // Update Loops with subscription change if email is available
             if (userEmail && planId && subscription.status === 'active') {
               try {
@@ -559,7 +559,7 @@ const webhookService = {
         case 'customer.subscription.deleted': {
           const subscription = event.data.object;
           const userEmail = subscription.metadata.userEmail;
-          
+
           await supabase
             .from('subscriptions')
             .update({
@@ -567,7 +567,7 @@ const webhookService = {
               plan_id: 'free'
             })
             .eq('stripe_subscription_id', subscription.id);
-            
+
           // Update Loops if email is available  
           if (userEmail) {
             try {
@@ -577,11 +577,11 @@ const webhookService = {
               // Continue anyway as this is not critical
             }
           }
-          
+
           break;
         }
       }
-      
+
       return successResponse({ received: true, mode });
     } catch (error) {
       console.error('Error processing webhook:', error);
@@ -605,12 +605,12 @@ serve(async (req) => {
     // Parse request body for non-GET requests
     let body = {};
     let mode = 'live'; // Default to live mode
-    
+
     if (req.method !== 'GET') {
       try {
         body = await req.json();
         console.log('Request body:', JSON.stringify(body));
-        
+
         // Extract mode from request body, default to live
         mode = body.mode || 'live';
         console.log(`Using ${mode} mode for Stripe`);
@@ -619,7 +619,7 @@ serve(async (req) => {
         return errorResponse('Invalid request body', 400);
       }
     }
-    
+
     // Health check endpoint
     const url = new URL(req.url);
     if (url.pathname.endsWith('/health')) {
@@ -639,22 +639,22 @@ serve(async (req) => {
     switch (action) {
       case 'getPlansWithPricing':
         return await pricingService.getPlansWithPricing(stripe, priceIds, mode);
-      
+
       case 'createCustomerPortalSession':
         return await subscriptionService.createCustomerPortalSession(stripe, supabase, userId, origin, mode);
-      
+
       case 'createCheckoutSession':
         return await subscriptionService.createCheckoutSession(stripe, supabase, userId, planId, origin, priceIds, mode);
-      
+
       case 'getCurrentSubscription':
         return await subscriptionService.getCurrentSubscription(supabase, userId, mode);
-      
+
       case 'cancelSubscription':
         return await subscriptionService.cancelSubscription(stripe, supabase, userId, mode);
-      
+
       case 'handleWebhook':
         return await webhookService.handleWebhook(stripe, supabase, req, mode);
-      
+
       default:
         return errorResponse('Unknown action', 400);
     }
