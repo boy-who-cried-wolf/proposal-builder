@@ -36,7 +36,7 @@ export const ProposalFooter: React.FC<ProposalFooterProps> = ({
   };
 
   return (
-    <footer className="flex justify-between bg-white px-[17px] py-[15px] border-t-[#C8C8C9] border-t border-solid max-sm:flex-col max-sm:gap-5">
+    <footer className="flex justify-between bg-white px-[17px] py-[11px] border-t-black border-t border-solid max-sm:flex-col max-sm:gap-5">
       <MetricItem value={totalHours} label="Total Hours" className="text-[#403E43]" />
       <MetricItem 
         value={hoursPerDay} 

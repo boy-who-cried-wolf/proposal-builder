@@ -16,7 +16,7 @@ export const MetricItem: React.FC<MetricItemProps> = ({
   return (
     <div
       className={cn(
-        "text-left px-[5px] py-[15px] max-sm:text-center",
+        "text-left px-[5px] py-0 max-sm:text-center",
         className,
       )}
     >

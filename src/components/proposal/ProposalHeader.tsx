@@ -27,7 +27,7 @@ export const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   onAddSection
 }) => {
   return (
-    <div className="px-[23px] py-[15px] border-b border-solid border-gray-300">
+    <div className="px-[23px] py-[20px] border-b border-solid border-b-black">
       <ProposalHeaderTabs
         activeHeaderTab={activeHeaderTab}
         handleHeaderTabChange={handleHeaderTabChange}
