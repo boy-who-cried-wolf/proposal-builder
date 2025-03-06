@@ -35,7 +35,7 @@ export const MainContent: React.FC<MainContentProps> = ({
     <main
       className={cn(
         "flex-1 overflow-auto",
-        isAccountSettings ? "pl-0" : "pl-4", // Reduced padding for account settings pages
+        isAccountSettings ? "pl-0" : "pl-1", // Reduced padding for all pages (pl-4 → pl-1)
         className
       )}
     >
