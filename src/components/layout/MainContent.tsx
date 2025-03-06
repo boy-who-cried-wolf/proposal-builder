@@ -90,16 +90,12 @@ export const MainContent: React.FC<MainContentProps> = ({
           </div>
           
           <ProposalFooter 
+            sections={generatedProposalSections}
+            dateRange={dateRange}
+            hourlyRate={hourlyRate}
+            freelancerRate={freelancerRate}
             proposalHistory={proposalHistory}
             onRevertProposal={onRevertProposal}
-            // Add default values for required props
-            totalHours="0"
-            hoursPerDay="0"
-            totalValue="$0"
-            monthlyRevenue="$0"
-            profitMargin="0%"
-            profitMarginValue={0}
-            hoursPerDayValue={0}
           />
         </div>
       );

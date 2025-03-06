@@ -119,9 +119,9 @@ export const ProposalTable: React.FC<ProposalTableProps> = ({
 
             <div className="section_table_footer grid grid-cols-[2fr_4fr_1fr_1fr_0.5fr_0.5fr] px-[29px] py-[11px] border-b-black border-b border-solid max-sm:grid-cols-[1fr] max-sm:gap-2.5 max-sm:p-[15px]">
               <div className="section_table_cell">Subtotal</div>
+              <div className="section_table_cell"></div>
+              <div className="section_table_cell"></div>
               <div className="section_table_cell">{section.subtotal}</div>
-              <div className="section_table_cell"></div>
-              <div className="section_table_cell"></div>
               <div className="section_table_cell"></div>
               <div className="section_table_cell">
                 {onAddItem && (
