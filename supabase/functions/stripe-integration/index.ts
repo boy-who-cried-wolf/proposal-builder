@@ -306,6 +306,7 @@ const subscriptionService = {
 
   // Create checkout session
   createCheckoutSession: async (stripe, supabase, userId, planId, origin, priceIds, mode) => {
+    return errorResponse(JSON.stringify(priceIds), 400);
     if (!userId) {
       return errorResponse('User ID is required', 400);
     }
