@@ -59,6 +59,13 @@ export const MainContent: React.FC<MainContentProps> = ({
             freelancerRate={freelancerRate}
             projectBudget={projectBudget}
             dateRange={dateRange}
+            // Add other required props with default values
+            activeHeaderTab={null}
+            handleHeaderTabChange={() => {}}
+            handleSaveProposal={() => {}}
+            handleCopyToFigma={() => {}}
+            isSaving={false}
+            isCopying={false}
           />
           
           <div className="flex-1 overflow-auto p-4">
@@ -85,6 +92,14 @@ export const MainContent: React.FC<MainContentProps> = ({
           <ProposalFooter 
             proposalHistory={proposalHistory}
             onRevertProposal={onRevertProposal}
+            // Add default values for required props
+            totalHours="0"
+            hoursPerDay="0"
+            totalValue="$0"
+            monthlyRevenue="$0"
+            profitMargin="0%"
+            profitMarginValue={0}
+            hoursPerDayValue={0}
           />
         </div>
       );

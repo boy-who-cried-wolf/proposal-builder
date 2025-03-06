@@ -1,4 +1,4 @@
-import { ProposalSection } from "@/services/openaiProposal";
+import { ProposalSection } from "@/types/proposal";
 import { Pencil, Plus, Settings } from "lucide-react";
 import React from "react";
 import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
@@ -9,6 +9,7 @@ interface ProposalTableProps {
   onOpenSectionSettings: (sectionIndex: number) => void;
   onAddItem?: (sectionIndex: number) => void;
   onReorderItems?: (sectionIndex: number, startIndex: number, endIndex: number) => void;
+  onReorderSections?: (startIndex: number, endIndex: number) => void;
 }
 
 export const ProposalTable: React.FC<ProposalTableProps> = ({ 
@@ -17,17 +18,15 @@ export const ProposalTable: React.FC<ProposalTableProps> = ({
   onOpenSectionSettings,
   onAddItem,
   onReorderItems,
+  onReorderSections
 }) => {
-  // Handle drag-and-drop events
   const handleDragEnd = (result: DropResult) => {
     const { source, destination } = result;
 
-    // Do nothing if dropped outside the list or in the same position
     if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) {
       return;
     }
 
-    // Call the onReorderItems callback if provided
     if (onReorderItems) {
       const sectionIndex = parseInt(source.droppableId, 10);
       onReorderItems(sectionIndex, source.index, destination.index);
@@ -92,7 +91,6 @@ export const ProposalTable: React.FC<ProposalTableProps> = ({
                           <div className="section_table_cell">{item.hours}</div>
                           <div className="section_table_cell">{item.price}</div>
                           <div className="section_table_cell">
-                            {/* Drag handle */}
                             <div className="cursor-move">
                               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <line x1="3" y1="12" x2="21" y2="12"></line>

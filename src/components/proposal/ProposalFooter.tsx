@@ -2,25 +2,32 @@
 import React from "react";
 import { MetricItem } from "@/components/ui/MetricItem";
 import { cn } from "@/lib/utils";
+import { ProposalSection } from "@/types/proposal";
 
 interface ProposalFooterProps {
-  totalHours: string;
-  hoursPerDay: string;
-  totalValue: string;
-  monthlyRevenue: string;
-  profitMargin: string;
-  profitMarginValue: number;
-  hoursPerDayValue: number;
+  totalHours?: string;
+  hoursPerDay?: string;
+  totalValue?: string;
+  monthlyRevenue?: string;
+  profitMargin?: string;
+  profitMarginValue?: number;
+  hoursPerDayValue?: number;
+  // Add the missing props
+  proposalHistory?: ProposalSection[][];
+  onRevertProposal?: (index: number) => void;
 }
 
 export const ProposalFooter: React.FC<ProposalFooterProps> = ({
-  totalHours,
-  hoursPerDay,
-  totalValue,
-  monthlyRevenue,
-  profitMargin,
-  profitMarginValue,
-  hoursPerDayValue
+  totalHours = "0",
+  hoursPerDay = "0",
+  totalValue = "$0",
+  monthlyRevenue = "$0",
+  profitMargin = "0%",
+  profitMarginValue = 0,
+  hoursPerDayValue = 0,
+  // New props (not using them yet)
+  proposalHistory,
+  onRevertProposal
 }) => {
   // Get the appropriate color classes based on the values
   const getHoursPerDayColorClass = () => {
