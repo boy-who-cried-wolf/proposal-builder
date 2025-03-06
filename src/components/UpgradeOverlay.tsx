@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export const UpgradeOverlay: React.FC<PropsWithChildren<{ open?: boolean, message?: string }>> = ({ open = false, message = "The AI Assistant feature is available exclusively with our Pro plan.", children }) => {
     return <div className='relative'>
-        {open ? <div className="absolute top-20 inset-0 flex flex-col items-center justify-start z-10 w-full h-full">
+        {open ? <div className="absolute inset-0 flex flex-col items-center justify-center z-10 w-full h-full min-h-56">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/100 to-white pointer-events-none"></div>
             <div className="z-20 bg-white border-2 border-amber-500 py-3 px-6 text-center max-w-md">
                 <h3 className="text-xl font-bold text-amber-800 mb-2">Upgrade Required</h3>
