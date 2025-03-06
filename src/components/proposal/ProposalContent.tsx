@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ProposalSection } from "@/services/openaiProposal";
+import { ProposalSection } from "@/types/proposal";
 import { ProposalTable } from "@/components/proposal/ProposalTable";
 
 interface ProposalContentProps {
