@@ -389,8 +389,8 @@ const subscriptionService = {
     }
 
     if (!priceId) {
-      console.error(`Invalid plan or missing price ID for plan: ${planId}`);
-      return errorResponse(`Invalid plan or missing price ID for: ${planId}`, 400);
+      console.error(`Invalid plan or missing price ID for plan: ${planId}, ${priceId}}`);
+      return errorResponse(`Invalid plan or missing price ID for: ${planId}, ${priceId}`, 400);
     }
 
     // Create checkout session
