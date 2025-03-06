@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
+
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +23,7 @@ const Auth = () => {
   if (user) {
     return <Navigate to="/" replace />;
   }
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -43,8 +46,14 @@ const Auth = () => {
       setLoading(false);
     }
   };
+  
   return <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="w-full max-w-md ">
+        {/* Logo added above the sign-in form */}
+        <div className="flex justify-center mb-6">
+          <img src="/lovable-uploads/044f32c4-fae7-492c-9ad5-18d2ac0a83f5.png" alt="Logo" className="h-16" />
+        </div>
+        
         <h2 className="text-2xl font-bold mb-8 text-center">
           {isForgotPassword ? 'Reset Password' : isLogin ? 'Sign In' : 'Create Account'}
         </h2>
@@ -100,4 +109,5 @@ const Auth = () => {
       </div>
     </div>;
 };
+
 export default Auth;

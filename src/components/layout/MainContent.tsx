@@ -1,136 +1,28 @@
 
 import React from "react";
-import { useProposalContent } from "@/hooks/useProposalContent";
-import { ProposalHeader } from "@/components/proposal/ProposalHeader";
-import { ProposalNavigation } from "@/components/proposal/ProposalNavigation";
-import { TabContent } from "@/components/proposal/TabContent";
-import { ProposalFooter } from "@/components/proposal/ProposalFooter";
-import { ProposalDialogs } from "@/components/proposal/ProposalDialogs";
-import { MainContentProps } from "@/types/mainContent";
+import { cn } from "@/lib/utils";
+import { useLocation } from "react-router-dom";
 
-export const MainContent: React.FC<MainContentProps> = ({
-  generatedProposalSections,
-  projectDescription,
-  projectType,
-  hourlyRate,
-  freelancerRate = 0,
-  projectBudget = 0,
-  dateRange,
-  services = [],
-  proposalHistory,
-  onRevertProposal,
-  children
-}) => {
+interface MainContentProps {
+  children: React.ReactNode;
+  className?: string;
+}
 
-  const {
-    activeTab,
-    activeHeaderTab,
-    isSaving,
-    isCopying,
-    sections,
-    isEditDialogOpen,
-    editingItem,
-    isHoursPriceLocked,
-    revisions,
-    isSectionEditorOpen,
-    editingSectionIndex,
-    handleTabClick,
-    handleHeaderTabChange,
-    getTotalHoursDisplay,
-    getHoursPerDayDisplay,
-    getHoursPerDayValue,
-    getTotalValueDisplay,
-    calculateMonthlyRevenue,
-    calculateProfitMargin,
-    handleSaveProposal,
-    handleCopyToFigma,
-    openEditDialog,
-    openSectionSettings,
-    setIsEditDialogOpen,
-    handleItemChange,
-    setIsHoursPriceLocked,
-    saveItemChanges,
-    deleteItem,
-    updateSection,
-    deleteSection,
-    setIsSectionEditorOpen,
-    addItem,
-    addSection,
-    reorderSections,
-    reorderItems
-  } = useProposalContent(
-    generatedProposalSections || [],
-    projectDescription || "",
-    projectType || "",
-    hourlyRate || 0,
-    freelancerRate,
-    projectBudget,
-    dateRange
-  );
-
-  if (children) {
-    return <main className="grow flex flex-col max-md:h-screen">{children}</main>;
-  }
-
+export const MainContent: React.FC<MainContentProps> = ({ children, className }) => {
+  const location = useLocation();
+  
+  // Check if the current route is account settings related to apply reduced padding
+  const isAccountSettings = location.pathname.includes('account-settings');
+  
   return (
-    <main className="grow flex flex-col max-md:h-screen">
-      <ProposalHeader
-        activeHeaderTab={activeHeaderTab}
-        handleHeaderTabChange={handleHeaderTabChange}
-        handleSaveProposal={handleSaveProposal}
-        handleCopyToFigma={handleCopyToFigma}
-        proposalHistory={proposalHistory}
-        onRevertProposal={onRevertProposal}
-        isSaving={isSaving}
-        isCopying={isCopying}
-        onAddSection={addSection}
-      />
-
-      <ProposalNavigation
-        activeTab={activeTab}
-        handleTabClick={handleTabClick}
-      />
-
-      <div className="grow overflow-y-auto px-[23px] py-[15px]">
-        <TabContent
-          activeTab={activeTab}
-          sections={sections}
-          revisions={revisions}
-          openEditDialog={openEditDialog}
-          openSectionSettings={openSectionSettings}
-          addItem={addItem}
-          reorderSections={reorderSections}
-          reorderItems={reorderItems}
-        />
-      </div>
-
-      <ProposalFooter
-        totalHours={getTotalHoursDisplay()}
-        hoursPerDay={getHoursPerDayDisplay()}
-        hoursPerDayValue={getHoursPerDayValue()}
-        totalValue={getTotalValueDisplay()}
-        monthlyRevenue={calculateMonthlyRevenue()}
-        profitMargin={calculateProfitMargin().display}
-        profitMarginValue={calculateProfitMargin().value}
-      />
-
-      <ProposalDialogs
-        isEditDialogOpen={isEditDialogOpen}
-        setIsEditDialogOpen={setIsEditDialogOpen}
-        editingItem={editingItem}
-        isHoursPriceLocked={isHoursPriceLocked}
-        setIsHoursPriceLocked={setIsHoursPriceLocked}
-        handleItemChange={handleItemChange}
-        saveItemChanges={saveItemChanges}
-        hourlyRate={hourlyRate || 0}
-        deleteItem={deleteItem}
-        isSectionEditorOpen={isSectionEditorOpen}
-        setIsSectionEditorOpen={setIsSectionEditorOpen}
-        editingSectionIndex={editingSectionIndex}
-        sections={sections}
-        updateSection={updateSection}
-        deleteSection={deleteSection}
-      />
+    <main
+      className={cn(
+        "flex-1 overflow-auto",
+        isAccountSettings ? "pl-0" : "pl-4", // Reduced padding for account settings pages
+        className
+      )}
+    >
+      {children}
     </main>
   );
 };
