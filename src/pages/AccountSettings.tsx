@@ -5,11 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getUserProfile, updateUserProfile } from "@/integrations/supabase/profileService";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { NavTab } from "@/components/ui/NavItem";
+
 const AccountSettings = () => {
   const {
     user,
@@ -23,11 +23,13 @@ const AccountSettings = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
   useEffect(() => {
     if (user) {
       loadUserProfile();
     }
   }, [user]);
+
   const loadUserProfile = async () => {
     if (!user?.id) return;
     try {
@@ -44,6 +46,7 @@ const AccountSettings = () => {
       setLoading(false);
     }
   };
+
   const handleSave = async () => {
     if (!user?.id) return;
     try {
@@ -60,6 +63,7 @@ const AccountSettings = () => {
       setSaving(false);
     }
   };
+
   const handleRequestPasswordReset = async () => {
     if (!user?.email) return;
     try {
@@ -70,21 +74,23 @@ const AccountSettings = () => {
       toast.error("Failed to send password reset email");
     }
   };
+
   const handleDeleteAccount = async () => {
     toast.info("Account deletion is not implemented in this demo");
     setShowDeleteDialog(false);
   };
+
   return <div className="flex h-screen">
       <Sidebar />
       <MainContent>
-        <div className="border-b border-border pb-4">
-          <div className="container">
+        <div className="border-b border-border pb-4 w-full">
+          <div className="px-6">
             <h1 className="text-3xl font-bold py-4">Account Settings</h1>
           </div>
         </div>
         
-        <div className="container px-4 py-[25px]">
-          <div className="flex gap-[34px] px-[23px] py-[15px] mb-4">
+        <div className="px-6 py-[25px] w-full">
+          <div className="flex gap-[34px] mb-4">
             <NavTab active={location.pathname === "/account-settings"} onClick={() => navigate("/account-settings")}>
               Account
             </NavTab>
@@ -172,4 +178,5 @@ const AccountSettings = () => {
       </MainContent>
     </div>;
 };
+
 export default AccountSettings;

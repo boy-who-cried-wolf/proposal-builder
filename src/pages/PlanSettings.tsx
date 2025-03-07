@@ -13,6 +13,7 @@ import { CurrentSubscription } from "@/components/subscription/CurrentSubscripti
 import { ErrorMessage } from "@/components/subscription/ErrorMessage";
 import { PlansGrid } from "@/components/subscription/PlansGrid";
 import { isTestEnvironment } from "@/utils/environment";
+
 const PlanSettings = () => {
   const {
     user
@@ -41,6 +42,7 @@ const PlanSettings = () => {
   const searchParams = new URLSearchParams(location.search);
   const success = searchParams.get('success');
   const canceled = searchParams.get('canceled');
+
   useEffect(() => {
     if (success) {
       toast.success("Subscription updated successfully!");
@@ -54,14 +56,16 @@ const PlanSettings = () => {
       });
     }
   }, [success, canceled, navigate]);
+
   useEffect(() => {
     fetchSubscription();
   }, [user]);
+
   return <div className="flex h-screen">
       <Sidebar />
       <MainContent>
-        <div className="border-b border-border pb-4">
-          <div className="container">
+        <div className="border-b border-border pb-4 w-full">
+          <div className="px-6">
             <h1 className="text-3xl font-bold py-4">Account Settings</h1>
             
             {isTestMode && <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4 flex items-start gap-2">
@@ -74,8 +78,8 @@ const PlanSettings = () => {
           </div>
         </div>
         
-        <div className="container px-4 py-[25px]">
-          <div className="flex gap-[34px] px-[23px] py-[15px] mb-4">
+        <div className="px-6 py-[25px] w-full">
+          <div className="flex gap-[34px] mb-4">
             <NavTab active={location.pathname === "/account-settings"} onClick={() => navigate("/account-settings")}>
               Account
             </NavTab>
@@ -116,4 +120,5 @@ const PlanSettings = () => {
       </MainContent>
     </div>;
 };
+
 export default PlanSettings;
