@@ -1,69 +1,97 @@
-# Welcome to your Lovable project
+# Proposal Builder
 
-## Project info
+A modern, AI-powered proposal generation and management platform built with React, TypeScript, and Supabase.
 
-**URL**: https://lovable.dev/projects/0122479c-88ee-4d71-a17d-da71b8b2b3ba
+![Proposal Builder](public/logo.png)
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- 🤖 AI-powered proposal generation
+- 📝 Rich text editing and formatting
+- 🔄 Real-time collaboration
+- 📊 Proposal analytics and tracking
+- 🔒 Secure authentication and data storage
+- 🎨 Modern, responsive UI with dark mode support
+- 📱 Mobile-friendly design
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/0122479c-88ee-4d71-a17d-da71b8b2b3ba) and start prompting.
+- **Frontend**: React 18, TypeScript, Vite
+- **UI Components**: shadcn/ui, Tailwind CSS
+- **State Management**: React Query, React Hook Form
+- **Database & Auth**: Supabase
+- **Styling**: Tailwind CSS, Framer Motion
+- **Form Validation**: Zod
+- **Deployment**: Vercel/Netlify
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+### Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Node.js 18+ and npm
+- Supabase account (for backend services)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
 
-Follow these steps:
+1. Clone the repository:
+```bash
+git clone https://github.com/boy-who-cried-wolf/proposal-builder.git
+cd proposal-builder
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. Install dependencies:
+```bash
+npm install
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+3. Set up environment variables:
+Create a `.env` file in the root directory with the following variables:
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+4. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Project Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+proposal-builder/
+├── src/
+│   ├── components/     # Reusable UI components
+│   ├── hooks/         # Custom React hooks
+│   ├── lib/           # Utility functions and configurations
+│   ├── pages/         # Page components
+│   ├── types/         # TypeScript type definitions
+│   └── utils/         # Helper functions
+├── public/            # Static assets
+└── supabase/          # Database migrations and functions
+```
 
-**Use GitHub Codespaces**
+## Contributing
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+We welcome contributions! Please follow these steps:
 
-## What technologies are used for this project?
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-This project is built with .
+## License
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## How can I deploy this project?
+## Support
 
-Simply open [Lovable](https://lovable.dev/projects/0122479c-88ee-4d71-a17d-da71b8b2b3ba) and click on Share -> Publish.
+For support, email ckang215@gmail.com or open an issue in the repository.
 
-## I want to use a custom domain - is that possible?
+## Acknowledgments
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- [shadcn/ui](https://ui.shadcn.com/) for the beautiful component library
+- [Supabase](https://supabase.com/) for the amazing backend services
+- [Vite](https://vitejs.dev/) for the fast build tool
+- [Tailwind CSS](https://tailwindcss.com/) for the utility-first CSS framework
